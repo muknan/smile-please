@@ -5,7 +5,7 @@
 -- Runs after all migrations. People are created via auth.users so the
 -- on_auth_user_created trigger builds profiles the same way real signups do.
 
--- ── People: 4 dentists, 3 patients ─────────────────────────────────────────
+-- ── People: 1 admin, 4 dentists, 3 patients ────────────────────────────────
 insert into auth.users
   (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
    raw_app_meta_data, raw_user_meta_data, created_at, updated_at)
@@ -30,7 +30,10 @@ values
    now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Ravi Kumar"}', now(), now()),
   ('00000000-0000-0000-0000-000000000000', '10000000-0000-0000-0000-000000000103',
    'authenticated', 'authenticated', 'pat.trilokpuri@example.com', 'x',
-   now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Meena Devi"}', now(), now());
+   now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Meena Devi"}', now(), now()),
+  ('00000000-0000-0000-0000-000000000000', '10000000-0000-0000-0000-000000000900',
+   'authenticated', 'authenticated', 'admin@smile-please.example', 'x',
+   now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Aisha Verma"}', now(), now());
 
 -- The trigger made every new user a patient. Dentists get their role moved,
 -- their stray patients rows removed, and their dentist record inserted.
@@ -56,6 +59,16 @@ where profile_id in (
   '10000000-0000-0000-0000-000000000003',
   '10000000-0000-0000-0000-000000000004'
 );
+
+-- The admin is created via SQL only — there is no admin signup route anywhere
+-- (Master §2). The trigger made this user a patient first; move the role and
+-- drop the stray patients row.
+update public.profiles
+set role = 'admin'
+where id = '10000000-0000-0000-0000-000000000900';
+
+delete from public.patients
+where profile_id = '10000000-0000-0000-0000-000000000900';
 
 update public.profiles
 set phone = case id

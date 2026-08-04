@@ -687,6 +687,10 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: boolean;
       };
+      record_signin_attempt: {
+        Args: { p_ip: string };
+        Returns: boolean;
+      };
       touch_updated_at: {
         Args: Record<PropertyKey, never>;
         Returns: undefined;
