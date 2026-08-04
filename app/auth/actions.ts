@@ -38,7 +38,7 @@ export async function requestSignInLink(
     };
   }
 
-  const parsed = signInSchema.safeParse(String(formData.get("email") ?? ""));
+  const parsed = signInSchema.safeParse({ email: String(formData.get("email") ?? "") });
   if (!parsed.success) {
     return {
       status: "error",
