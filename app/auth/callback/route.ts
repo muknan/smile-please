@@ -17,7 +17,13 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    // The app sends OTPs server-side (no PKCE challenge), so the emailed and
+    // admin-generated links carry a plain token, not an auth code. Verify it
+    // by token_hash — exchangeCodeForSession only accepts PKCE auth codes.
+    const { error } = await supabase.auth.verifyOtp({
+      token_hash: code,
+      type: "magiclink",
+    });
     if (!error) {
       const {
         data: { user },

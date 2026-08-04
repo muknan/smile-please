@@ -35,6 +35,31 @@ values
    'authenticated', 'authenticated', 'admin@smile-please.example', 'x',
    now(), '{"provider":"email","providers":["email"]}', '{"full_name":"Aisha Verma"}', now(), now());
 
+-- GoTrue (v2.195+) scans auth.users string-token columns as plain Go strings:
+-- NULLs make every lookup 500 with "Database error finding user". Relying on
+-- column defaults leaves the four below NULL, so force them to ''.
+update auth.users
+set confirmation_token = coalesce(confirmation_token, ''),
+    recovery_token     = coalesce(recovery_token, ''),
+    email_change       = coalesce(email_change, ''),
+    email_change_token_new = coalesce(email_change_token_new, '')
+where email like '%@example.com';
+
+-- auth.identities are required by GoTrue's magic-link and session flows; a
+-- real signup creates both rows. The insert above only creates auth.users.
+insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+select
+  gen_random_uuid(),
+  u.id,
+  u.email,
+  jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true, 'phone_verified', false),
+  'email',
+  now(),
+  now(),
+  now()
+from auth.users u
+where u.email like '%@example.com';
+
 -- The trigger made every new user a patient. Dentists get their role moved,
 -- their stray patients rows removed, and their dentist record inserted.
 update public.profiles
