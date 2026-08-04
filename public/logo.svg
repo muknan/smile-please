@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="56" viewBox="0 0 220 56" role="img" aria-labelledby="title">
+  <title id="title">Smile Please</title>
+  <path d="M4,52 L4,22 C4,12 12,4.8 28,0 C44,4.8 52,12 52,22 L52,52 Z" fill="none" stroke="#12302A" stroke-width="3" stroke-linejoin="round"/>
+  <text x="64" y="38" font-family="Fraunces, Georgia, serif" font-size="30" font-weight="600" fill="#12302A">Smile Please</text>
+</svg>

@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smile Please
 
-## Getting Started
+Smile Please is an NGO in New Delhi, India providing free dental care to underserved
+communities and running dental health awareness campaigns. This repository is its website:
+a public presence, a self-booking care flow for patients, a portal for dentists, and an
+admin dashboard — built on Next.js, Tailwind CSS, and Supabase (Postgres).
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 3.4, Supabase (auth, Postgres
+with Row Level Security), Zod, date-fns, lucide-react. All services are on permanent free
+tiers.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Install dependencies:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   npm install
+   ```
 
-## Learn More
+2. Copy `.env.example` to `.env.local` and fill in your Supabase project URL and keys plus
+   the SMTP settings for booking notifications.
 
-To learn more about Next.js, take a look at the following resources:
+3. Run the dev server:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   npm run dev
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Open http://localhost:3000.
 
-## Deploy on Vercel
+## Environment variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon (public) key — safe for the browser |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service-role key — server-only, never in the browser |
+| `NEXT_PUBLIC_SITE_URL` | Canonical site URL, used in links in emails |
+| `SMTP_HOST` / `SMTP_PORT` | SMTP relay host and port |
+| `SMTP_USER` / `SMTP_PASS` | SMTP login and key |
+| `MAIL_FROM` | From address for outgoing mail |
+| `ADMIN_NOTIFY_EMAIL` | Inbox for admin notifications (new submissions, etc.) |
+| `CRON_SECRET` | Shared secret that guards scheduled jobs |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Scripts
+
+- `npm run dev` — development server
+- `npm run build` — production build (must pass before every commit)
+- `npm run start` — serve the production build
+- `npm run lint` — ESLint
+
+## Repository layout
+
+- `app/` — routes, grouped into public, patient, dentist, admin, and auth areas
+- `components/` — UI primitives, site shell, booking flow, admin widgets
+- `lib/` — Supabase clients, auth helpers, validation schemas, booking state machine, formatting
+- `supabase/migrations/` — numbered SQL migrations (schema + RLS policies)
+- `types/db.ts` — generated database types
