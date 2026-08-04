@@ -69,10 +69,29 @@ where id in (
   '10000000-0000-0000-0000-000000000103'
 );
 
-insert into public.patients (profile_id, age_band, locality, pincode) values
-  ('10000000-0000-0000-0000-000000000101', '18_39', 'Seelampur', '110053'),
-  ('10000000-0000-0000-0000-000000000102', '40_59', 'Shahdara', '110032'),
-  ('10000000-0000-0000-0000-000000000103', '60_plus', 'Trilokpuri', '110091');
+-- The signup trigger already created each patient's `patients` row (bare,
+-- with no details) — fill them in rather than inserting again.
+update public.patients
+set age_band = (case profile_id
+      when '10000000-0000-0000-0000-000000000101' then '18_39'
+      when '10000000-0000-0000-0000-000000000102' then '40_59'
+      when '10000000-0000-0000-0000-000000000103' then '60_plus'
+    end)::age_band,
+    locality = case profile_id
+      when '10000000-0000-0000-0000-000000000101' then 'Seelampur'
+      when '10000000-0000-0000-0000-000000000102' then 'Shahdara'
+      when '10000000-0000-0000-0000-000000000103' then 'Trilokpuri'
+    end,
+    pincode = case profile_id
+      when '10000000-0000-0000-0000-000000000101' then '110053'
+      when '10000000-0000-0000-0000-000000000102' then '110032'
+      when '10000000-0000-0000-0000-000000000103' then '110091'
+    end
+where profile_id in (
+  '10000000-0000-0000-0000-000000000101',
+  '10000000-0000-0000-0000-000000000102',
+  '10000000-0000-0000-0000-000000000103'
+);
 
 -- ── Dentists ───────────────────────────────────────────────────────────────
 insert into public.dentists
@@ -178,7 +197,7 @@ insert into public.appointments
 select
   '10000000-0000-0000-0000-000000000102', '10000000-0000-0000-0000-000000000002',
   t.id, 'self_booked', 'assigned', 'checkup',
-  'Haven't had a check-up in years, just want everything looked at.',
+  'Haven''t had a check-up in years, just want everything looked at.',
   t.starts_at, now() - interval '2 days'
 from target_slot t;
 
@@ -290,9 +309,9 @@ Bleeding that lasts longer than two weeks of correct brushing and flossing, gums
 A little blood during brushing is not an emergency. A mouthful of blood, bleeding that will not stop, or bleeding with swelling that grows over a day or two: get help the same day. Smile Please clinics see gum problems at every appointment, and a check-up is the right first step.',
    'Gum health', 'published', now() - interval '7 days', now() - interval '8 days'),
 
-  ('children-first-dental-visit', "Your child's first dental visit: what to expect",
+  ('children-first-dental-visit', 'Your child''s first dental visit: what to expect',
    'The first visit does not have to be scary. Do it early, keep it boring, and let the dentist do the talking.',
-   '## Your child first dental visit: what to expect
+   '## Your child''s first dental visit: what to expect
 
 Most parents bring a child to the dentist for the first time only when something hurts. That is the hardest possible time to start. Bring them early, when nothing is wrong, and the dentist becomes a normal part of life — like a haircut, not like a hospital.
 
@@ -302,7 +321,7 @@ The rule of thumb is: the first visit by the first birthday, or within six month
 
 ### What happens
 
-A first visit is short and boring on purpose. The dentist counts the teeth, looks gently at the gums and the bite, and answers your questions. There is no drilling, no filling, nothing sharp near the mouth. Most children sit on a parent lap. If the child is upset, the dentist stops and tries again in a few minutes — or on another day. That is normal and encouraged.
+A first visit is short and boring on purpose. The dentist counts the teeth, looks gently at the gums and the bite, and answers your questions. There is no drilling, no filling, nothing sharp near the mouth. Most children sit on a parent''s lap. If the child is upset, the dentist stops and tries again in a few minutes — or on another day. That is normal and encouraged.
 
 ### How to prepare at home
 

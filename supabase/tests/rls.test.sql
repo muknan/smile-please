@@ -65,8 +65,8 @@ values (
 insert into public.availability_slots (dentist_id, starts_at, ends_at, created_by)
 values (
   '20000000-0000-0000-0000-0000000000b1',
-  ((now() at time zone 'Asia/Kolkata')::date + 1)::timestamp + time '10:00' at time zone 'Asia/Kolkata',
-  ((now() at time zone 'Asia/Kolkata')::date + 1)::timestamp + time '10:30' at time zone 'Asia/Kolkata',
+  (((now() at time zone 'Asia/Kolkata')::date + 1) + time '10:00') at time zone 'Asia/Kolkata',
+  (((now() at time zone 'Asia/Kolkata')::date + 1) + time '10:30') at time zone 'Asia/Kolkata',
   '20000000-0000-0000-0000-0000000000b1'
 );
 
@@ -255,8 +255,8 @@ begin
              (dentist_id, starts_at, ends_at, created_by)
              values (
                ''20000000-0000-0000-0000-0000000000b1'',
-               ((now() at time zone ''Asia/Kolkata'')::date + 1)::timestamp + time ''10:15'' at time zone ''Asia/Kolkata'',
-               ((now() at time zone ''Asia/Kolkata'')::date + 1)::timestamp + time ''10:45'' at time zone ''Asia/Kolkata'',
+               (((now() at time zone ''Asia/Kolkata'')::date + 1) + time ''10:15'') at time zone ''Asia/Kolkata'',
+               (((now() at time zone ''Asia/Kolkata'')::date + 1) + time ''10:45'') at time zone ''Asia/Kolkata'',
                ''20000000-0000-0000-0000-0000000000b1''
              )';
   exception when others then

@@ -43,24 +43,30 @@ $$;
 -- Authorisation helpers. SECURITY DEFINER on purpose: it prevents infinite
 -- recursion when RLS policies on `profiles` need to read `profiles`.
 -- Do not remove `security definer` or `set search_path`.
+-- plpgsql (not sql) on purpose: plpgsql bodies are validated lazily, so these
+-- can be created in migration 001 before public.profiles exists in 002.
 create or replace function public.is_admin()
 returns boolean
-language sql stable security definer set search_path = public
+language plpgsql stable security definer set search_path = public
 as $$
-  select exists (
+begin
+  return exists (
     select 1 from public.profiles
     where id = auth.uid() and role = 'admin'
   );
+end;
 $$;
 
 create or replace function public.is_dentist()
 returns boolean
-language sql stable security definer set search_path = public
+language plpgsql stable security definer set search_path = public
 as $$
-  select exists (
+begin
+  return exists (
     select 1 from public.profiles
     where id = auth.uid() and role = 'dentist'
   );
+end;
 $$;
 
 revoke execute on function public.is_admin()   from public;
