@@ -30,6 +30,54 @@ tiers.
 
 4. Open http://localhost:3000.
 
+## Database setup (Supabase)
+
+1. Create a free Supabase project at supabase.com. Region: **Southeast Asia
+   (Singapore)** — closest to Delhi. No paid services are used anywhere.
+2. From Project Settings → API, copy the Project URL, the `anon` public key and
+   the `service_role` secret key into `.env.local` (see the variables below).
+   Never commit `.env.local`.
+3. Install and link the Supabase CLI:
+
+   ```bash
+   npm i -g supabase
+   supabase login
+   supabase link --project-ref <your-project-ref>
+   ```
+
+4. Apply the migrations and load the seed data:
+
+   ```bash
+   supabase db push        # applies supabase/migrations/*.sql in order
+   psql "$DATABASE_URL" -f supabase/seed.sql   # or paste seed.sql in the SQL editor
+   ```
+
+   `supabase db reset` (local Docker) also applies migrations and seed in one
+   go if you run the stack locally.
+
+5. Verify the security invariants with the adversarial RLS test:
+
+   ```bash
+   psql "$DATABASE_URL" -f supabase/tests/rls.test.sql
+   ```
+
+   It runs in a single transaction and rolls back, so the database is left
+   untouched. A failing assertion aborts with a message — fix the policy,
+   never the test.
+
+### Creating the admin account
+
+There is no admin signup route — admin accounts are created manually via SQL:
+
+```sql
+-- 1. The human signs up normally at /auth/sign-in with the admin email.
+-- 2. Then run, replacing the email:
+update public.profiles set role = 'admin' where email = 'admin@example.com';
+delete from public.patients where profile_id = (
+  select id from public.profiles where email = 'admin@example.com'
+);
+```
+
 ## Environment variables
 
 | Variable | Purpose |
