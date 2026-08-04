@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { SectionMarker } from "@/components/site/SectionMarker";
 
-export const metadata: Metadata = { title: "Care" };
+export const metadata: Metadata = {
+  title: "Care",
+  description:
+    "Free dental care in Delhi: tell us what's wrong and we'll match you with a dentist nearby, or pick a dentist and time yourself.",
+  alternates: { canonical: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/care` },
+};
 
 export default function CarePage() {
   return (

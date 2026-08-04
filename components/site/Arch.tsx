@@ -42,10 +42,13 @@ export function ArchGlyph({ size = 24, className }: { size?: number; className?:
  */
 export function ArchFrame({
   keyline = false,
+  keylineClass,
   className,
   children,
 }: {
   keyline?: boolean;
+  /** Extra classes for the keyline path — the hero uses these for its draw animation. */
+  keylineClass?: string;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -61,6 +64,7 @@ export function ArchFrame({
           preserveAspectRatio="none"
         >
           <path
+            className={keylineClass}
             d="M0,1 L0,0.458 C0,0.25 0.2,0.1 0.5,0 C0.8,0.1 1,0.25 1,0.458"
             fill="none"
             stroke="#E9A227"

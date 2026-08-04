@@ -33,3 +33,32 @@
   .text-display-xl { font-size: 2.5rem; }
   .text-display-l  { font-size: 2rem; }
 }
+
+/* Landing hero load sequence — runs once per session (guard in ArchHero).
+   Initial states are invisible-only (opacity/transform), so the hero's
+   height is always reserved: no CLS while fonts load or during the play. */
+.hero-keyline { stroke-dasharray: 3; stroke-dashoffset: 3; }
+.hero-keyline-draw {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 700ms ease-out;
+}
+.hero-fade { opacity: 0; transform: translateY(12px); }
+.hero-fade-in {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms ease-out, transform 500ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-keyline,
+  .hero-keyline-draw {
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
+  }
+  .hero-fade,
+  .hero-fade-in {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
