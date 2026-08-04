@@ -691,6 +691,60 @@ export type Database = {
         Args: { p_ip: string };
         Returns: boolean;
       };
+      hold_slot: {
+        Args: { p_slot_id: string };
+        Returns: Tables<"availability_slots">;
+      };
+      create_booking_request: {
+        Args: {
+          p_email: string;
+          p_full_name: string;
+          p_phone: string;
+          p_age_band: Enums<"age_band">;
+          p_reason_category: Enums<"reason_category">;
+          p_patient_note?: string | null;
+          p_preferred_locality?: string | null;
+          p_preferred_window?: Json | null;
+          p_consent_updates?: boolean | null;
+        };
+        Returns: Tables<"appointments">;
+      };
+      confirm_booking: {
+        Args: {
+          p_slot_id: string;
+          p_email: string;
+          p_full_name: string;
+          p_phone: string;
+          p_age_band: Enums<"age_band">;
+          p_locality: string;
+          p_pincode?: string | null;
+          p_reason_category: Enums<"reason_category">;
+          p_patient_note?: string | null;
+          p_consent_updates?: boolean | null;
+          p_reschedule_appointment_id?: string | null;
+        };
+        Returns: Tables<"appointments">;
+      };
+      transition_appointment: {
+        Args: {
+          p_appointment_id: string;
+          p_to: Enums<"appointment_status">;
+          p_reason?: string | null;
+        };
+        Returns: Tables<"appointments">;
+      };
+      lookup_appointment: {
+        Args: { p_ref: string; p_phone: string };
+        Returns: Json;
+      };
+      get_slot_details: {
+        Args: { p_slot_id: string };
+        Returns: Json;
+      };
+      check_rate_limit: {
+        Args: { p_key: string; p_limit: number; p_window_seconds: number };
+        Returns: boolean;
+      };
       touch_updated_at: {
         Args: Record<PropertyKey, never>;
         Returns: undefined;

@@ -20,6 +20,13 @@ const dayShortFormatter = new Intl.DateTimeFormat("en-IN", {
   month: "short",
 });
 
+const fullDayFormatter = new Intl.DateTimeFormat("en-IN", {
+  timeZone: TZ,
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+});
+
 const dayKeyFormatter = new Intl.DateTimeFormat("en-US", {
   timeZone: TZ,
   year: "numeric",
@@ -51,7 +58,22 @@ export function formatDayShort(d: string | Date): string {
   return dayShortFormatter.format(toDate(d)).replace(",", "");
 }
 
-/** Day of the month in Asia/Kolkata as a UTC day-number, for calendar-day diffs. */
+/** "Wed 12 Aug" (no comma crowd) — grid column headers. */
+export function formatDayShortLabel(d: string | Date): string {
+  return dayShortFormatter.format(toDate(d)).replace(",", " ");
+}
+
+/** "Wednesday, 12 August" — accessible names for slot cells. */
+export function fullDayLabel(d: string | Date): string {
+  return fullDayFormatter.format(toDate(d));
+}
+
+/** Calendar-day key in Asia/Kolkata, e.g. "2026-08-12". */
+export function dayKey(d: string | Date): string {
+  return dayKeyFormatter.format(toDate(d));
+}
+
+/** Calendar day in Asia/Kolkata as a UTC day-number, for calendar-day diffs. */
 function dayNumber(d: Date): number {
   const parts = dayKeyFormatter.formatToParts(d);
   const year = Number(parts.find((p) => p.type === "year")?.value);
