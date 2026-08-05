@@ -51,3 +51,10 @@ Judgement calls, non-standard choices, and things that need a human decision. Fo
 - [phase 4] `lib/supabase/server.ts` now falls back to a stateless anon client when `cookies()` throws (generateStaticParams runs outside a request scope at build time and needs a client without cookies).
 - [phase 4] SectionMarker label colour changed neem-600 → ink-950: 13px labels in neem-600 would violate Master §6 ("neem-600 never below 14px").
 - [phase 5] minors are blocked at the form; verifiable parental consent flow is required before real patient data — see plan §7.4.
+- [phase 6] Added nodemailer@6.9.16 + @types/nodemailer@6.4.17 — the only new dependency this phase (spec §6.3).
+- [phase 6] SMTP is still placeholder (Brevo not provisioned). Verified the required behaviour with it UNCONFIGURED: every send is a silent no-op and never blocks a booking; a real transport failure writes audit_log (action email_failed, recipient stored as SHA-256, never the address). When the human provisions Brevo and fills SMTP_USER/SMTP_PASS, test real delivery and check the spam folder (acceptance item).
+- [phase 6] No SMS in v1 — TRAI DLT registration is a paid gate (~₹5,900 per operator) before a single message sends. v2 upgrade path only.
+- [phase 6] If real spam appears, the free upgrade path is Cloudflare Turnstile (spec §6.2) — not built now.
+- [phase 6] contact_submissions gained clinic_area + availability (migration 010) for the dentist tab — the Phase 2 DDL had no structured home for those two fields.
+- [phase 6] WhatsApp button reads NEXT_PUBLIC_WHATSAPP_NUMBER; hidden entirely when unset (acceptance item). .env.example documents it; .env.local carries a placeholder for testing.
+- [phase 6] The 24h reminder cron + digest scheduling are Phase 8; the reminder template and the admin-digest endpoint already exist and are CRON_SECRET-guarded.

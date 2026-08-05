@@ -3,9 +3,11 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/db";
 
 /**
- * SERVICE ROLE client. Bypasses RLS. Used in exactly two places:
- * 1. the admin dentist-approval action
+ * SERVICE ROLE client. Bypasses RLS. Used in exactly four places:
+ * 1. the admin dentist-approval action (Phase 7)
  * 2. the scheduled hold-expiry job
+ * 3. the admin daily digest cron (runs with no user session)
+ * 4. email-failure audit logging (same reason)
  * If you think you need it elsewhere, you have an RLS bug — fix the policy.
  */
 export const admin = createClient<Database>(

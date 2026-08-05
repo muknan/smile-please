@@ -76,6 +76,47 @@ export const bookSlotSchema = z.object({
   consentUpdates: z.boolean().default(false),
 });
 
+/** Phase 6 — contact submissions, one schema per tab (§6.1). */
+const contactMessage = z
+  .string()
+  .trim()
+  .min(10, "Tell us a bit more — a sentence is enough.")
+  .max(1000, "Keep it under 1000 characters.");
+
+export const contactPatientSchema = z.object({
+  tab: z.literal("patient"),
+  name: z.string().trim().min(2, "Enter your name.").max(120),
+  phone: phoneSchema,
+  email: optionalEmailSchema,
+  message: contactMessage,
+  consentContact: z.literal(true, { message: "You need to agree before we can store your message." }),
+});
+
+export const contactDentistSchema = z.object({
+  tab: z.literal("dentist"),
+  name: z.string().trim().min(2, "Enter your name.").max(120),
+  phone: phoneSchema,
+  email: z.string().trim().email("Enter a valid email — we reply there.").max(200),
+  dciRegNo: z.string().trim().max(40, "That DCI number looks too long.").default(""),
+  clinicArea: z.string().trim().min(2, "Tell us the area of Delhi you can practise in.").max(120),
+  availability: z.string().trim().max(200, "Keep it short — a few hours a month is plenty.").default(""),
+  message: contactMessage,
+  consentContact: z.literal(true, { message: "You need to agree before we can store your message." }),
+});
+
+export const contactOrganizationSchema = z.object({
+  tab: z.literal("organization"),
+  organizationName: z.string().trim().min(2, "Enter the organisation's name.").max(160),
+  contactPerson: z.string().trim().min(2, "Enter a contact person's name.").max(120),
+  email: z.string().trim().email("Enter a valid email — we reply there.").max(200),
+  phone: phoneSchema.optional().or(z.literal("")),
+  partnershipType: z.enum(["funding", "venue", "camp_host", "supplies", "other"], {
+    message: "Choose a partnership type.",
+  }),
+  message: contactMessage,
+  consentContact: z.literal(true, { message: "You need to agree before we can store your message." }),
+});
+
 /** Reference + phone lookup (§5.9). */
 export const lookupSchema = z.object({
   ref: z.string().trim().min(6, "Enter the reference code.").max(30),

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { notifyAppointmentTransition } from "@/lib/notifications";
 import type { Database } from "@/types/db";
 
 type AppointmentStatus = Database["public"]["Enums"]["appointment_status"];
@@ -29,7 +30,12 @@ export async function transitionAsDentist(
   reason?: string,
 ): Promise<DentistState> {
   const supabase = await createClient();
-  const { error } = await supabase.rpc("transition_appointment", {
+  const { data: before } = await supabase
+    .from("appointments")
+    .select("*")
+    .eq("id", appointmentId)
+    .maybeSingle();
+  const { data: updated, error } = await supabase.rpc("transition_appointment", {
     p_appointment_id: appointmentId,
     p_to: to,
     p_reason: reason || null,
@@ -40,6 +46,10 @@ export async function transitionAsDentist(
       return { ok: false, error: "That move isn't possible from the appointment's current state." };
     }
     return { ok: false, error: "We couldn't update it just now. Try again." };
+  }
+  // Best-effort patient email after the DB write; never blocks the action.
+  if (updated && typeof updated === "object") {
+    void notifyAppointmentTransition(supabase, updated, before?.status ?? to, to);
   }
   revalidatePath("/dentist/appointments");
   return { ok: true };

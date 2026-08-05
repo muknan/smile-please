@@ -417,6 +417,8 @@ export type Database = {
           organization_name: string | null;
           dci_registration_no: string | null;
           partnership_type: Database["public"]["Enums"]["partnership_type"] | null;
+          clinic_area: string | null;
+          availability: string | null;
           message: string;
           status: Database["public"]["Enums"]["submission_status"];
           assigned_to: string | null;
@@ -436,6 +438,8 @@ export type Database = {
           organization_name?: string | null;
           dci_registration_no?: string | null;
           partnership_type?: Database["public"]["Enums"]["partnership_type"] | null;
+          clinic_area?: string | null;
+          availability?: string | null;
           message: string;
           status?: Database["public"]["Enums"]["submission_status"];
           assigned_to?: string | null;
@@ -455,6 +459,8 @@ export type Database = {
           organization_name?: string | null;
           dci_registration_no?: string | null;
           partnership_type?: Database["public"]["Enums"]["partnership_type"] | null;
+          clinic_area?: string | null;
+          availability?: string | null;
           message?: string;
           status?: Database["public"]["Enums"]["submission_status"];
           assigned_to?: string | null;
@@ -708,6 +714,23 @@ export type Database = {
           p_consent_updates?: boolean | null;
         };
         Returns: Tables<"appointments">;
+      };
+      submit_contact: {
+        Args: {
+          p_type: Enums<"submission_type">;
+          p_name: string;
+          p_phone: string | null;
+          p_email: string | null;
+          p_organization_name: string | null;
+          p_dci_registration_no: string | null;
+          p_clinic_area: string | null;
+          p_availability: string | null;
+          p_partnership_type: Enums<"partnership_type"> | null;
+          p_message: string;
+          p_source_page?: string | null;
+          p_ip_hash?: string | null;
+        };
+        Returns: Tables<"contact_submissions">;
       };
       confirm_booking: {
         Args: {

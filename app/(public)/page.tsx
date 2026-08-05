@@ -188,12 +188,20 @@ export default async function HomePage() {
               Volunteer a few hours a month, host a camp, or fund a clinic day. We&apos;ll be in
               touch within two working days.
             </p>
-            <Link
-              href="/contact?tab=organization"
-              className="mt-12 inline-flex items-center justify-center rounded bg-marigold-500 px-6 py-3 font-utility text-body-s font-medium text-ink-950 transition hover:brightness-95"
-            >
-              Talk to us
-            </Link>
+            <div className="mt-12 flex flex-wrap gap-4">
+              <Link
+                href="/contact?tab=dentist"
+                className="inline-flex items-center justify-center rounded bg-marigold-500 px-6 py-3 font-utility text-body-s font-medium text-ink-950 transition hover:brightness-95"
+              >
+                I&apos;m a dentist
+              </Link>
+              <Link
+                href="/contact?tab=organization"
+                className="inline-flex items-center justify-center rounded border border-chalk-0/40 px-6 py-3 font-utility text-body-s font-medium text-chalk-0 transition hover:border-marigold-500 hover:text-marigold-500"
+              >
+                We&apos;re an organisation
+              </Link>
+            </div>
           </div>
         </div>
       </section>

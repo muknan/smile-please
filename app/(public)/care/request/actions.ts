@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { requestBookingSchema } from "@/lib/schemas";
 import { checkHuman, withinRateLimit, clientIp } from "@/lib/antispam";
+import { notify } from "@/lib/email";
 
 export type RequestState =
   | { status: "idle" }
@@ -101,6 +102,12 @@ export async function submitCareRequest(
     } catch {
       // non-blocking by design
     }
+    // Best-effort acknowledgement (Phase 6 §6.3); the request is already saved.
+    notify("care_request_received", data.email, {
+      name: data.fullName,
+      locality: data.locality,
+      ref: booking.reference_code,
+    });
   }
 
   return { status: "success", ref: booking.reference_code };

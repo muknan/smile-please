@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { bookSlotSchema } from "@/lib/schemas";
 import { checkHuman, withinRateLimit, clientIp } from "@/lib/antispam";
+import { notify } from "@/lib/email";
+import { formatDate, formatTime } from "@/lib/format";
 
 export type BookState =
   | { status: "idle" }
@@ -106,6 +108,39 @@ export async function confirmSlotBooking(
       });
     } catch {
       // non-blocking by design
+    }
+    // Best-effort confirmation email after the DB write (Phase 6 §6.3);
+    // a failed mailer never affects the saved booking.
+    if (typeof booking === "object" && booking && "scheduled_for" in booking && booking.scheduled_for) {
+      const when = {
+        date: formatDate(booking.scheduled_for as string),
+        time: formatTime(booking.scheduled_for as string),
+      };
+      if (details.rescheduleAppointmentId) {
+        const { data: oldAppt } = await supabase
+          .from("appointments")
+          .select("scheduled_for, reference_code")
+          .eq("id", details.rescheduleAppointmentId)
+          .maybeSingle();
+        if (oldAppt?.scheduled_for) {
+          notify("appointment_rescheduled", data.email, {
+            fromDate: formatDate(oldAppt.scheduled_for),
+            fromTime: formatTime(oldAppt.scheduled_for),
+            toDate: when.date,
+            toTime: when.time,
+            dentist: details.dentistName,
+            locality: details.dentistLocality || null,
+            ref: String(booking.reference_code ?? ""),
+          });
+        }
+      } else {
+        notify("appointment_confirmed", data.email, {
+          ...when,
+          dentist: details.dentistName,
+          locality: details.dentistLocality || null,
+          ref: String(booking.reference_code ?? ""),
+        });
+      }
     }
   }
 
