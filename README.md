@@ -7,7 +7,7 @@ admin dashboard — built on Next.js, Tailwind CSS, and Supabase (Postgres).
 
 ## Stack
 
-Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS 3.4, Supabase (auth, Postgres
+Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 3.4, Supabase (auth, Postgres
 with Row Level Security), Zod, date-fns, lucide-react. All services are on permanent free
 tiers.
 

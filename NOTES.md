@@ -113,4 +113,4 @@ resolve before going live. None block local development; some block launch.
 - **Backups.** The free Supabase tier has no backups. The weekly GH Actions dump
   (`.github/workflows/backup.yml`) needs `SUPABASE_DB_URL` + `BACKUP_PASSPHRASE` repo
   secrets and a one-time restore drill into a scratch project.
-
+- [phase 8.1 follow-up] Vercel refused to deploy Next 15.1.6 ("Vulnerable version of Next.js detected"), forcing the Next upgrade that was previously deferred as approved-risk. Upgraded next -> 16.3.0 (React 19 kept; Node >=20.9, have 24). The Windows OG-font patch became a clean no-op (Next 16 fixed the path bug) and /og still renders a valid PNG. npm audit for next/postcss/sharp is now clear. Full local rebuild + route smoke test green; deployed to Vercel.
