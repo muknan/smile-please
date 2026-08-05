@@ -21,7 +21,7 @@ export function ConsentBlock({ disabled }: { disabled?: boolean }) {
           name="consentBooking"
           required
           aria-describedby="consent-booking-note"
-          className="mt-1 h-5 w-5 shrink-0 rounded border-neem-100 accent-neem-600"
+          className="choice-control mt-1"
         />
         <div>
           <label htmlFor="consentBooking" className="text-body">
@@ -43,7 +43,7 @@ export function ConsentBlock({ disabled }: { disabled?: boolean }) {
           type="checkbox"
           id="consentUpdates"
           name="consentUpdates"
-          className="mt-1 h-5 w-5 shrink-0 rounded border-neem-100 accent-neem-600"
+          className="choice-control mt-1"
         />
         <label htmlFor="consentUpdates" className="text-body">
           I&apos;d also like occasional updates about camp dates and oral health. This is

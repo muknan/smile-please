@@ -67,9 +67,14 @@ export default async function LearnPage({
       </div>
 
       {articles.length > 0 ? (
-        <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 flex flex-wrap justify-center gap-6">
           {articles.map((article) => (
-            <ArticleCard key={article.slug} article={article} />
+            <div
+              key={article.slug}
+              className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
+            >
+              <ArticleCard article={article} />
+            </div>
           ))}
         </div>
       ) : (

@@ -34,7 +34,7 @@ export default async function AdminDentistsPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <h1 className="font-utility text-2xl font-bold text-ink-950">Dentists</h1>
+      <h1 className="text-display-l text-ink-950">Dentists</h1>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {(["all", ...STATUSES] as const).map((s) => (

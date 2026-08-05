@@ -14,7 +14,7 @@ export default async function AdminExportsPage() {
   await requireRole("admin");
   return (
     <>
-      <h1 className="font-utility text-2xl font-bold text-ink-950">Exports</h1>
+      <h1 className="text-display-l text-ink-950">Exports</h1>
       <p className="mt-2 max-w-[65ch] rounded border border-clay-600/40 bg-clay-600/5 p-4 font-utility text-body-s text-ink-950">
         Exported files contain personal data. Store them securely and delete them when you&apos;re
         done. Every export is recorded in the audit log.

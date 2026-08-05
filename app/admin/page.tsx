@@ -74,7 +74,7 @@ export default async function AdminOverviewPage() {
 
   return (
     <>
-      <h1 className="font-utility text-2xl font-bold text-ink-950">Overview</h1>
+      <h1 className="text-display-l text-ink-950">Overview</h1>
       <p className="mt-2 font-utility text-body-s text-ink-950/60">
         {totalCount} appointments in total. Land on what is rotting — oldest problem first.
       </p>

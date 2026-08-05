@@ -87,7 +87,7 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
   }
 
   return (
-    <form ref={formRef} action={formAction} className="max-w-[65ch] space-y-10">
+    <form ref={formRef} action={formAction} className="max-w-[65ch]">
       {/* honeypot — hidden but not display:none; bots fill it, humans never see it */}
       <input
         type="text"
@@ -105,41 +105,50 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
         </p>
       )}
 
-      <Field label="Full name" htmlFor="fullName" required error={fieldError(issues, "fullName")}>
-        <Input id="fullName" name="fullName" autoComplete="name" required />
-      </Field>
+      <section className="mt-10 first:mt-0">
+        <h2 className="font-utility text-label uppercase text-ink-950">About you</h2>
+        <div className="mt-6 space-y-6">
+          <Field label="Full name" htmlFor="fullName" required error={fieldError(issues, "fullName")}>
+            <Input id="fullName" name="fullName" autoComplete="name" required />
+          </Field>
 
-      <Field
-        label="Phone"
-        htmlFor="phone"
-        required
-        hint="We only use this to confirm the appointment. Format: +91 98765 43210."
-        error={fieldError(issues, "phone")}
-      >
-        <Input id="phone" name="phone" type="tel" inputMode="tel" placeholder="+91" required />
-      </Field>
+          <Field
+            label="Phone"
+            htmlFor="phone"
+            required
+            hint="We only use this to confirm the appointment. Format: +91 98765 43210."
+            error={fieldError(issues, "phone")}
+          >
+            <Input id="phone" name="phone" type="tel" inputMode="tel" placeholder="+91" required />
+          </Field>
 
-      <Field
-        label="Email"
-        htmlFor="email"
-        hint="Optional. We use it for appointment emails and a sign-in link to your account."
-        error={fieldError(issues, "email")}
-      >
-        <Input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" />
-      </Field>
+          <Field
+            label="Email"
+            htmlFor="email"
+            hint="Optional. We use it for appointment emails and a sign-in link to your account."
+            error={fieldError(issues, "email")}
+          >
+            <Input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" />
+          </Field>
 
-      <Field label="Age band" htmlFor="ageBand" required error={fieldError(issues, "ageBand")}>
-        <Select id="ageBand" name="ageBand" required defaultValue="">
-          <option value="" disabled>
-            Choose…
-          </option>
-          {AGE_BANDS.map((band) => (
-            <option key={band} value={band}>
-              {AGE_BAND_LABELS[band]}
-            </option>
-          ))}
-        </Select>
-      </Field>
+          <Field label="Age band" htmlFor="ageBand" required error={fieldError(issues, "ageBand")}>
+            <Select id="ageBand" name="ageBand" required defaultValue="">
+              <option value="" disabled>
+                Choose…
+              </option>
+              {AGE_BANDS.map((band) => (
+                <option key={band} value={band}>
+                  {AGE_BAND_LABELS[band]}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
+      </section>
+
+      <section className="mt-10 border-t border-neem-100 pt-10">
+        <h2 className="font-utility text-label uppercase text-ink-950">What&apos;s wrong</h2>
+        <div className="mt-6 space-y-6">
 
       <fieldset className="space-y-4">
         <legend className="text-label uppercase text-ink-950">What&apos;s wrong?<span aria-hidden="true" className="text-marigold-500"> *</span></legend>
@@ -154,9 +163,9 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
               name="reason"
               value={reason}
               required
-              className="h-5 w-5 accent-neem-600"
+              className="choice-control"
             />
-            <label htmlFor={`reason-${reason}`} className="text-body">
+            <label htmlFor={`reason-${reason}`} className="cursor-pointer text-body">
               {REASON_CATEGORY_LABELS[reason]}
             </label>
           </div>
@@ -167,6 +176,13 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
         <Textarea id="note" name="note" rows={4} maxLength={500} />
         <p className="mt-2 text-body-s text-ink-950/60">Up to 500 characters.</p>
       </Field>
+
+        </div>
+      </section>
+
+      <section className="mt-10 border-t border-neem-100 pt-10">
+        <h2 className="font-utility text-label uppercase text-ink-950">Where &amp; when</h2>
+        <div className="mt-6 space-y-6">
 
       <Field label="Area you're in" htmlFor="locality" required error={fieldError(issues, "locality")}>
         <Select id="locality" name="locality" required defaultValue="">
@@ -197,9 +213,9 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
               id={`days-${day}`}
               name="preferredDays"
               value={day}
-              className="h-5 w-5 accent-neem-600"
+              className="choice-control"
             />
-            <label htmlFor={`days-${day}`} className="text-body">
+            <label htmlFor={`days-${day}`} className="cursor-pointer text-body">
               {day === "weekdays" ? "Weekdays (Mon–Fri)" : "Weekends"}
             </label>
           </div>
@@ -218,49 +234,56 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
               id={`times-${time}`}
               name="preferredTimes"
               value={time}
-              className="h-5 w-5 accent-neem-600"
+              className="choice-control"
             />
-            <label htmlFor={`times-${time}`} className="text-body">
+            <label htmlFor={`times-${time}`} className="cursor-pointer text-body">
               {time === "morning" ? "Morning (9–12)" : time === "afternoon" ? "Afternoon (12–4)" : "Evening (4–8)"}
             </label>
           </div>
         ))}
       </fieldset>
 
-      <div className="flex items-center gap-4">
-        <input
-          type="checkbox"
-          id="forMinor"
-          name="forMinor"
-          checked={forMinor}
-          onChange={(e) => setForMinor(e.target.checked)}
-          className="h-5 w-5 accent-neem-600"
-        />
-        <label htmlFor="forMinor" className="text-body">
-          Booking for someone under 18?
-        </label>
-      </div>
+        </div>
+      </section>
 
-      {forMinor && (
-        <p role="status" className="rounded border border-clay-600 bg-chalk-0 px-4 py-3 text-body-s text-clay-600">
-          {MINOR_NOTE}
-        </p>
-      )}
+      <section className="mt-10 border-t border-neem-100 pt-10">
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <input
+              type="checkbox"
+              id="forMinor"
+              name="forMinor"
+              checked={forMinor}
+              onChange={(e) => setForMinor(e.target.checked)}
+              className="choice-control"
+            />
+            <label htmlFor="forMinor" className="cursor-pointer text-body">
+              Booking for someone under 18?
+            </label>
+          </div>
 
-      <ConsentBlock disabled={forMinor} />
+          {forMinor && (
+            <p role="status" className="rounded border border-clay-600 bg-chalk-0 px-4 py-3 text-body-s text-clay-600">
+              {MINOR_NOTE}
+            </p>
+          )}
+
+          <ConsentBlock disabled={forMinor} />
+        </div>
+      </section>
 
       {state.status === "guardian" && (
-        <p role="alert" className="text-body-s text-clay-600">
+        <p role="alert" className="mt-6 text-body-s text-clay-600">
           {MINOR_NOTE}
         </p>
       )}
       {state.status === "error" && (
-        <p role="alert" className="text-body-s text-clay-600">
+        <p role="alert" className="mt-6 text-body-s text-clay-600">
           {state.error}
         </p>
       )}
 
-      <div>
+      <div className="mt-10">
         <SubmitButton pendingLabel="Sending…" disabled={forMinor}>Send my request</SubmitButton>
       </div>
     </form>

@@ -171,6 +171,11 @@ export function AccountClient({
   const [noticeError, setNoticeError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
+  // Treat the internal seed placeholder ("New user") as "not yet set", the
+  // same way we treat a missing name — don't surface it as real profile data.
+  const rawName = (profile.full_name ?? "").trim();
+  const isSeededName = rawName === "" || rawName.toLowerCase() === "new user";
+
   const consentGranted = (purpose: string) =>
     consents.some((c) => c.purpose === purpose && c.withdrawn_at === null);
   const consentNotice = (purpose: string) =>
@@ -245,6 +250,11 @@ export function AccountClient({
         <h2 id="details-heading" className="text-display-m">
           Your details
         </h2>
+        {isSeededName && (
+          <p className="mt-3 max-w-[60ch] text-body text-ink-950/80">
+            Add your details so we can match you with care.
+          </p>
+        )}
         <form
           action={async (formData) => {
             const state = await updateProfile({ status: "idle" }, formData);
@@ -255,7 +265,13 @@ export function AccountClient({
           className="mt-8 grid max-w-[65ch] gap-6 md:grid-cols-2"
         >
           <Field label="Full name" htmlFor="edit-name" required>
-            <Input id="edit-name" name="fullName" defaultValue={profile.full_name} required />
+            <Input
+              id="edit-name"
+              name="fullName"
+              defaultValue={isSeededName ? undefined : profile.full_name}
+              placeholder={isSeededName ? "Your full name" : undefined}
+              required
+            />
           </Field>
           <Field label="Phone" htmlFor="edit-phone" required>
             <Input id="edit-phone" name="phone" type="tel" defaultValue={profile.phone ?? ""} required />
@@ -307,11 +323,19 @@ export function AccountClient({
             <div>
               <h3 className="text-body font-semibold">Booking and care</h3>
               <p className="mt-1 text-body-s text-ink-950/60">
+                Lets us store your details and arrange a dentist for you, and contact
+                you about the appointment.
+              </p>
+              <p className="mt-1 text-body-s text-ink-950/60">
                 {consentGranted("booking")
-                  ? "Granted · keeps your appointments possible"
+                  ? "Granted — you can withdraw it below."
                   : consentNotice("booking")
                     ? `Withdrawn on ${formatDate(consentNotice("booking")!)}`
-                    : "Not granted"}
+                    : <>Not granted yet —{" "}
+                      <Link href="/care" className="font-medium text-neem-600 underline underline-offset-4">grant it when you book a check-up</Link>
+                      . For how it&apos;s used, see the{" "}
+                      <Link href="/privacy" className="font-medium text-neem-600 underline underline-offset-4">privacy notice</Link>.
+                    </>}
               </p>
             </div>
             {consentGranted("booking") && (
@@ -329,11 +353,17 @@ export function AccountClient({
             <div>
               <h3 className="text-body font-semibold">Awareness updates</h3>
               <p className="mt-1 text-body-s text-ink-950/60">
+                Occasional emails about camp dates and oral health — separate from
+                booking consent.
+              </p>
+              <p className="mt-1 text-body-s text-ink-950/60">
                 {consentGranted("awareness_updates")
-                  ? "Granted · camp dates and oral health posts"
+                  ? "Granted — you can stop these below."
                   : consentNotice("awareness_updates")
                     ? `Withdrawn on ${formatDate(consentNotice("awareness_updates")!)}`
-                    : "Not granted"}
+                    : <>Not granted yet — you can{" "}
+                      <Link href="/care" className="font-medium text-neem-600 underline underline-offset-4">opt in during any care request</Link>.
+                    </>}
               </p>
             </div>
             {consentGranted("awareness_updates") && (

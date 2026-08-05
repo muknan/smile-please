@@ -88,7 +88,7 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
         <h1 className="mt-6 text-display-l">{data.title}</h1>
 
         <div className="mt-16 space-y-6 [&_h2]:mt-16 [&_h2]:text-display-m [&_h3]:mt-10 [&_h3]:text-display-m">
-          {renderMarkdown(data.body_md)}
+          {renderMarkdown(data.body_md, data.title)}
         </div>
 
         {/* Awareness content always routes into care: the point of the page. */}

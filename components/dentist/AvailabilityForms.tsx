@@ -50,7 +50,7 @@ function LocationFields() {
             name="locationType"
             value="clinic"
             defaultChecked
-            className="h-5 w-5 accent-neem-600"
+            className="choice-control"
           />
           Clinic
         </label>
@@ -59,7 +59,7 @@ function LocationFields() {
             type="radio"
             name="locationType"
             value="camp"
-            className="h-5 w-5 accent-neem-600"
+            className="choice-control"
           />
           Camp
         </label>
@@ -124,7 +124,7 @@ function WeeklyForm() {
                 type="checkbox"
                 name="days"
                 value={day.value}
-                className="h-5 w-5 accent-neem-600"
+                className="choice-control"
               />
               <span className="text-body">{day.label}</span>
             </label>

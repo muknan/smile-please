@@ -77,7 +77,7 @@ export function BookForm({ details }: { details: BookDetails }) {
   }
 
   return (
-    <form ref={formRef} action={formAction} className="space-y-10">
+    <form ref={formRef} action={formAction}>
       <input
         type="text"
         name="website"
@@ -94,75 +94,90 @@ export function BookForm({ details }: { details: BookDetails }) {
         </p>
       )}
 
-      <Field label="Full name" htmlFor="fullName" required error={fieldError(issues, "fullName")}>
-        <Input id="fullName" name="fullName" autoComplete="name" required />
-      </Field>
+      <section className="mt-10 first:mt-0">
+        <h2 className="font-utility text-label uppercase text-ink-950">About you</h2>
+        <div className="mt-6 space-y-6">
+          <Field label="Full name" htmlFor="fullName" required error={fieldError(issues, "fullName")}>
+            <Input id="fullName" name="fullName" autoComplete="name" required />
+          </Field>
 
-      <Field
-        label="Phone"
-        htmlFor="phone"
-        required
-        hint="We only use this to confirm the appointment. Format: +91 98765 43210."
-        error={fieldError(issues, "phone")}
-      >
-        <Input id="phone" name="phone" type="tel" inputMode="tel" placeholder="+91" required />
-      </Field>
+          <Field
+            label="Phone"
+            htmlFor="phone"
+            required
+            hint="We only use this to confirm the appointment. Format: +91 98765 43210."
+            error={fieldError(issues, "phone")}
+          >
+            <Input id="phone" name="phone" type="tel" inputMode="tel" placeholder="+91" required />
+          </Field>
 
-      <Field
-        label="Email"
-        htmlFor="email"
-        hint="Optional. We use it for appointment emails and a sign-in link to your account."
-        error={fieldError(issues, "email")}
-      >
-        <Input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" />
-      </Field>
+          <Field
+            label="Email"
+            htmlFor="email"
+            hint="Optional. We use it for appointment emails and a sign-in link to your account."
+            error={fieldError(issues, "email")}
+          >
+            <Input id="email" name="email" type="email" autoComplete="email" placeholder="you@example.com" />
+          </Field>
 
-      <Field label="Age band" htmlFor="ageBand" required error={fieldError(issues, "ageBand")}>
-        <Select id="ageBand" name="ageBand" required defaultValue="">
-          <option value="" disabled>
-            Choose…
-          </option>
-          {AGE_BANDS.map((band) => (
-            <option key={band} value={band}>
-              {AGE_BAND_LABELS[band]}
-            </option>
-          ))}
-        </Select>
-      </Field>
+          <Field label="Age band" htmlFor="ageBand" required error={fieldError(issues, "ageBand")}>
+            <Select id="ageBand" name="ageBand" required defaultValue="">
+              <option value="" disabled>
+                Choose…
+              </option>
+              {AGE_BANDS.map((band) => (
+                <option key={band} value={band}>
+                  {AGE_BAND_LABELS[band]}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
+      </section>
 
-      <fieldset className="space-y-4">
-        <legend className="text-label uppercase text-ink-950">What&apos;s wrong?<span aria-hidden="true" className="text-marigold-500"> *</span></legend>
-        {fieldError(issues, "reason") && (
-          <p role="alert" className="text-body-s text-clay-600">{fieldError(issues, "reason")}</p>
-        )}
-        {REASONS.map((reason) => (
-          <div key={reason} className="flex items-center gap-4">
-            <input
-              type="radio"
-              id={`reason-${reason}`}
-              name="reason"
-              value={reason}
-              required
-              className="h-5 w-5 accent-neem-600"
-            />
-            <label htmlFor={`reason-${reason}`} className="text-body">
-              {REASON_CATEGORY_LABELS[reason]}
-            </label>
-          </div>
-        ))}
-      </fieldset>
+      <section className="mt-10 border-t border-neem-100 pt-10">
+        <h2 className="font-utility text-label uppercase text-ink-950">What&apos;s wrong</h2>
+        <p className="mt-2 text-body-s text-ink-950/60">
+          Just so the dentist can prepare for your visit.
+        </p>
+        <div className="mt-6 space-y-6">
+          <fieldset className="space-y-4">
+            <legend className="text-label uppercase text-ink-950">What&apos;s wrong?<span aria-hidden="true" className="text-marigold-500"> *</span></legend>
+            {fieldError(issues, "reason") && (
+              <p role="alert" className="text-body-s text-clay-600">{fieldError(issues, "reason")}</p>
+            )}
+            {REASONS.map((reason) => (
+              <div key={reason} className="flex items-center gap-4">
+                <input
+                  type="radio"
+                  id={`reason-${reason}`}
+                  name="reason"
+                  value={reason}
+                  required
+                  className="choice-control"
+                />
+                <label htmlFor={`reason-${reason}`} className="cursor-pointer text-body">
+                  {REASON_CATEGORY_LABELS[reason]}
+                </label>
+              </div>
+            ))}
+          </fieldset>
 
-      <Field label="Anything else we should know" htmlFor="note">
-        <Textarea id="note" name="note" rows={3} maxLength={500} />
-      </Field>
+          <Field label="Anything else we should know" htmlFor="note">
+            <Textarea id="note" name="note" rows={3} maxLength={500} />
+          </Field>
 
-      <Field label="Pincode" htmlFor="pincode" hint="Optional." error={fieldError(issues, "pincode")}>
-        <Input id="pincode" name="pincode" inputMode="numeric" autoComplete="postal-code" maxLength={6} placeholder="110095" />
-      </Field>
+          <Field label="Pincode" htmlFor="pincode" hint="Optional." error={fieldError(issues, "pincode")}>
+            <Input id="pincode" name="pincode" inputMode="numeric" autoComplete="postal-code" maxLength={6} placeholder="110095" />
+          </Field>
+        </div>
+      </section>
 
-      <ConsentBlock />
+      <section className="mt-10 border-t border-neem-100 pt-10">
+        <ConsentBlock />
+      </section>
 
-      <div>
+      <div className="mt-10">
         <SubmitButton pendingLabel="Confirming…">Confirm booking</SubmitButton>
         <p className="mt-3 text-body-s text-ink-950/60">
           Confirming books the slot. It&apos;s free, and you can cancel up to 24 hours

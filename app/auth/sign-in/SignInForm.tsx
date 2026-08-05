@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 import { useActionState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -21,6 +22,25 @@ export function SignInForm({ renderedAt }: { renderedAt: string }) {
   );
 }
 
+/** Minimal branding for standalone auth screens — logo only, links home. */
+function AuthHeader() {
+  return (
+    <header className="border-b border-neem-100 bg-mineral-50">
+      <div className="container-content flex h-[60px] items-center sm:h-[72px]">
+        <Link href="/" className="flex items-center" aria-label="Smile Please — home">
+          <Image
+            src="/logo.svg"
+            alt="Smile Please"
+            width={140}
+            height={33}
+            className="h-[28px] w-auto sm:h-[36px]"
+          />
+        </Link>
+      </div>
+    </header>
+  );
+}
+
 function Form({ renderedAt }: { renderedAt: string }) {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/account";
@@ -32,31 +52,42 @@ function Form({ renderedAt }: { renderedAt: string }) {
 
   if (state.status === "sent") {
     return (
-      <main className="py-24">
-        <div className="container-content max-w-2xl">
-          <p className="text-label">Sign in</p>
-          <h1 className="mt-6 text-display-l">Check your email</h1>
-          <p className="mt-4 text-body-l">
-            We&apos;ve sent a sign-in link to <strong>{state.email}</strong>. It expires in one hour.
-          </p>
-          <p className="mt-2 text-body-s text-ink-950/60">
-            No link in your inbox? Check the spam folder, then try again.
-          </p>
-          <div className="mt-10">
-            <Link
-              href="/auth/sign-in"
-              className="font-utility text-body-s font-medium text-neem-600 underline-offset-2 hover:underline"
-            >
-              Use a different email
-            </Link>
+      <>
+        <AuthHeader />
+        <main className="py-24">
+          <div className="container-content max-w-2xl">
+            <p className="text-label">Sign in</p>
+            <h1 className="mt-6 text-display-l">Check your email</h1>
+            <p className="mt-4 text-body-l">
+              We&apos;ve sent a sign-in link to <strong>{state.email}</strong>. It expires in one hour.
+            </p>
+            <p className="mt-2 text-body-s text-ink-950/60">
+              No link in your inbox? Check the spam folder first — or use a different address below.
+            </p>
+            <div className="mt-10 flex flex-col gap-4">
+              <Link
+                href="/"
+                className="font-utility text-body-s font-medium text-neem-600 underline underline-offset-2 hover:underline"
+              >
+                ← Back to the site
+              </Link>
+              <Link
+                href="/auth/sign-in"
+                className="font-utility text-body-s font-medium text-neem-600 underline-offset-2 hover:underline"
+              >
+                Use a different email
+              </Link>
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </>
     );
   }
 
   return (
-    <main className="py-24">
+    <>
+      <AuthHeader />
+      <main className="py-24">
       <div className="container-content max-w-2xl">
         <p className="text-label">Sign in</p>
         <h1 className="mt-6 max-w-3xl text-display-l">Sign in to your account</h1>
@@ -125,6 +156,7 @@ function Form({ renderedAt }: { renderedAt: string }) {
           </Button>
         </form>
       </div>
-    </main>
+      </main>
+    </>
   );
 }

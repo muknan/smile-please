@@ -46,13 +46,18 @@ function renderInline(text: string, prefix: string): React.ReactNode[] {
 }
 
 /** Block renderer: returns the article body as elements (h2+, p, ul). */
-export function renderMarkdown(md: string): React.ReactNode[] {
+export function renderMarkdown(
+  md: string,
+  /** When set, a leading h2 whose text matches (case-insensitively) is dropped. */
+  skipTitle?: string,
+): React.ReactNode[] {
   // React escapes text children; pre-escaping here would display entities literally.
   const lines = md.split("\n");
   const out: React.ReactNode[] = [];
   let paragraph: string[] = [];
   let list: string[] = [];
   let key = 0;
+  let firstHeadingSeen = false;
 
   const flushParagraph = () => {
     if (paragraph.length === 0) return;
@@ -81,6 +86,20 @@ export function renderMarkdown(md: string): React.ReactNode[] {
     if (heading) {
       flushParagraph();
       flushList();
+      // Safe-guard against a first-line h2 duplicating the page's own H1 title,
+      // so a future article authored that way doesn't repeat the heading (see
+      // seed articles). Only the very first heading is ever dropped, and only
+      // if it's an h2 whose text matches the article title case-insensitively.
+      if (
+        !firstHeadingSeen &&
+        heading[1] === "##" &&
+        skipTitle &&
+        heading[2].trim().toLowerCase() === skipTitle.trim().toLowerCase()
+      ) {
+        firstHeadingSeen = true;
+        continue;
+      }
+      firstHeadingSeen = true;
       // Start at h2 — article pages already own the h1 (D-20).
       const level = Math.min(4, heading[1].length + 1);
       const base = `h${key++}`;

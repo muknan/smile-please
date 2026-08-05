@@ -30,6 +30,18 @@
 @layer components {
   .container-content { @apply mx-auto w-full max-w-content px-4 sm:px-6; }
   .tabular { font-variant-numeric: tabular-nums; }
+
+  /* Light, consistent treatment for native checkboxes/radios — one shared
+     control across every form so they read as designed rather than as raw
+     browser defaults. Native input + accent-color is kept (accessibility),
+     with a visible focus ring matching the global :focus-visible below. */
+  .choice-control {
+    @apply h-5 w-5 shrink-0 cursor-pointer accent-neem-600;
+  }
+  .choice-control:focus-visible {
+    outline: 2px solid #2E6B54;
+    outline-offset: 2px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

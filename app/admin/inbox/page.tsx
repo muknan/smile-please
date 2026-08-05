@@ -44,7 +44,7 @@ export default async function AdminInboxPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <h1 className="font-utility text-2xl font-bold text-ink-950">Inbox</h1>
+      <h1 className="text-display-l text-ink-950">Inbox</h1>
 
       <div role="tablist" aria-label="Submission type" className="mt-4 flex flex-wrap gap-2">
         {TYPES.map((t) => (

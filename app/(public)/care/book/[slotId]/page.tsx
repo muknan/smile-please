@@ -70,7 +70,9 @@ export default async function BookPage({ params, searchParams }: PageProps) {
         </div>
       </div>
 
-      <HoldCountdown />
+      <div className="mt-10 max-w-[65ch]">
+        <HoldCountdown />
+      </div>
 
       <div className="mt-6 max-w-[65ch]">
         <BookForm details={details} />

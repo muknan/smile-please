@@ -248,7 +248,7 @@ export function ContactForm({
               id="consentContact"
               name="consentContact"
               required
-              className="mt-1 h-5 w-5 shrink-0 rounded border-neem-100 accent-neem-600"
+              className="choice-control mt-1"
             />
             <div>
               <label htmlFor="consentContact" className="text-body">

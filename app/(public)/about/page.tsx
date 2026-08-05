@@ -23,13 +23,6 @@ const values = [
   },
 ];
 
-const orgDetails = [
-  { label: "Registration type", value: "Public charitable trust" },
-  { label: "Registration number", value: "TBC-2026-0001" },
-  { label: "Registered address", value: "Smile Please, c/o [clinic name], New Delhi — [pin]" },
-  { label: "Grievance contact", value: "[name], [email] — responds within 7 working days" },
-];
-
 export default function AboutPage() {
   return (
     <>
@@ -70,33 +63,14 @@ export default function AboutPage() {
         </div>
       </Section>
 
-      <Section marker="The team" className="border-t border-neem-100 py-24">
-        <h2 className="text-display-l">The people behind it</h2>
-        {/* The team section renders an honest empty state until real people are added. */}
-        <div className="mt-16 rounded-card border border-neem-100 bg-chalk-0 p-10">
-          <p className="max-w-[50ch] text-body-l">
-            We&apos;re building this page out — the founder, the volunteer dentists, and the
-            people who run camp days will be named here.
-          </p>
-          {/* CLIENT-COPY: add team members as short profiles (name, role, one line) once approved. */}
-          <p className="mt-4 text-body-s text-ink-950/60">Profiles to be added.</p>
-        </div>
-      </Section>
-
       <Section marker="Registration" className="border-t border-neem-100 py-24">
         <h2 className="text-display-l">Organisation details</h2>
-        <dl className="mt-16 max-w-[70ch] space-y-10">
-          {orgDetails.map((detail) => (
-            <div key={detail.label} className="grid gap-2 md:grid-cols-12 md:gap-6">
-              <dt className="font-utility text-label uppercase text-neem-600 md:col-span-3">
-                {detail.label}
-              </dt>
-              <dd className="text-body md:col-span-9">{detail.value}</dd>
-            </div>
-          ))}
-        </dl>
-        {/* CLIENT-COPY: replace TBC registration number, address and grievance contact above with
-            the trust's real deed details before publishing to real patients. */}
+        <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
+          Registration details — the trust deed number, registered address and grievance
+          contact — will be published here once finalised.
+        </p>
+        {/* CLIENT-COPY: publish the trust's real deed details (registration number,
+            registered address and grievance contact) when they are finalised. */}
       </Section>
     </>
   );

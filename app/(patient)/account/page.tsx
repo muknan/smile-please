@@ -58,12 +58,17 @@ export default async function AccountPage() {
   const upcomingIds = new Set(upcoming.map((a) => a.id));
   const past = appointmentsList.filter((a) => !waitingIds.has(a.id) && !upcomingIds.has(a.id));
 
+  // Don't surface the internal seed placeholder ("New user") as a greeting.
+  const name = profile.full_name?.trim() ?? "";
+  const hasUsableName = name !== "" && name.toLowerCase() !== "new user";
+  const greeting = hasUsableName ? name.split(/\s+/)[0] : "there";
+
   return (
     <main className="py-24">
       <div className="container-content max-w-3xl space-y-24">
         <header>
           <p className="font-utility text-label uppercase text-neem-600">Account</p>
-          <h1 className="mt-6 text-display-l">Hello, {profile.full_name.split(/\s+/)[0]}</h1>
+          <h1 className="mt-6 text-display-l">Hello, {greeting}</h1>
           {profile.email && (
             <p className="mt-4 text-body-s text-ink-950/60">Signed in as {profile.email}</p>
           )}

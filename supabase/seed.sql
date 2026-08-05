@@ -289,9 +289,7 @@ insert into public.articles
 values
   ('how-to-brush-properly', 'How to brush so it actually works',
    'Most people brush every day and still get cavities. The problem is usually not how often — it is how.',
-   '## How to brush so it actually works
-
-Brushing is a habit almost everyone has and almost everyone does too quickly. If you are reading this and brushing for under two minutes, fix that first. Two minutes feels long. Set a timer for two weeks and it stops feeling long.
+   'Brushing is a habit almost everyone has and almost everyone does too quickly. If you are reading this and brushing for under two minutes, fix that first. Two minutes feels long. Set a timer for two weeks and it stops feeling long.
 
 ### The angle matters
 
@@ -318,9 +316,7 @@ Two minutes, twice a day, soft brush, 45 degrees. That is the whole lesson, and 
 
   ('gums-bleeding-when-brushing', 'Gums that bleed when you brush: what is happening',
    'Blood in the sink is common, and it is usually a warning, not a crisis. Here is what it means and when to worry.',
-   '## Gums that bleed when you brush: what is happening
-
-Seeing pink in the sink is unnerving, but it is one of the most common things dentists hear about. The short version: bleeding gums usually mean inflammation, and inflammation almost always means plaque has been sitting at the gum line. The good news is that the fix is gentle and it works.
+   'Seeing pink in the sink is unnerving, but it is one of the most common things dentists hear about. The short version: bleeding gums usually mean inflammation, and inflammation almost always means plaque has been sitting at the gum line. The good news is that the fix is gentle and it works.
 
 ### What is actually happening
 
@@ -349,9 +345,7 @@ A little blood during brushing is not an emergency. A mouthful of blood, bleedin
 
   ('children-first-dental-visit', 'Your child''s first dental visit: what to expect',
    'The first visit does not have to be scary. Do it early, keep it boring, and let the dentist do the talking.',
-   '## Your child''s first dental visit: what to expect
-
-Most parents bring a child to the dentist for the first time only when something hurts. That is the hardest possible time to start. Bring them early, when nothing is wrong, and the dentist becomes a normal part of life — like a haircut, not like a hospital.
+   'Most parents bring a child to the dentist for the first time only when something hurts. That is the hardest possible time to start. Bring them early, when nothing is wrong, and the dentist becomes a normal part of life — like a haircut, not like a hospital.
 
 ### When to come
 
@@ -378,9 +372,7 @@ Keep the visit routine. Twice a year, no drama, and dentistry becomes something 
 
   ('what-happens-at-a-camp', 'What happens at a Smile Please camp',
    'A camp is a free dental clinic that sets up in a school, community centre or gurdwara for a day. Here is what actually happens.',
-   '## What happens at a Smile Please camp
-
-A camp is a free dental clinic that sets up wherever people already gather: a school hall, a community centre, a gurdwara, a local club. By the evening it is gone. In one day we see hundreds of people who would not otherwise reach a dentist, and we leave the community with the same tools it needs to keep going.
+   'A camp is a free dental clinic that sets up wherever people already gather: a school hall, a community centre, a gurdwara, a local club. By the evening it is gone. In one day we see hundreds of people who would not otherwise reach a dentist, and we leave the community with the same tools it needs to keep going.
 
 ### Before the camp
 

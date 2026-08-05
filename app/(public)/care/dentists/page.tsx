@@ -126,7 +126,7 @@ export default async function DentistsPage({
             name="slots"
             value="1"
             defaultChecked={slotsOnly}
-            className="h-5 w-5 accent-neem-600"
+            className="choice-control"
           />
           <span className="text-body">Only dentists with open slots in the next 14 days</span>
         </label>
@@ -140,9 +140,14 @@ export default async function DentistsPage({
       </form>
 
       {list.length > 0 ? (
-        <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 flex flex-wrap justify-center gap-6">
           {list.map((dentist) => (
-            <DentistCard key={dentist.slug} dentist={dentist} />
+            <div
+              key={dentist.slug}
+              className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
+            >
+              <DentistCard dentist={dentist} />
+            </div>
           ))}
         </div>
       ) : (

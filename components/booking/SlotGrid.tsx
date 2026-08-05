@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatTime } from "@/lib/format";
 
@@ -46,7 +47,31 @@ export function SlotGrid({
   const [mobileDay, setMobileDay] = useState(0);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(true);
   const gridRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Full 14-day grid overflows every real viewport — measure once on mount so
+  // the "more days" affordance reflects whether scrolling is actually possible.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanPrev(el.scrollLeft > 1);
+    setCanNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  }, []);
+
+  const updateScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanPrev(el.scrollLeft > 1);
+    setCanNext(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  };
+
+  // Advance by roughly one day column so a user can step through the fortnight.
+  const scrollByDay = (dir: number) => {
+    scrollRef.current?.scrollBy({ left: dir * 130, behavior: "smooth" });
+  };
 
   const slotAt = (d: number, t: number): GridSlot | null =>
     cells[d]?.[t] ?? null;
@@ -180,48 +205,86 @@ export function SlotGrid({
 
       {/* Desktop: the 14-day matrix, keyboard-operable. */}
       <div className="hidden sm:block">
-        <div className="overflow-x-auto" role="region" aria-label="Available appointment times" tabIndex={0}>
+        <div className="relative">
           <div
-            ref={gridRef}
-            role="grid"
+            ref={scrollRef}
+            onScroll={updateScroll}
+            className="overflow-x-auto"
+            role="region"
             aria-label="Available appointment times"
-            className="grid min-w-[1296px] gap-px"
-            style={{ gridTemplateColumns: `120px repeat(${days.length}, minmax(84px, 1fr))` }}
+            tabIndex={0}
           >
-            {/* corner + day headers */}
-            <div role="columnheader" className="p-2" />
-            {days.map((day) => (
-              <div
-                key={day.dateKey}
-                role="columnheader"
-                className="flex flex-col items-center gap-1 p-2 text-center"
-              >
-                <span className="font-utility text-body-s font-semibold text-ink-950">
-                  {day.shortLabel}
-                </span>
-              </div>
-            ))}
+            <div
+              ref={gridRef}
+              role="grid"
+              aria-label="Available appointment times"
+              className="grid min-w-[1296px] gap-px"
+              style={{ gridTemplateColumns: `120px repeat(${days.length}, minmax(84px, 1fr))` }}
+            >
+              {/* corner + day headers */}
+              <div role="columnheader" className="p-2" />
+              {days.map((day) => (
+                <div
+                  key={day.dateKey}
+                  role="columnheader"
+                  className="flex flex-col items-center gap-1 p-2 text-center"
+                >
+                  <span className="font-utility text-body-s font-semibold text-ink-950">
+                    {day.shortLabel}
+                  </span>
+                </div>
+              ))}
 
-            {times.map((time, t) => (
-              <GridRow
-                key={time}
-                time={time}
-                t={t}
-                days={days}
-                cursor={cursor}
-                busy={busy}
-                slotAt={slotAt}
-                onMove={move}
-                onPick={pick}
-                onFocusCell={focusCell}
-              />
-            ))}
+              {times.map((time, t) => (
+                <GridRow
+                  key={time}
+                  time={time}
+                  t={t}
+                  days={days}
+                  cursor={cursor}
+                  busy={busy}
+                  slotAt={slotAt}
+                  onMove={move}
+                  onPick={pick}
+                  onFocusCell={focusCell}
+                />
+              ))}
+            </div>
+          </div>
+          {/* Right-edge fade: signals there are more days off-screen. */}
+          {canNext && (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-mineral-50 to-transparent"
+            />
+          )}
+        </div>
+        <div className="mt-3 flex items-end justify-between gap-4">
+          <p className="text-body-s text-ink-950/60">
+            Use the arrow keys to move and Enter to pick a time. Picking a time reserves
+            it for ten minutes while you enter your details.
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => scrollByDay(-1)}
+              disabled={!canPrev}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded border border-neem-100 bg-chalk-0 px-4 font-utility text-body-s font-medium text-ink-950 transition hover:border-neem-600 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <ChevronLeft size={16} aria-hidden="true" />
+              <span>Earlier days</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollByDay(1)}
+              disabled={!canNext}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded border border-neem-100 bg-chalk-0 px-4 font-utility text-body-s font-medium text-ink-950 transition hover:border-neem-600 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <span>Later days</span>
+              <ChevronRight size={16} aria-hidden="true" />
+            </button>
           </div>
         </div>
-        <p className="text-body-s text-ink-950/60">
-          Use the arrow keys to move and Enter to pick a time. Picking a time reserves
-          it for ten minutes while you enter your details.
-        </p>
       </div>
     </div>
   );

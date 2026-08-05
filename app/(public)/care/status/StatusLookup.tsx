@@ -5,12 +5,13 @@ import Link from "next/link";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { formatDateTime } from "@/lib/format";
 import { STATUS_LABELS } from "@/lib/booking";
 import { lookupAppointmentAction, type StatusState } from "./actions";
 
 export function StatusLookup({ initialRef, renderedAt }: { initialRef?: string; renderedAt: string }) {
-  const [state, formAction, pending] = useActionState<StatusState, FormData>(
+  const [state, formAction] = useActionState<StatusState, FormData>(
     lookupAppointmentAction,
     { status: "idle" },
   );
@@ -149,13 +150,7 @@ export function StatusLookup({ initialRef, renderedAt }: { initialRef?: string; 
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex items-center justify-center rounded bg-marigold-500 px-6 py-3 font-utility text-body-s font-medium text-ink-950 transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {pending ? "Looking…" : "Find my appointment"}
-      </button>
+      <SubmitButton pendingLabel="Looking…">Find my appointment</SubmitButton>
     </form>
   );
 }

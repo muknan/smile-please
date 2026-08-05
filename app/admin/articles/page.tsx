@@ -18,7 +18,7 @@ export default async function AdminArticlesPage() {
 
   return (
     <>
-      <h1 className="font-utility text-2xl font-bold text-ink-950">Articles</h1>
+      <h1 className="text-display-l text-ink-950">Articles</h1>
       <ArticlesEditor articles={articles} categories={[...CATEGORIES]} />
     </>
   );

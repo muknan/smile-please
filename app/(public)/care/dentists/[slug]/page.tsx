@@ -119,7 +119,7 @@ export default async function DentistProfilePage({ params, searchParams }: PageP
         {dentist.bio && <p className="mt-6 max-w-[65ch] text-body text-ink-950/80">{dentist.bio}</p>}
       </Section>
 
-      <Section marker="Pick a time" className="border-t border-neem-100 py-24">
+      <Section marker="Pick a time" className="border-t border-neem-100 pb-24 pt-16">
         <h2 className="text-display-m">Next two weeks</h2>
         {reschedule && (
           <p className="mt-4 max-w-[65ch] rounded border border-neem-100 bg-chalk-0 px-4 py-3 text-body-s">

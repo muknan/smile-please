@@ -3,12 +3,7 @@ import { Section } from "@/components/site/Section";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { makeRenderedAt } from "@/lib/antispam";
 import { CONTACT_TABS, type ContactTab } from "@/lib/contact";
-import {
-  CONTACT_EMAIL,
-  CONTACT_PHONE_DISPLAY,
-  CONTACT_PHONE_TEL,
-  GRIEVANCE_EMAIL,
-} from "@/lib/contact-info";
+import { GRIEVANCE_EMAIL } from "@/lib/contact-info";
 
 export const metadata: Metadata = {
   title: "Contact us",
@@ -49,36 +44,24 @@ export default async function ContactPage({ searchParams }: PageProps) {
         </div>
       </Section>
 
-      <Section marker="Our details" className="border-t border-neem-100 py-24">
-        <dl className="max-w-[65ch] space-y-10">
-          <div>
-            <dt className="font-utility text-label uppercase text-neem-600">Registered address</dt>
-            {/* CLIENT-COPY: replace with the trust's registered address. */}
-            <dd className="mt-2 text-body">c/o [clinic name], New Delhi — [pin]</dd>
-          </div>
-          <div>
-            <dt className="font-utility text-label uppercase text-neem-600">Email</dt>
-            <dd className="mt-2 text-body">
-              <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium text-neem-600 underline underline-offset-4">
-                {CONTACT_EMAIL}
-              </a>
-            </dd>
-          </div>
-          <div>
-            <dt className="font-utility text-label uppercase text-neem-600">Phone</dt>
-            <dd className="mt-2 text-body">
-              <a href={`tel:${CONTACT_PHONE_TEL}`} className="font-medium text-neem-600 underline underline-offset-4">
-                {CONTACT_PHONE_DISPLAY}
-              </a>
-            </dd>
-          </div>
-          <div>
-            <dt className="font-utility text-label uppercase text-neem-600">Grievance contact</dt>
-            <dd className="mt-2 text-body">
-              {/* CLIENT-COPY: optional named DPO. Same mailbox handles data requests. */}
-              {GRIEVANCE_EMAIL} — we answer within 7 working days
-            </dd>
-          </div>
+      <Section marker="Escalation" className="border-t border-neem-100 py-24">
+        <h2 className="text-display-m">Complaints and data requests</h2>
+        <p className="mt-4 max-w-[65ch] text-body-l text-ink-950/70">
+          For email and phone, see the Contact block in the footer. This channel is for
+          anything formal — a complaint, a request about your data, or an escalation.
+        </p>
+        <dl className="mt-8 max-w-[65ch]">
+          <dt className="font-utility text-label uppercase text-neem-600">Grievance contact</dt>
+          <dd className="mt-2 text-body">
+            {/* CLIENT-COPY: optional named DPO. Same mailbox handles data requests. */}
+            <a
+              href={`mailto:${GRIEVANCE_EMAIL}`}
+              className="font-medium text-neem-600 underline underline-offset-4"
+            >
+              {GRIEVANCE_EMAIL}
+            </a>{" "}
+            — we answer within 7 working days
+          </dd>
         </dl>
       </Section>
     </>
