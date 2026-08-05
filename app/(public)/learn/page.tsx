@@ -40,7 +40,7 @@ export default async function LearnPage({
         articles without jargon, so the advice works when you&apos;re not in the clinic.
       </p>
 
-      <div className="mt-16 flex flex-wrap gap-2" role="group" aria-label="Filter by topic">
+      <div className="mt-8 flex flex-wrap gap-2" role="group" aria-label="Filter by topic">
         <Link
           href="/learn"
           aria-current={!active ? "page" : undefined}
@@ -67,14 +67,9 @@ export default async function LearnPage({
       </div>
 
       {articles.length > 0 ? (
-        <div className="mt-16 flex flex-wrap justify-center gap-6">
+        <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
-            <div
-              key={article.slug}
-              className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
-            >
-              <ArticleCard article={article} />
-            </div>
+            <ArticleCard key={article.slug} article={article} />
           ))}
         </div>
       ) : (
