@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { displayFirstName } from "@/lib/format";
 import { AccountClient } from "./AccountClient";
 
 export const metadata: Metadata = {
@@ -59,9 +60,7 @@ export default async function AccountPage() {
   const past = appointmentsList.filter((a) => !waitingIds.has(a.id) && !upcomingIds.has(a.id));
 
   // Don't surface the internal seed placeholder ("New user") as a greeting.
-  const name = profile.full_name?.trim() ?? "";
-  const hasUsableName = name !== "" && name.toLowerCase() !== "new user";
-  const greeting = hasUsableName ? name.split(/\s+/)[0] : "there";
+  const greeting = displayFirstName(profile.full_name);
 
   return (
     <main className="py-24">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { displayFirstName } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 import { SignOutForm } from "./SignOutForm";
 import type { UserRole } from "@/lib/auth";
@@ -56,7 +57,7 @@ export function HeaderProfile() {
           .maybeSingle();
         if (cancelled) return;
         setProfile({
-          name: data?.full_name?.trim().split(/\s+/)[0] || "Account",
+          name: displayFirstName(data?.full_name, "Account"),
           home: data?.role ? ROLE_HOME[data.role as UserRole] : "/account",
         });
         setState("in");

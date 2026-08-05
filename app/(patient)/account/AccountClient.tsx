@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Dialog } from "@/components/ui/Dialog";
 import { STATUS_LABELS, AGE_BAND_LABELS, REASON_CATEGORY_LABELS } from "@/lib/booking";
 import { LOCALITIES, AGE_BANDS } from "@/lib/schemas";
-import { formatDate, formatTime } from "@/lib/format";
+import { formatDate, formatTime, isSeededName } from "@/lib/format";
 import { cancelAppointment, updateProfile, withdrawConsent } from "./actions";
 import type { Database } from "@/types/db";
 
@@ -173,8 +173,7 @@ export function AccountClient({
 
   // Treat the internal seed placeholder ("New user") as "not yet set", the
   // same way we treat a missing name — don't surface it as real profile data.
-  const rawName = (profile.full_name ?? "").trim();
-  const isSeededName = rawName === "" || rawName.toLowerCase() === "new user";
+  const seeded = isSeededName(profile.full_name);
 
   const consentGranted = (purpose: string) =>
     consents.some((c) => c.purpose === purpose && c.withdrawn_at === null);
@@ -250,7 +249,7 @@ export function AccountClient({
         <h2 id="details-heading" className="text-display-m">
           Your details
         </h2>
-        {isSeededName && (
+        {seeded && (
           <p className="mt-3 max-w-[60ch] text-body text-ink-950/80">
             Add your details so we can match you with care.
           </p>
@@ -268,8 +267,8 @@ export function AccountClient({
             <Input
               id="edit-name"
               name="fullName"
-              defaultValue={isSeededName ? undefined : profile.full_name}
-              placeholder={isSeededName ? "Your full name" : undefined}
+              defaultValue={seeded ? undefined : profile.full_name}
+              placeholder={seeded ? "Your full name" : undefined}
               required
             />
           </Field>

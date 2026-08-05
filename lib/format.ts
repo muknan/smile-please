@@ -99,3 +99,29 @@ export function formatPhone(e164: string): string {
   const digits = e164.replace(/^\+/, "");
   return `+${digits.slice(0, 2)} ${digits.slice(2, 7)} ${digits.slice(7)}`;
 }
+
+/**
+ * The signup trigger seeds new profiles with the placeholder name "new user"
+ * (migration 002). It must never be shown to a user, so every place that turns
+ * `full_name` into a display name guards against it. Single source of truth
+ * for that check and for deriving a first-name greeting.
+ */
+const SEEDED_NAME = "new user";
+
+/** True when the stored name is missing or still the signup placeholder. */
+export function isSeededName(fullName: string | null | undefined): boolean {
+  const trimmed = (fullName ?? "").trim();
+  return trimmed === "" || trimmed.toLowerCase() === SEEDED_NAME;
+}
+
+/**
+ * First word of a display name for a greeting / nav label, falling back to
+ * `fallback` when the name is the seed placeholder or empty.
+ */
+export function displayFirstName(
+  fullName: string | null | undefined,
+  fallback = "there",
+): string {
+  if (isSeededName(fullName)) return fallback;
+  return (fullName ?? "").trim().split(/\s+/)[0];
+}
