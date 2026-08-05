@@ -715,6 +715,17 @@ export type Database = {
         };
         Returns: Tables<"appointments">;
       };
+      admin_appointment_action: {
+        Args: {
+          p_appointment_id: string;
+          p_to: Enums<"appointment_status">;
+          p_reason: string;
+          p_new_dentist_id?: string | null;
+          p_new_slot_id?: string | null;
+          p_new_scheduled_for?: string | null;
+        };
+        Returns: Tables<"appointments">;
+      };
       submit_contact: {
         Args: {
           p_type: Enums<"submission_type">;
