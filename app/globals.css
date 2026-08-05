@@ -42,6 +42,57 @@
     outline: 2px solid #2E6B54;
     outline-offset: 2px;
   }
+
+  /* Landing hero arch padding — default breathing room, tightened only on
+     short viewports so the CTA row never falls below the fold on laptops
+     (taller screens keep the standard rhythm). */
+  .hero-frame-pad {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+  @media (min-width: 768px) {
+    .hero-frame-pad {
+      padding-top: 6rem;
+      padding-bottom: 4rem;
+    }
+  }
+  @media (max-height: 800px) {
+    .hero-frame-pad {
+      padding-top: 3rem;
+      padding-bottom: 0.75rem;
+    }
+  }
+
+  /* Space between the hero paragraph and the CTA row; tightened at short
+     heights to keep both buttons above the fold. */
+  .hero-cta-gap {
+    margin-top: 2.25rem;
+  }
+  @media (min-width: 768px) {
+    .hero-cta-gap {
+      margin-top: 3rem;
+    }
+  }
+  @media (max-height: 800px) {
+    .hero-cta-gap {
+      margin-top: 0.75rem;
+    }
+  }
+
+  /* Inner hero content inset (below the arch keyline). */
+  .hero-body-pad {
+    padding-top: 1rem;
+  }
+  @media (min-width: 768px) {
+    .hero-body-pad {
+      padding-top: 3rem;
+    }
+  }
+  @media (max-height: 800px) {
+    .hero-body-pad {
+      padding-top: 2rem;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

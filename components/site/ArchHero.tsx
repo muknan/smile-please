@@ -32,7 +32,7 @@ export function ArchHero() {
   }, []);
 
   return (
-    <section className="flex snap-start min-h-[100svh] items-center justify-center bg-neem-900">
+    <section className="flex snap-start min-h-[calc(100svh-var(--header-h))] items-center justify-center bg-neem-900">
       {/* max-w on the wrapper, not the frame: % padding on the frame resolves
           against its containing block, and a stretched flex item would use the
           full-width wrapper. Frame %s must resolve against the frame's own width. */}
@@ -40,13 +40,13 @@ export function ArchHero() {
         <ArchFrame
           keyline
           keylineClass={played ? "hero-keyline hero-keyline-draw" : "hero-keyline"}
-          className="w-full py-16 sm:py-24 sm:pb-16"
+          className="hero-frame-pad w-full"
         >
           {/* Content is visible by default (D-38). The arch is narrowest at its
               apex, so the text is kept below-and-inside the opening: narrow
               measure + generous horizontal + top inset so the marigold keyline
               never crosses the text. */}
-          <div className="flex flex-col items-center px-10 pt-4 text-center sm:px-14 sm:pt-12">
+          <div className="hero-body-pad flex flex-col items-center px-10 text-center sm:px-14">
             <h1 className="max-w-[22ch] text-display-xl text-chalk-0">
               Free dental care for the people Delhi&apos;s clinics don&apos;t reach.
             </h1>
@@ -54,7 +54,7 @@ export function ArchHero() {
               Real dentists, registered with the Dental Council of India, working in the
               communities that need them. A check-up is free. It takes about ten minutes to arrange.
             </p>
-            <div className="mt-9 flex flex-col items-stretch gap-4 sm:mt-12 sm:flex-row sm:items-center">
+            <div className="hero-cta-gap flex flex-col items-stretch gap-4 sm:flex-row sm:items-center">
               <Link
                 href="/care"
                 className="inline-flex min-h-11 items-center justify-center rounded bg-marigold-500 px-6 py-3 font-utility text-body-s font-medium text-ink-950 transition hover:brightness-95"

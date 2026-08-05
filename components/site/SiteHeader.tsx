@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { DesktopNav, MobileMenu } from "./HeaderNav";
@@ -11,10 +10,7 @@ import { HeaderProfile } from "./HeaderProfile";
  */
 export function SiteHeader() {
   return (
-    <header
-      className="sticky top-0 z-50 border-b border-neem-100 bg-mineral-50"
-      style={{ "--header-h": "60px" } as CSSProperties}
-    >
+    <header className="sticky top-0 z-50 border-b border-neem-100 bg-mineral-50 [--header-h:60px] sm:[--header-h:72px]">
       <div className="container-content flex h-[60px] items-center justify-between sm:h-[72px]">
         <Link href="/" className="flex items-center" aria-label="Smile Please — home">
           <Image
