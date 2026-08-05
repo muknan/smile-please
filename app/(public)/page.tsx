@@ -77,7 +77,7 @@ export default async function HomePage() {
     <>
       <ArchHero />
 
-      <Section marker="What we do" className="pt-24">
+      <Section marker="What we do" className="pt-24" snap>
         <h2 className="text-display-l">Two things, both free.</h2>
         <div className="mt-16 grid gap-16 md:grid-cols-2 md:gap-6">
           <div>
@@ -101,7 +101,7 @@ export default async function HomePage() {
         </div>
       </Section>
 
-      <Section marker="How it works" className="border-t border-neem-100 py-24">
+      <Section marker="How it works" className="border-t border-neem-100 py-24" snap>
         <h2 className="text-display-l">Three steps, then we&apos;re out of your way.</h2>
         <ol className="mt-16 space-y-16">
           {steps.map((step, i) => (
@@ -122,7 +122,7 @@ export default async function HomePage() {
         </ol>
       </Section>
 
-      <Section marker="Trust" className="bg-neem-100 py-24">
+      <Section marker="Trust" className="bg-neem-100 py-24" snap>
         <h2 className="text-display-l">The ground rules.</h2>
         <ul className="mt-16 grid gap-10 md:grid-cols-2 md:gap-x-6 md:gap-y-10">
           {trust.map((claim) => (
@@ -134,7 +134,7 @@ export default async function HomePage() {
         </ul>
       </Section>
 
-      <Section marker="Learn" className="py-24">
+      <Section marker="Learn" className="py-24" snap>
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <h2 className="max-w-[20ch] text-display-l">
             What the dentists tell people every day.

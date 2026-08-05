@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function CarePage() {
   return (
-    <Section marker="Care" className="pt-24">
+    <Section marker="Care" className="pt-24" snap>
       <h1 className="max-w-3xl text-display-l">Book a check-up, free</h1>
       <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
         Care costs nothing, and nobody here turns a patient away. Two ways in — pick

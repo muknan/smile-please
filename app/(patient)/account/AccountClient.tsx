@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -378,12 +379,14 @@ export function AccountClient({
           </li>
         </ul>
         {notice && (
-          <p role="status" className="mt-6 text-body-s text-neem-600">
+          <p role="status" className="mt-6 inline-flex items-center gap-2 rounded-full bg-neem-600 px-4 py-2 text-body-s font-medium text-chalk-0 shadow-sm">
+            <CheckCircle2 size={16} aria-hidden="true" />
             {notice}
           </p>
         )}
         {noticeError && (
-          <p role="alert" className="mt-6 text-body-s text-clay-600">
+          <p role="alert" className="mt-6 inline-flex items-center gap-2 rounded-full bg-clay-600 px-4 py-2 text-body-s font-medium text-chalk-0 shadow-sm">
+            <AlertCircle size={16} aria-hidden="true" />
             {noticeError}
           </p>
         )}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArchGlyph } from "@/components/site/Arch";
 import { formatDate } from "@/lib/format";
+import { CategoryIcon } from "./CategoryIcon";
 
 export type ArticleTeaser = {
   slug: string;
@@ -23,70 +23,48 @@ function coverUrl(path: string): string {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/article-covers/${path}`;
 }
 
-/** Arch-masked cover. Placeholder glyph when there is no photo yet. */
-function Cover({ article }: { article: ArticleTeaser }) {
-  const inner = article.cover_path ? (
-    <Image
-      src={coverUrl(article.cover_path)}
-      alt=""
-      fill
-      sizes="(max-width: 1024px) 90vw, 30vw"
-      className="object-cover"
-    />
-  ) : (
-    <div
-      aria-hidden="true"
-      className="flex h-full w-full items-center justify-center bg-neem-100"
-    >
-      <ArchGlyph size={64} className="text-neem-600/40" />
-    </div>
-  );
-  return (
-    <div
-      aria-hidden={article.cover_path ? undefined : true}
-      className="relative h-40 w-full sm:h-44"
-      style={{ clipPath: "url(#arch-clip)" }}
-    >
-      {inner}
-    </div>
-  );
-}
-
+/**
+ * Compact card — a small icon/thumbnail tile beside the text instead of a large
+ * full-width cover, so more articles fit on screen. Tile shows the real cover
+ * photo when one exists and a meaningful per-category icon otherwise.
+ */
 export function ArticleCard({ article }: { article: ArticleTeaser }) {
   return (
-    <article className="flex flex-col overflow-visible rounded-card border border-neem-100 bg-chalk-0">
-      <Cover article={article} />
-      <div className="flex flex-1 flex-col p-6">
-        <p className="font-utility text-label uppercase text-neem-600">
-          {article.category}
-          <span aria-hidden="true"> · </span>
-          <span className="sr-only">, </span>
-          <time dateTime={article.published_at ?? undefined}>
+    <article className="group flex flex-col overflow-hidden rounded-card border border-neem-100 bg-chalk-0 transition hover:border-neem-600 hover:shadow-sm">
+      <div className="flex items-start gap-4 p-5">
+        <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-card bg-neem-100 text-neem-600">
+          {article.cover_path ? (
+            <Image
+              src={coverUrl(article.cover_path)}
+              alt=""
+              fill
+              sizes="56px"
+              className="object-cover"
+            />
+          ) : (
+            <CategoryIcon category={article.category} size={28} />
+          )}
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <p className="font-utility text-label uppercase text-neem-600">{article.category}</p>
+          <h3 className="mt-1 font-display text-body-l font-medium leading-snug">
+            <Link
+              href={`/learn/${article.slug}`}
+              className="line-clamp-2 text-ink-950 transition hover:text-neem-600"
+            >
+              {article.title}
+            </Link>
+          </h3>
+          {article.excerpt && (
+            <p className="mt-1 line-clamp-2 text-body-s text-ink-950/70">{article.excerpt}</p>
+          )}
+          <p className="mt-2 font-utility text-data text-ink-950/60 tabular">
             {article.published_at ? formatDate(article.published_at) : "Soon"}
-          </time>
-          <span aria-hidden="true"> · </span>
-          <span className="sr-only">, </span>
-          {readMinutes(article.body_md)} min read
-        </p>
-        <h3 className="mt-4 text-display-m leading-snug">
-          <Link
-            href={`/learn/${article.slug}`}
-            className="text-ink-950 transition hover:text-neem-600"
-          >
-            {article.title}
-          </Link>
-        </h3>
-        {article.excerpt && (
-          <p className="mt-4 text-body-s text-ink-950/70">{article.excerpt}</p>
-        )}
-        <p className="mt-6">
-          <Link
-            href={`/learn/${article.slug}`}
-            className="font-utility text-body-s font-medium text-neem-600 underline-offset-4 hover:underline"
-          >
-            Read it
-          </Link>
-        </p>
+            <span aria-hidden="true"> · </span>
+            {readMinutes(article.body_md)} min read
+          </p>
+        </div>
       </div>
     </article>
   );

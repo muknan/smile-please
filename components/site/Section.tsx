@@ -8,16 +8,16 @@ import { SectionMarker } from "./SectionMarker";
  * The rail appears only at lg (1280px) in this config; below that the marker
  * moves above the section (D-49 — comment brought in line with `lg:`).
  *
- * Sections snap into the global `scroll-snap-type: y proximity` by default so
- * stacked sections latch cleanly on scrolling pages (the homepage). Set
- * `snap={false}` for content/legal/booking pages where section snapping would
- * get in the way.
+ * Sections can opt into the global `scroll-snap-type: y proximity` — used only
+ * on pages deliberately divided into section-like blocks (homepage, about,
+ * care). It defaults OFF; pass `snap` where section snapping is wanted.
+ * Forms, listings, article and reading pages must stay on free scrolling.
  */
 export function Section({
   marker,
   className,
   children,
-  snap = true,
+  snap = false,
 }: {
   marker: string;
   className?: string;

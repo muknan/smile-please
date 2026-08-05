@@ -26,7 +26,7 @@ const values = [
 export default function AboutPage() {
   return (
     <>
-      <Section marker="About" className="pt-24">
+      <Section marker="About" className="pt-24" snap>
         <h1 className="text-display-l">Why Smile Please exists</h1>
 
         {/* CLIENT-COPY: replace with the founder's real words. 150–200 words, first person. */}
@@ -52,7 +52,7 @@ export default function AboutPage() {
         {/* END CLIENT-COPY */}
       </Section>
 
-      <Section marker="What we hold to" className="border-t border-neem-100 py-24">
+      <Section marker="What we hold to" className="border-t border-neem-100 py-24" snap>
         <div className="space-y-16">
           {values.map((value) => (
             <div key={value.title} className="max-w-[65ch]">
@@ -63,7 +63,7 @@ export default function AboutPage() {
         </div>
       </Section>
 
-      <Section marker="Registration" className="border-t border-neem-100 py-24">
+      <Section marker="Registration" className="border-t border-neem-100 py-24" snap>
         <h2 className="text-display-l">Organisation details</h2>
         <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
           Registration details — the trust deed number, registered address and grievance
