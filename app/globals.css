@@ -13,8 +13,13 @@
        `snap-stop: always` causes. scroll-margin-top accounts for the sticky
        header without shifting the content. */
     scroll-snap-type: y proximity;
-    scroll-padding-top: 64px;
+    scroll-padding-top: 60px; /* sticky header height on mobile (sm+ below) */
     scroll-behavior: smooth;
+  }
+  @media (min-width: 768px) {
+    html {
+      scroll-padding-top: 72px; /* sticky header height at sm and up */
+    }
   }
   body {
     @apply bg-mineral-50 text-ink-950 font-body text-body antialiased;

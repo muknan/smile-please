@@ -30,7 +30,7 @@ const terms = [
 export default function TermsPage() {
   return (
     <>
-      <Section marker="Terms" className="pt-24">
+      <Section marker="Terms" className="pt-24" snap={false}>
         <h1 className="text-display-l">Terms of use</h1>
         <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
           Short and plain, because paperwork shouldn&apos;t need a lawyer. Using this website
@@ -50,7 +50,7 @@ export default function TermsPage() {
         </div>
       </section>
 
-      <Section marker="The rules" className="py-24">
+      <Section marker="The rules" className="py-24" snap={false}>
         <div className="max-w-[65ch] space-y-16">
           {terms.map((term) => (
             <section key={term.title}>

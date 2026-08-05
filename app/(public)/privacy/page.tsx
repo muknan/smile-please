@@ -41,7 +41,7 @@ const sharing = [
 export default function PrivacyPage() {
   return (
     <>
-      <Section marker="Privacy" className="pt-24">
+      <Section marker="Privacy" className="pt-24" snap={false}>
         <h1 className="text-display-l">Privacy notice</h1>
         <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
           This notice explains what we collect, why, how long we keep it, who we share it with,
@@ -70,7 +70,7 @@ export default function PrivacyPage() {
         </dl>
       </Section>
 
-      <Section marker="What we collect" className="border-t border-neem-100 py-24">
+      <Section marker="What we collect" className="border-t border-neem-100 py-24" snap={false}>
         <h2 className="text-display-m">2. What we collect</h2>
         <p className="mt-6 max-w-[65ch] text-body">
           Only what the service needs. If a field is optional, it stays optional.
@@ -105,7 +105,7 @@ export default function PrivacyPage() {
         </p>
       </Section>
 
-      <Section marker="Why we collect it" className="border-t border-neem-100 py-24">
+      <Section marker="Why we collect it" className="border-t border-neem-100 py-24" snap={false}>
         <h2 className="text-display-m">3. Why we collect it</h2>
         <ul className="mt-10 space-y-10">
           {purposes.map(([purpose, why]) => (
@@ -117,7 +117,7 @@ export default function PrivacyPage() {
         </ul>
       </Section>
 
-      <Section marker="How long we keep it" className="border-t border-neem-100 py-24">
+      <Section marker="How long we keep it" className="border-t border-neem-100 py-24" snap={false}>
         <h2 className="text-display-m">4. How long we keep it</h2>
         <ul className="mt-8 max-w-[65ch] list-disc space-y-4 pl-6 text-body">
           <li>Booking records and consent records: 12 months after the last activity.</li>
@@ -127,7 +127,7 @@ export default function PrivacyPage() {
         </ul>
       </Section>
 
-      <Section marker="Who we share it with" className="border-t border-neem-100 py-24">
+      <Section marker="Who we share it with" className="border-t border-neem-100 py-24" snap={false}>
         <h2 className="text-display-m">5. Who we share it with</h2>
         <p className="mt-6 max-w-[65ch] text-body">
           We do not sell data, and we do not show your details publicly. The named processors
@@ -161,7 +161,7 @@ export default function PrivacyPage() {
         </div>
       </Section>
 
-      <Section marker="Your rights" className="border-t border-neem-100 py-24">
+      <Section marker="Your rights" className="border-t border-neem-100 py-24" snap={false}>
         <h2 className="text-display-m">6. Your rights</h2>
         <ul className="mt-8 max-w-[65ch] list-disc space-y-4 pl-6 text-body">
           <li>
@@ -186,7 +186,7 @@ export default function PrivacyPage() {
         </ul>
       </Section>
 
-      <Section marker="Withdrawing consent" className="border-t border-neem-100 py-24">
+      <Section marker="Withdrawing consent" className="border-t border-neem-100 py-24" snap={false}>
         <h2 className="text-display-m">7. How to withdraw consent</h2>
         <p className="mt-6 max-w-[65ch] text-body">
           Consent is per purpose. Withdrawal is as easy as granting it: open your account, see
@@ -202,7 +202,7 @@ export default function PrivacyPage() {
         </Link>
       </Section>
 
-      <Section marker="Children" className="border-t border-neem-100 py-24">
+      <Section marker="Children" className="border-t border-neem-100 py-24" snap={false}>
         <h2 className="text-display-m">8. Children&apos;s data</h2>
         <p className="mt-6 max-w-[65ch] text-body">
           Bookings for anyone under 18 must be made by a parent or guardian, who stands as the
@@ -212,7 +212,7 @@ export default function PrivacyPage() {
         </p>
       </Section>
 
-      <Section marker="Complaints" className="border-t border-neem-100 py-24">
+      <Section marker="Complaints" className="border-t border-neem-100 py-24" snap={false}>
         <h2 className="text-display-m">9. How to complain</h2>
         <p className="mt-6 max-w-[65ch] text-body">
           Tried us first and not satisfied? You can complain to the Data Protection Board of

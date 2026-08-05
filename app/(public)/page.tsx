@@ -160,7 +160,7 @@ export default async function HomePage() {
         )}
       </Section>
 
-      <section className="bg-neem-900 py-24 text-chalk-0">
+      <section className="snap-start bg-neem-900 py-24 text-chalk-0">
         <div className="container-content grid gap-10 lg:grid-cols-12 lg:gap-6">
           <div className="lg:col-span-8 lg:col-start-2">
             <h2 className="text-display-l">Are you a dentist or an organisation?</h2>
