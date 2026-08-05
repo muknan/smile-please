@@ -17,13 +17,11 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createClient();
-    // The app sends OTPs server-side (no PKCE challenge), so the emailed and
-    // admin-generated links carry a plain token, not an auth code. Verify it
-    // by token_hash — exchangeCodeForSession only accepts PKCE auth codes.
-    const { error } = await supabase.auth.verifyOtp({
-      token_hash: code,
-      type: "magiclink",
-    });
+    // @supabase/ssr defaults to the PKCE flow, so magic links carry an auth
+    // `code` in the query (the token_hash lives in the URL fragment, which the
+    // server never receives). Exchange it with the code_verifier that was
+    // stored in the browser cookie when the OTP was requested.
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
       const {
         data: { user },
