@@ -33,6 +33,25 @@ type Vars = Record<string, unknown>;
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+/**
+ * Brevo (and several other relays) reject a raw `"Name <addr>"` string as the
+ * envelope From with 451 Invalid from, but accept a structured
+ * { name, address }. MAIL_FROM may be either form, possibly with a quoted
+ * display name — normalise it here so the SMTP envelope is always clean.
+ */
+function parseFrom(raw: string): { name: string; address: string } {
+  // Strip any surrounding quotes first (dotenv may keep them).
+  const s = raw.replace(/^["']|["']$/g, "");
+  const angled = s.match(/<([^>]+)>/);
+  if (angled) {
+    const name = s.slice(0, s.indexOf("<")).replace(/^["']|["']$/g, "").trim();
+    return { name: name || "Smile Please", address: angled[1] };
+  }
+  return { name: "Smile Please", address: s.trim() };
+}
+
+const FROM = parseFrom(process.env.MAIL_FROM ?? "Smile Please <noreply@example.com>");
+
 function esc(value: unknown): string {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -280,7 +299,7 @@ export async function sendMail(
   try {
     const { html, text } = renderLayout(opts);
     await getTransport().sendMail({
-      from: process.env.MAIL_FROM ?? "Smile Please <noreply@example.com>",
+      from: FROM,
       to,
       subject: opts.subject,
       html,
