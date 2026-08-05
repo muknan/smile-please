@@ -2,11 +2,12 @@ name: Scheduled jobs
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # release slot holds every 15 minutes
-    - cron: "0 3 * * *"      # 08:30 IST — appointment reminders
-    - cron: "30 3 * * *"     # 09:00 IST — admin daily digest
-    - cron: "0 */6 * * *"    # keep the free Supabase tier awake
+    - cron: "*/15 * * * *"
+    - cron: "0 3 * * *"
+    - cron: "30 3 * * *"
+    - cron: "0 */6 * * *"
   workflow_dispatch: {}
+
 
 # Vercel Hobby cron is limited to once a day, which is not enough for hold
 # release; GitHub Actions gives 2,000 free minutes/month and is the fit here.
