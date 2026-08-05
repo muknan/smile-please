@@ -63,7 +63,7 @@ export default async function AccountPage() {
   const greeting = displayFirstName(profile.full_name);
 
   return (
-    <main className="py-24">
+    <div className="py-24">
       <div className="container-content max-w-3xl space-y-24">
         <header>
           <p className="font-utility text-label uppercase text-neem-600">Account</p>
@@ -107,6 +107,6 @@ export default async function AccountPage() {
           — it explains the full withdrawal and erasure process.
         </p>
       </div>
-    </main>
+    </div>
   );
 }
