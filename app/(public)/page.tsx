@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BookOpen } from "lucide-react";
 import { ArchHero } from "@/components/site/ArchHero";
 import { Section } from "@/components/site/Section";
 import { ArticleCard, type ArticleTeaser } from "@/components/site/ArticleCard";
@@ -47,29 +48,6 @@ function ToothIcon() {
   );
 }
 
-/** Neem sprig — a curved stem with paired leaflets. */
-function SprigIcon() {
-  return (
-    <svg
-      width="40"
-      height="40"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      aria-hidden="true"
-      className="text-neem-600"
-    >
-      <path d="M6.5 21c2-6.5 5.5-12.5 12-16.5" />
-      <path d="M9 12.2c2-.3 3.4-1.2 4.2-2.6" />
-      <path d="M10.6 9.3c-1.8.2-3.1.9-3.9 2" />
-      <path d="M12.6 6.6c1.6-.4 2.7-1.1 3.3-2.3" />
-      <path d="M13.4 14c1.6-.4 2.6-1.2 3.2-2.4" />
-    </svg>
-  );
-}
-
 const steps = [
   {
     title: "Tell us what's wrong",
@@ -99,7 +77,7 @@ export default async function HomePage() {
     <>
       <ArchHero />
 
-      <Section marker="What we do" className="pt-24">
+      <Section marker="What we do" className="snap-start pt-24">
         <h2 className="text-display-l">Two things, both free.</h2>
         <div className="mt-16 grid gap-16 md:grid-cols-2 md:gap-6">
           <div>
@@ -112,7 +90,7 @@ export default async function HomePage() {
             </p>
           </div>
           <div>
-            <SprigIcon />
+            <BookOpen className="text-neem-600" size={40} strokeWidth={1.5} aria-hidden="true" />
             <h3 className="mt-6 text-display-m">Awareness in schools and communities</h3>
             <p className="mt-4 max-w-[52ch] text-body text-ink-950/80">
               We run short, plain sessions about what cavities actually are, how brushing works,
@@ -123,7 +101,7 @@ export default async function HomePage() {
         </div>
       </Section>
 
-      <Section marker="How it works" className="border-t border-neem-100 py-24">
+      <Section marker="How it works" className="snap-start border-t border-neem-100 py-24">
         <h2 className="text-display-l">Three steps, then we&apos;re out of your way.</h2>
         <ol className="mt-16 space-y-16">
           {steps.map((step, i) => (
@@ -144,7 +122,7 @@ export default async function HomePage() {
         </ol>
       </Section>
 
-      <Section marker="Trust" className="bg-neem-100 py-24">
+      <Section marker="Trust" className="snap-start bg-neem-100 py-24">
         <h2 className="text-display-l">The ground rules.</h2>
         <ul className="mt-16 grid gap-10 md:grid-cols-2 md:gap-x-6 md:gap-y-10">
           {trust.map((claim) => (
@@ -156,7 +134,7 @@ export default async function HomePage() {
         </ul>
       </Section>
 
-      <Section marker="Learn" className="py-24">
+      <Section marker="Learn" className="snap-start py-24">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <h2 className="max-w-[20ch] text-display-l">
             What the dentists tell people every day.
@@ -182,7 +160,7 @@ export default async function HomePage() {
         )}
       </Section>
 
-      <section className="bg-neem-900 py-24 text-chalk-0">
+      <section className="snap-start bg-neem-900 py-24 text-chalk-0">
         <div className="container-content grid gap-10 lg:grid-cols-12 lg:gap-6">
           <div className="lg:col-span-8 lg:col-start-2">
             <h2 className="text-display-l">Are you a dentist or an organisation?</h2>

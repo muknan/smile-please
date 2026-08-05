@@ -32,15 +32,15 @@ export function ArchHero() {
   }, []);
 
   return (
-    <section className="flex min-h-[70svh] items-center justify-center bg-neem-900 sm:min-h-[78svh]">
+    <section className="flex snap-start min-h-[100svh] items-center justify-center bg-neem-900">
       {/* max-w on the wrapper, not the frame: % padding on the frame resolves
           against its containing block, and a stretched flex item would use the
           full-width wrapper. Frame %s must resolve against the frame's own width. */}
-      <div className="mx-auto w-full max-w-[620px] px-4 py-16 sm:px-6 sm:py-24">
+      <div className="mx-auto w-full max-w-[600px] px-4 py-8 sm:px-6 sm:py-6">
         <ArchFrame
           keyline
           keylineClass={played ? "hero-keyline hero-keyline-draw" : "hero-keyline"}
-          className="w-full py-[52%] pb-[16%] sm:pt-[28%] sm:pb-[20%]"
+          className="w-full py-[34%] pb-[13%] sm:pt-[16%] sm:pb-[12%]"
         >
           {/* Content is visible by default (D-38): a slow or failed hydration
               never leaves the hero blank — only the keyline animates. */}

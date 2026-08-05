@@ -14,9 +14,17 @@ const ROLE_HOME: Record<UserRole, string> = {
 };
 
 const signedOut = (
-  <Button href="/care" size="sm" className="min-w-[8rem]">
-    Book a check-up
-  </Button>
+  <div className="flex items-center gap-4">
+    <Link
+      href="/auth/sign-in"
+      className="font-utility text-body-s font-medium text-ink-950 transition hover:text-neem-600"
+    >
+      Sign in
+    </Link>
+    <Button href="/care" size="sm" className="min-w-[8rem]">
+      Book a check-up
+    </Button>
+  </div>
 );
 
 /**

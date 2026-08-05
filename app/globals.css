@@ -3,7 +3,12 @@
 @tailwind utilities;
 
 @layer base {
-  html { -webkit-text-size-adjust: 100%; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* Landing-page section snapping (scroll-snap). Targets are opt-in via
+       scroll-snap-align, so only pages that mark sections actually snap. */
+    scroll-snap-type: y proximity;
+  }
   body {
     @apply bg-mineral-50 text-ink-950 font-body text-body antialiased;
   }
@@ -26,6 +31,7 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  html { scroll-snap-type: none; }
 }
 
 /* Mobile display sizes */
@@ -34,31 +40,17 @@
   .text-display-l  { font-size: 2rem; }
 }
 
-/* Landing hero load sequence — runs once per session (guard in ArchHero).
-   Initial states are invisible-only (opacity/transform), so the hero's
-   height is always reserved: no CLS while fonts load or during the play. */
+/* Landing hero keyline draw — runs once per session (guard in ArchHero). */
 .hero-keyline { stroke-dasharray: 3; stroke-dashoffset: 3; }
 .hero-keyline-draw {
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 700ms ease-out;
-}
-.hero-fade { opacity: 0; transform: translateY(12px); }
-.hero-fade-in {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 500ms ease-out, transform 500ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero-keyline,
   .hero-keyline-draw {
     stroke-dashoffset: 0 !important;
-    transition: none !important;
-  }
-  .hero-fade,
-  .hero-fade-in {
-    opacity: 1 !important;
-    transform: none !important;
     transition: none !important;
   }
 }

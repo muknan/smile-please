@@ -43,6 +43,7 @@ export function SlotGrid({
 }) {
   const router = useRouter();
   const [cursor, setCursor] = useState<{ d: number; t: number }>({ d: 0, t: 0 });
+  const [mobileDay, setMobileDay] = useState(0);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -126,48 +127,102 @@ export function SlotGrid({
           {message}
         </p>
       )}
-      <div className="overflow-x-auto" role="region" aria-label="Available appointment times" tabIndex={0}>
+      {/* Mobile: day chips -> time list (D-09 mobile rebuild). */}
+      <div className="space-y-4 sm:hidden">
         <div
-          ref={gridRef}
-          role="grid"
-          aria-label="Available appointment times"
-          className="grid min-w-[1296px] gap-px sm:min-w-[720px]"
-          style={{ gridTemplateColumns: `120px repeat(${days.length}, minmax(84px, 1fr))` }}
+          className="flex gap-2 overflow-x-auto pb-1"
+          role="tablist"
+          aria-label="Pick a day"
         >
-          {/* corner + day headers */}
-          <div role="columnheader" className="p-2" />
-          {days.map((day) => (
-            <div
+          {days.map((day, d) => (
+            <button
               key={day.dateKey}
-              role="columnheader"
-              className="flex flex-col items-center gap-1 p-2 text-center"
+              type="button"
+              role="tab"
+              aria-selected={mobileDay === d}
+              onClick={() => setMobileDay(d)}
+              className={
+                mobileDay === d
+                  ? "shrink-0 rounded-full bg-neem-900 px-4 py-2 font-utility text-body-s font-medium text-chalk-0"
+                  : "shrink-0 rounded-full border border-neem-100 bg-chalk-0 px-4 py-2 font-utility text-body-s text-ink-950 hover:border-neem-600"
+              }
             >
-              <span className="font-utility text-body-s font-semibold text-ink-950">
-                {day.shortLabel}
-              </span>
-            </div>
-          ))}
-
-          {times.map((time, t) => (
-            <GridRow
-              key={time}
-              time={time}
-              t={t}
-              days={days}
-              cursor={cursor}
-              busy={busy}
-              slotAt={slotAt}
-              onMove={move}
-              onPick={pick}
-              onFocusCell={focusCell}
-            />
+              {day.shortLabel}
+            </button>
           ))}
         </div>
+
+        <ul className="space-y-2" aria-label={`Times on ${days[mobileDay]?.fullLabel ?? ""}`}>
+          {times.map((time, t) => {
+            const slot = cells[mobileDay]?.[t] ?? null;
+            if (!slot) return null; // skip days/times with no slot
+            return (
+              <li key={time}>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => pick(slot)}
+                  className="flex w-full items-center justify-between rounded-card border border-neem-100 bg-chalk-0 px-4 py-3 font-utility text-data text-ink-950 transition hover:border-neem-600 disabled:opacity-60"
+                >
+                  <span>{formatTime(slot.starts_at)}</span>
+                  <span className="text-neem-600">
+                    {days[mobileDay]?.fullLabel}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+        <p className="text-body-s text-ink-950/60">
+          Choose a day, then a time — it&apos;s held for ten minutes while you enter your details.
+        </p>
       </div>
-      <p className="text-body-s text-ink-950/60">
-        Use the arrow keys to move and Enter to pick a time. Picking a time reserves
-        it for ten minutes while you enter your details.
-      </p>
+
+      {/* Desktop: the 14-day matrix, keyboard-operable. */}
+      <div className="hidden sm:block">
+        <div className="overflow-x-auto" role="region" aria-label="Available appointment times" tabIndex={0}>
+          <div
+            ref={gridRef}
+            role="grid"
+            aria-label="Available appointment times"
+            className="grid min-w-[1296px] gap-px"
+            style={{ gridTemplateColumns: `120px repeat(${days.length}, minmax(84px, 1fr))` }}
+          >
+            {/* corner + day headers */}
+            <div role="columnheader" className="p-2" />
+            {days.map((day) => (
+              <div
+                key={day.dateKey}
+                role="columnheader"
+                className="flex flex-col items-center gap-1 p-2 text-center"
+              >
+                <span className="font-utility text-body-s font-semibold text-ink-950">
+                  {day.shortLabel}
+                </span>
+              </div>
+            ))}
+
+            {times.map((time, t) => (
+              <GridRow
+                key={time}
+                time={time}
+                t={t}
+                days={days}
+                cursor={cursor}
+                busy={busy}
+                slotAt={slotAt}
+                onMove={move}
+                onPick={pick}
+                onFocusCell={focusCell}
+              />
+            ))}
+          </div>
+        </div>
+        <p className="text-body-s text-ink-950/60">
+          Use the arrow keys to move and Enter to pick a time. Picking a time reserves
+          it for ten minutes while you enter your details.
+        </p>
+      </div>
     </div>
   );
 }
