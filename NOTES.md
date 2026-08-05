@@ -73,3 +73,44 @@ Judgement calls, non-standard choices, and things that need a human decision. Fo
   - RLS: all public tables have RLS enabled (0 tables off). Re-ran the Phase 2 adversarial assertions against the CURRENT schema: all 12 + the guard + the admin bonus PASS (no drift after Phases 5-7).
   - Added security headers in `next.config.ts` (HSTS, X-Content-Type-Options, X-Frame-Options DENY, Referrer-Policy, Permissions-Policy, Content-Security-Policy). CSP allows self + Supabase URL + inline styles + inline scripts (Next 15 bootstrap requires `'unsafe-inline'` for scripts — noted tradeoff). Verified the app renders fully under the CSP (no blocked scripts/styles).
 
+---
+
+## Needs a decision from the client
+
+These are deliberately left as placeholders or deferred choices the client must
+resolve before going live. None block local development; some block launch.
+
+- **Real content (CLIENT-COPY markers).** The `/about` founder story and trust-register
+  details, the privacy address + grievance contact, the contact page's named human and
+  registered address, and the WhatsApp number all carry `CLIENT-COPY` markers and need
+  real details.
+- **Rotate the database password.** The live Supabase `postgres` password was exposed
+  in plaintext during development (session tool output) and seed `auth.users` password
+  hashes are `'x'`. **Rotate before any production deploy** and move the value out of
+  plaintext tooling.
+- **Provision SMTP (Brevo).** `.env.local` SMTP_* are placeholders. Until real
+  credentials are set, no email actually sends — which also blocks interactive
+  sign-in, dentist/admin-portal browser testing, and the confirmation/reminder emails
+  on the acceptance checklists.
+- **Sentry (Phase 8 §8.2).** Creating the free Sentry account and setting `SENTRY_DSN`
+  is a human step. Install `@sentry/nextjs`, configure `beforeSend` to scrub phone,
+  email, patient_note, clinical_note, full_name and message, and set
+  `sendDefaultPii: false` BEFORE the first deploy.
+- **Next.js upgrade (approved risk).** 3 npm audit findings (2 high, 1 critical) remain,
+  all shipped inside Next 15.1.6. The only fix is a breaking Next 16.3.0 upgrade.
+  Approve before upgrading — it will re-require the OG-font patch and QA of every phase.
+- **Vercel Hobby commercial limit.** No Donate button may appear while on the Hobby
+  plan; if donations are wanted, move to Vercel Pro (~₹1,910/mo), Cloudflare Workers
+  (free, commercial-friendly), or keep donations external. In README.
+- **SMS (v2).** Not in v1 — TRAI DLT registration is a paid gate (~₹5,900 per
+  operator). v2 upgrade path only.
+- **Admin seed inconsistency.** The seed's `admin@smile-please.example` (
+  `...000900`) has no profile row on the live DB; the real admin is `f2e550fc...881`.
+  On a fresh environment, confirm the seed creates the admin profile.
+- **Deployment + hosting.** Requires the human's `gh auth login`, `vercel login`, repo
+  creation (private), Vercel env vars for all three environments, and auth redirect URL
+  updates. See README "Deployment".
+- **Backups.** The free Supabase tier has no backups. The weekly GH Actions dump
+  (`.github/workflows/backup.yml`) needs `SUPABASE_DB_URL` + `BACKUP_PASSPHRASE` repo
+  secrets and a one-time restore drill into a scratch project.
+

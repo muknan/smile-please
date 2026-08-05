@@ -1,0 +1,40 @@
+name: Scheduled jobs
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # release slot holds every 15 minutes
+    - cron: "0 3 * * *"      # 08:30 IST — appointment reminders
+    - cron: "30 3 * * *"     # 09:00 IST — admin daily digest
+    - cron: "0 */6 * * *"    # keep the free Supabase tier awake
+  workflow_dispatch: {}
+
+# Vercel Hobby cron is limited to once a day, which is not enough for hold
+# release; GitHub Actions gives 2,000 free minutes/month and is the fit here.
+concurrency:
+  group: scheduled-jobs
+  cancel-in-progress: false
+
+jobs:
+  release-holds:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release expired holds
+        run: curl -sf -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ vars.SITE_URL }}/api/cron/release-holds"
+
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send 24h reminders
+        run: curl -sf -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ vars.SITE_URL }}/api/cron/send-reminders"
+
+  admin-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send admin digest
+        run: curl -sf -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ vars.SITE_URL }}/api/cron/admin-digest"
+
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Keep Supabase awake
+        run: curl -sf -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "${{ vars.SITE_URL }}/api/cron/keep-alive"
