@@ -11,25 +11,29 @@ import { createClient } from "@/lib/supabase/server";
  */
 
 export const MIN_FILL_MS = 3000;
+export const MAX_TOKEN_AGE_MS = 2 * 60 * 60 * 1000;
 export const HOURLY_LIMIT = 5;
 
-const SALT = process.env.CRON_SECRET ?? "dev-salt";
+const FORM_SECRET = process.env.FORM_SECRET ?? (process.env.NODE_ENV === "production" ? "" : "dev-form-secret");
+if (!FORM_SECRET) throw new Error("FORM_SECRET must be configured in production.");
 
 /** Client IP best-effort (behind nginx/Vercel). Never logged raw. */
 export async function clientIp(): Promise<string> {
   const h = await headers();
+  const vercel = h.get("x-vercel-forwarded-for");
+  if (vercel) return vercel.trim();
   const forwarded = h.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim();
+  if (forwarded) return forwarded.split(",").map((part) => part.trim()).filter(Boolean).at(-1) ?? "local";
   return h.get("x-real-ip") ?? "local";
 }
 
 export function hashedIpKey(scope: string, ip: string): string {
-  return createHash("sha256").update(`${scope}|${ip}|${SALT}`).digest("hex");
+  return createHash("sha256").update(`${scope}|${ip}|${FORM_SECRET}`).digest("hex");
 }
 
 /** HMAC signature so a bot can't forge a back-dated renderedAt. */
 export function signRenderedAt(ts: number): string {
-  return createHmac("sha256", SALT).update(String(ts)).digest("hex").slice(0, 16);
+  return createHmac("sha256", FORM_SECRET).update(String(ts)).digest("hex").slice(0, 16);
 }
 
 /** Returns the signed timestamp to embed in a hidden field (server render). */
@@ -53,15 +57,17 @@ export function checkHuman(formData: FormData): HumanCheck {
   const rendered = String(formData.get("renderedAt") ?? "");
   const [tsRaw, sig] = rendered.split(".");
   const ts = Number(tsRaw);
+  const age = Date.now() - ts;
   if (
     !Number.isFinite(ts) ||
     ts <= 0 ||
     sig !== signRenderedAt(ts) ||
-    Date.now() - ts < MIN_FILL_MS
+    age < MIN_FILL_MS ||
+    age > MAX_TOKEN_AGE_MS
   ) {
     return {
       ok: false,
-      error: "That submitted too quickly to be a real person. Wait a moment and try again.",
+      error: "This form has expired or was submitted too quickly. Refresh and try again.",
     };
   }
   return { ok: true };

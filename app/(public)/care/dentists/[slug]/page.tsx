@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!data) return { title: "Dentist not found" };
   return {
     title: data.display_name,
-    description: `Free dental check-ups with Dr ${data.display_name} in ${data.locality}, New Delhi — book a slot directly.`,
+    description: `Free dental check-ups with ${data.display_name} in ${data.locality}, New Delhi — book a slot directly.`,
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/care/dentists/${slug}`,
     },
@@ -68,6 +68,7 @@ export default async function DentistProfilePage({ params, searchParams }: PageP
   const dayIndex = new Map<string, number>();
   const times: string[] = [];
   const timeIndex = new Map<string, number>();
+  const timeMinutes = new Map<string, number>();
 
   for (const slot of gridSlots) {
     const key = dayKey(slot.starts_at);
@@ -77,12 +78,14 @@ export default async function DentistProfilePage({ params, searchParams }: PageP
       days.push({ dateKey: key, shortLabel: formatDayShortLabel(d), fullLabel: fullDayLabel(d) });
     }
     const timeKey = formatTime(slot.starts_at);
-    if (!timeIndex.has(timeKey)) {
-      timeIndex.set(timeKey, times.length);
+    if (!timeMinutes.has(timeKey)) {
+      const d = new Date(slot.starts_at);
+      timeMinutes.set(timeKey, d.getUTCHours() * 60 + d.getUTCMinutes() + 330);
       times.push(timeKey);
     }
   }
-  times.sort();
+  times.sort((a, b) => timeMinutes.get(a)! - timeMinutes.get(b)!);
+  times.forEach((time, index) => timeIndex.set(time, index));
 
   const cells: (GridSlot | null)[][] = Array.from({ length: days.length }, () =>
     Array(times.length).fill(null),

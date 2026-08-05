@@ -10,11 +10,15 @@ export const signInSchema = z.object({
     .email("That doesn't look like a real email address."),
 });
 
-/** Indian mobile, E.164. */
-export const phoneSchema = z
-  .string()
-  .trim()
-  .regex(/^\+91[6-9]\d{9}$/, "Enter a mobile number like +91 98765 43210.");
+/** Indian mobile, E.164. Accepts "9876543210", "+91 98765 43210", "+919876543210". */
+export const phoneSchema = z.preprocess(
+  (value) => {
+    let s = String(value ?? "").trim().replace(/[\s-]/g, "");
+    if (/^0?[6-9]\d{9}$/.test(s)) s = `+91${s.replace(/^0/, "")}`;
+    return s;
+  },
+  z.string().regex(/^\+91[6-9]\d{9}$/, "Enter a mobile number like +91 98765 43210."),
+);
 
 export const optionalEmailSchema = z
   .string()

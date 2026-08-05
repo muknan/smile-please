@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "Free dental care in Delhi — Smile Please",
   description:

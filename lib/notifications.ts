@@ -50,23 +50,23 @@ export async function notifyAppointmentTransition(
 
   if (toStatus === "confirmed" && fromStatus !== toStatus) {
     // Path-B self-book or dentist/admin confirm of an assigned appointment.
-    if (patientEmail) notify("appointment_confirmed", patientEmail, common);
+    if (patientEmail) await notify("appointment_confirmed", patientEmail, common);
     return;
   }
 
   if (fromStatus === "confirmed" && toStatus === "confirmed") {
     // Reschedule keeps status confirmed; date/time moved.
-    if (patientEmail) notify("appointment_rescheduled", patientEmail, common);
+    if (patientEmail) await notify("appointment_rescheduled", patientEmail, common);
     return;
   }
 
   if (toStatus === "assigned") {
-    if (patientEmail) notify("appointment_assigned", patientEmail, common);
+    if (patientEmail) await notify("appointment_assigned", patientEmail, common);
     if (dentist && appointment.scheduled_for) {
       const patientName = await nameFor(supabase, appointment.patient_id);
       const dentistEmail = await dentistProfileEmail(supabase, dentist.profileId);
       if (dentistEmail) {
-        notify("new_assignment_dentist", dentistEmail, {
+        await notify("new_assignment_dentist", dentistEmail, {
           patientName,
           date: when?.date ?? "",
           time: when?.time ?? "",
@@ -79,7 +79,7 @@ export async function notifyAppointmentTransition(
 
   const mail = PATIENT_MAIL[toStatus];
   if (mail && patientEmail && appointment.scheduled_for) {
-    notify(mail, patientEmail, common);
+    await notify(mail, patientEmail, common);
   }
 }
 

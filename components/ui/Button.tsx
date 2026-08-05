@@ -1,21 +1,23 @@
 import * as React from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  // ink-950 on marigold: never white text on the accent
-  primary: "bg-marigold-500 text-ink-950",
-  secondary: "bg-neem-900 text-chalk-0",
-  ghost: "border border-neem-100 text-ink-950 bg-transparent",
-  danger: "bg-clay-600 text-chalk-0",
+  primary: "bg-marigold-500 text-ink-950 hover:brightness-95",
+  secondary: "bg-neem-900 text-chalk-0 hover:bg-neem-600",
+  ghost: "border border-neem-100 text-ink-950 bg-transparent hover:border-neem-600 hover:bg-neem-100/40",
+  danger: "bg-clay-600 text-chalk-0 hover:brightness-95",
+  "danger-outline": "border border-clay-600 bg-transparent text-clay-600 hover:bg-clay-600 hover:text-chalk-0",
+  link: "bg-transparent px-0 text-neem-600 underline-offset-4 hover:underline",
 };
 
 const sizeClasses: Record<NonNullable<ButtonProps["size"]>, string> = {
-  sm: "px-4 py-2 text-body-s",
-  md: "px-6 py-3 text-body-s",
+  sm: "min-h-11 px-4 py-2 text-body-s",
+  md: "min-h-11 px-6 py-3 text-body-s",
 };
 
 export type ButtonProps = {
-  variant?: "primary" | "secondary" | "ghost" | "danger";
+  variant?: "primary" | "secondary" | "ghost" | "danger" | "danger-outline" | "link";
   size?: "sm" | "md";
   /** When set, renders an <a> with the same styles instead of a <button>. */
   href?: string;
@@ -40,9 +42,9 @@ export function Button({
 
   if (href) {
     return (
-      <a href={href} className={classes}>
+      <Link href={href} className={classes}>
         {children}
-      </a>
+      </Link>
     );
   }
   return (

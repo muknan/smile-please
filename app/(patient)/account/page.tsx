@@ -47,13 +47,16 @@ export default async function AccountPage() {
   );
 
   const now = new Date();
-  const upcoming = appointmentsList.filter(
-    (a) =>
-      a.scheduled_for &&
-      new Date(a.scheduled_for) >= now &&
-      !["cancelled_by_patient", "cancelled_by_dentist", "cancelled_by_admin", "completed", "no_show"].includes(a.status),
+  const terminalStatuses = new Set(["cancelled_by_patient", "cancelled_by_dentist", "cancelled_by_admin", "completed", "no_show"]);
+  const waitingOnUs = appointmentsList.filter(
+    (a) => !a.scheduled_for && (a.status === "requested" || a.status === "assigned"),
   );
-  const past = appointmentsList.filter((a) => !upcoming.includes(a));
+  const waitingIds = new Set(waitingOnUs.map((a) => a.id));
+  const upcoming = appointmentsList.filter(
+    (a) => a.scheduled_for && new Date(a.scheduled_for) >= now && !terminalStatuses.has(a.status),
+  );
+  const upcomingIds = new Set(upcoming.map((a) => a.id));
+  const past = appointmentsList.filter((a) => !waitingIds.has(a.id) && !upcomingIds.has(a.id));
 
   return (
     <main className="py-24">
@@ -69,6 +72,7 @@ export default async function AccountPage() {
         <AccountClient
           profile={profile}
           patient={patientRes.data}
+          waitingOnUs={waitingOnUs}
           upcoming={upcoming}
           past={past}
           consents={consents}

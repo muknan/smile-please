@@ -591,4 +591,59 @@ begin
   raise notice 'test 8 pass: 6th attempt refused, other keys unaffected';
 end $$;
 
+-- ── Test 9: admin reassignment is one atomic transition (D-51/D-57) ────────
+-- An `assigned` appointment can be moved straight to another active dentist
+-- in a single RPC call; a requested row is assigned directly. The reason is
+-- mandatory and lands in appointment_events in the same transaction.
+set local role postgres;
+-- Dedicated fixtures: one assigned appointment to reassign, one requested row.
+insert into public.appointments (patient_id, dentist_id, source, status, reason_category, scheduled_for)
+values
+  ('30000000-0000-0000-0000-0000000000a1','30000000-0000-0000-0000-0000000000b1','admin_created','assigned','checkup', now() + interval '72 hours'),
+  ('30000000-0000-0000-0000-0000000000a1','30000000-0000-0000-0000-0000000000b1','admin_created','requested','pain', null);
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"30000000-0000-0000-0000-0000000000c1"}';
+do $$
+declare v_new_app public.appointments;
+        v_event_count int;
+begin
+  v_new_app := public.admin_appointment_action(
+    (select id from public.appointments a
+       where a.patient_id='30000000-0000-0000-0000-0000000000a1'
+         and a.status='assigned' and a.scheduled_for = now() + interval '72 hours' limit 1),
+    'assigned', 'reassign test', '30000000-0000-0000-0000-0000000000b1');
+  select count(*) into v_event_count from public.appointment_events e
+    join public.appointments a on a.id=e.appointment_id
+   where a.id = v_new_app.id and e.actor_role='admin' and e.to_status='assigned' and e.from_status='assigned';
+  if v_event_count <> 1 then
+    raise exception 'TEST 9 FAILED: reassign did not write one admin event (%)', v_event_count;
+  end if;
+  if v_new_app.dentist_id <> '30000000-0000-0000-0000-0000000000b1' then
+    raise exception 'TEST 9 FAILED: reassigned dentist not applied';
+  end if;
+  raise notice 'test 9 pass: atomic reassignment writes one admin event';
+end $$;
+
+-- ── Test 10: reassignment without a reason is rejected ─────────────────────
+do $$
+declare rejected boolean := false;
+begin
+  begin
+    perform public.admin_appointment_action(
+      (select id from public.appointments a
+         where a.patient_id='30000000-0000-0000-0000-0000000000a1'
+           and a.status='requested' and a.dentist_id='30000000-0000-0000-0000-0000000000b1' limit 1),
+      'assigned', '   ', '30000000-0000-0000-0000-0000000000b1');
+    rejected := true;
+  exception when others then
+    if SQLERRM not like '%REASON_REQUIRED%' then
+      raise exception 'TEST 10 FAILED: wrong error (%:%)', SQLERRM, SQLSTATE;
+    end if;
+  end;
+  if rejected then
+    raise exception 'TEST 10 FAILED: blank reason accepted for admin action';
+  end if;
+  raise notice 'test 10 pass: admin actions require a reason';
+end $$;
+
 rollback;

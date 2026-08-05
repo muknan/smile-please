@@ -1,16 +1,17 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export type TableProps = React.TableHTMLAttributes<HTMLTableElement>;
+export type TableProps = React.TableHTMLAttributes<HTMLTableElement> & { caption?: string };
 
 /** Token-styled table wrapper. Defined in Master Context §4; zebra rows via neem-100/50. */
-export function Table({ className, children, ...rest }: TableProps) {
+export function Table({ className, children, caption, ...rest }: TableProps) {
   return (
     <div className="overflow-x-auto">
       <table
         className={cn("w-full border-collapse font-utility text-data", className)}
         {...rest}
       >
+        {caption && <caption className="sr-only">{caption}</caption>}
         {children}
       </table>
     </div>
@@ -35,7 +36,8 @@ export function TableCell({ className, ...rest }: React.TdHTMLAttributes<HTMLTab
 
 export function TableHeaderCell({
   className,
+  scope = "col",
   ...rest
 }: React.ThHTMLAttributes<HTMLTableCellElement>) {
-  return <th className={cn("px-4 py-3 text-left font-medium", className)} {...rest} />;
+  return <th scope={scope} className={cn("px-4 py-3 text-left font-medium", className)} {...rest} />;
 }

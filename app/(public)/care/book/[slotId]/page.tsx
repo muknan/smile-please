@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { Section } from "@/components/site/Section";
 import { ArchStepper } from "@/components/booking/ArchStepper";
+import { HoldCountdown } from "@/components/booking/HoldCountdown";
 import { createClient } from "@/lib/supabase/server";
 import { makeRenderedAt } from "@/lib/antispam";
 import { formatDateTime } from "@/lib/format";
@@ -69,7 +70,9 @@ export default async function BookPage({ params, searchParams }: PageProps) {
         </div>
       </div>
 
-      <div className="mt-10 max-w-[65ch]">
+      <HoldCountdown />
+
+      <div className="mt-6 max-w-[65ch]">
         <BookForm details={details} />
       </div>
     </Section>

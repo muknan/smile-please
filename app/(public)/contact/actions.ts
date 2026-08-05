@@ -8,21 +8,20 @@ import {
 } from "@/lib/schemas";
 import { checkHuman, withinRateLimit, clientIp, hashedIpKey } from "@/lib/antispam";
 import { notify } from "@/lib/email";
+import { CONTACT_PHONE_DISPLAY, CONTACT_EMAIL } from "@/lib/contact-info";
 import type { Database } from "@/types/db";
+
+import { issuesFromZod, type FieldError } from "@/lib/form-errors";
 
 export type ContactState =
   | { status: "idle" }
-  | { status: "error"; error: string }
+  | { status: "error"; error: string; issues?: FieldError[] }
   | { status: "success"; ref: string };
 
 type SubmissionType = Database["public"]["Enums"]["submission_type"];
 
-const RATE_MSG =
-  "You've sent several messages recently. Please wait an hour, or call us on the number at the bottom of this page.";
+const RATE_MSG = `You've sent several messages recently. Please wait about an hour, or call ${CONTACT_PHONE_DISPLAY} or write to ${CONTACT_EMAIL}.`;
 
-function fakeRef(): string {
-  return `SP-C-2026-${String(Math.floor(Math.random() * 9000 + 1000))}`;
-}
 
 /**
  * Phase 6 §6.1/§6.2: three audiences, one action. Runs the three anti-spam
@@ -36,11 +35,7 @@ export async function submitContact(
   formData: FormData,
 ): Promise<ContactState> {
   const human = checkHuman(formData);
-  if (!human.ok) {
-    // Honeypot-filled or faster than a human: accept with a normal-looking
-    // success and discard the data. Never tell a bot it failed.
-    return { status: "success", ref: fakeRef() };
-  }
+  if (!human.ok) return { status: "error", error: human.error };
 
   const ip = await clientIp();
   if (!(await withinRateLimit("contact", ip))) {
@@ -74,7 +69,8 @@ export async function submitContact(
         : contactPatientSchema;
   const parsed = schema.safeParse(raw);
   if (!parsed.success) {
-    return { status: "error", error: parsed.error.issues[0]?.message ?? "Check the form." };
+    const issues = issuesFromZod(parsed.error);
+    return { status: "error", error: issues[0]?.message ?? "Check the form.", issues };
   }
   const d = parsed.data;
 
@@ -161,7 +157,7 @@ export async function submitContact(
   // Patient and organisation submissions wait for the daily digest.
   if (tab === "dentist") {
     const dentist = parsed.data as Extract<typeof parsed.data, { tab: "dentist" }>;
-    notify("new_submission_admin", process.env.ADMIN_NOTIFY_EMAIL ?? "", {
+    await notify("new_submission_admin", process.env.ADMIN_NOTIFY_EMAIL ?? "", {
       type: "dentist",
       name: dentist.name,
       phone: dentist.phone,
@@ -172,7 +168,7 @@ export async function submitContact(
 
   const submitterEmail = d.email;
   if (submitterEmail) {
-    notify("contact_received", submitterEmail, {
+    await notify("contact_received", submitterEmail, {
       name: submitterName,
       ref: row.reference_code,
     });

@@ -72,8 +72,11 @@ export function BookingsBoard(props: BookingsBoardProps) {
   const [showShorts, setShowShorts] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [assignDentist, setAssignDentist] = useState("");
 
-  const selected = rows[cursor] ?? null;
+  // `selectedId` is the single source of truth for both the drawer and the
+  // action dialog; `cursor` drives only keyboard-navigation highlighting.
+  const selected = selectedId ? rows.find((r) => r.id === selectedId) ?? null : null;
 
   const applyFilters = useCallback(
     (patch: Partial<typeof filters>) => {
@@ -94,10 +97,14 @@ export function BookingsBoard(props: BookingsBoardProps) {
   );
 
   const openDrawer = useCallback((id: string) => {
-    setSelectedId((prev) => (prev === id ? null : id));
+    setSelectedId((prev) => {
+      // Log only on the open transition, never on close (D-52).
+      if (prev === id) return null;
+      void logBookingView(id);
+      return id;
+    });
     setDialog(null);
     setError(null);
-    void logBookingView(id);
   }, []);
 
   // Keyboard shortcuts: j/k move, Enter open, a assign, Escape close, ? help.
@@ -132,17 +139,18 @@ export function BookingsBoard(props: BookingsBoardProps) {
         e.preventDefault();
         setCursor((c) => Math.max(c - 1, 0));
       }
-      if (e.key === "Enter" && selected) {
+      if (e.key === "Enter" && rows[cursor]) {
         e.preventDefault();
-        openDrawer(selected.id);
+        openDrawer(rows[cursor].id);
       }
-      if (e.key === "a" && selected) {
+      if (e.key === "a" && rows[cursor]) {
         e.preventDefault();
+        openDrawer(rows[cursor].id);
         setDialog({ kind: "assign" });
         setError(null);
       }
     },
-    [dialog, selectedId, rows, selected, openDrawer],
+    [dialog, selectedId, rows, cursor, openDrawer],
   );
 
   // Keep the cursor within range after filtering.
@@ -150,15 +158,24 @@ export function BookingsBoard(props: BookingsBoardProps) {
     if (cursor >= rows.length) setCursor(Math.max(0, rows.length - 1));
   }, [rows.length, cursor]);
 
+  // Reset the assigned-dentist picker each time the assign dialog opens.
+  useEffect(() => {
+    if (dialog?.kind === "assign" || dialog === null) setAssignDentist("");
+  }, [dialog]);
+
   const run = async (fn: () => Promise<{ ok: boolean; error?: string }>) => {
     setBusy(true);
     setError(null);
     const res = await fn();
     setBusy(false);
-    if (!res.ok && res.error) setError(res.error);
+    if (!res.ok && res.error) {
+      // Keep the dialog (and drawer) open with the error inline so the admin
+      // can retry without losing context or the typed reason (D-57).
+      setError(res.error);
+      return;
+    }
     router.refresh();
     setDialog(null);
-    setSelectedId(null);
   };
 
   const transition = (to: AppointmentStatus, label: string) => setDialog({ kind: "transition", to, label });
@@ -205,6 +222,8 @@ export function BookingsBoard(props: BookingsBoardProps) {
             <select
               name="dentistId"
               required
+              value={assignDentist}
+              onChange={(e) => setAssignDentist(e.target.value)}
               className="mt-1 w-full rounded border border-neem-100 bg-chalk-0 px-3 py-2 font-utility text-body"
             >
               <option value="" disabled>
@@ -227,14 +246,17 @@ export function BookingsBoard(props: BookingsBoardProps) {
             </span>
             <select
               name="slotId"
-              className="mt-1 w-full rounded border border-neem-100 bg-chalk-0 px-3 py-2 font-utility text-body"
+              disabled={!assignDentist}
+              className="mt-1 w-full rounded border border-neem-100 bg-chalk-0 px-3 py-2 font-utility text-body disabled:opacity-50"
             >
-              <option value="">No slot yet</option>
-              {openSlots.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {formatDateTime(s.starts_at)}
-                </option>
-              ))}
+              <option value="">{assignDentist ? "No slot yet" : "Choose a dentist first"}</option>
+              {openSlots
+                .filter((s) => s.dentist_id === assignDentist)
+                .map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {formatDateTime(s.starts_at)}
+                  </option>
+                ))}
             </select>
           </label>
         )}
@@ -282,11 +304,12 @@ export function BookingsBoard(props: BookingsBoardProps) {
   ) : null;
 
   return (
-    <div tabIndex={0} onKeyDown={onKeyDown} className="mt-6 outline-none" aria-label="Bookings table, keyboard shortcuts: j/k to move, Enter to open, a to assign, ? for help">
+    <div tabIndex={0} onKeyDown={onKeyDown} className="mt-6 rounded outline-none focus-visible:ring-2 focus-visible:ring-neem-600" aria-label="Bookings table, keyboard shortcuts: j/k to move, Enter to open, a to assign, ? for help">
       <Filters
         statuses={allStatuses}
         statusLabels={statusLabels}
         filters={filters}
+        activeDentists={activeDentists}
         onChange={applyFilters}
       />
 
@@ -310,7 +333,16 @@ export function BookingsBoard(props: BookingsBoardProps) {
             {rows.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-4 py-10 text-center text-ink-950/60">
-                  No bookings match those filters.
+                  <p>No bookings match those filters.</p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      applyFilters({ status: "", source: "", dentist: "", locality: "", from: "", to: "" })
+                    }
+                    className="mt-3 rounded border border-neem-100 px-3 py-1.5 font-utility text-data text-clay-600 hover:border-clay-600"
+                  >
+                    Clear all filters
+                  </button>
                 </td>
               </tr>
             ) : (
@@ -323,7 +355,6 @@ export function BookingsBoard(props: BookingsBoardProps) {
                   statusLabels={statusLabels}
                   patientById={patientById}
                   dentistByProfile={dentistByProfile}
-                  onActivate={() => setCursor(i)}
                   onClickRow={() => openDrawer(r.id)}
                 />
               ))
@@ -355,15 +386,24 @@ export function BookingsBoard(props: BookingsBoardProps) {
   );
 }
 
+const SOURCE_OPTIONS = ["patient_request", "self_booked", "admin_created"] as const;
+const SOURCE_LABELS: Record<(typeof SOURCE_OPTIONS)[number], string> = {
+  patient_request: "Requested",
+  self_booked: "Self-booked",
+  admin_created: "Admin",
+};
+
 function Filters({
   statuses,
   statusLabels,
   filters,
+  activeDentists,
   onChange,
 }: {
   statuses: AppointmentStatus[];
   statusLabels: Record<string, string>;
   filters: BookingsBoardProps["filters"];
+  activeDentists: BookingsBoardProps["activeDentists"];
   onChange: (patch: Partial<BookingsBoardProps["filters"]>) => void;
 }) {
   const current = filters.status ? filters.status.split(",").filter(Boolean) : [];
@@ -371,39 +411,112 @@ function Filters({
     const next = current.includes(s) ? current.filter((x) => x !== s) : [...current, s];
     onChange({ status: next.join(",") });
   };
+
+  const selectCls =
+    "rounded border border-neem-100 bg-chalk-0 px-2 py-1 font-utility text-data text-ink-950";
+  const inputCls =
+    "rounded border border-neem-100 bg-chalk-0 px-2 py-1 font-utility text-data text-ink-950";
+
   return (
-    <fieldset className="mt-4">
-      <legend className="sr-only">Filter by status</legend>
-      <div className="flex flex-wrap gap-1.5">
-        {statuses.map((s) => {
-          const on = current.includes(s);
-          return (
+    <div className="mt-4 space-y-3">
+      <fieldset>
+        <legend className="sr-only">Filter by status</legend>
+        <div className="flex flex-wrap gap-1.5">
+          {statuses.map((s) => {
+            const on = current.includes(s);
+            return (
+              <button
+                key={s}
+                type="button"
+                aria-pressed={on}
+                onClick={() => toggle(s)}
+                className={
+                  on
+                    ? "rounded-full bg-ink-950 px-3 py-1 font-utility text-data text-chalk-0"
+                    : "rounded-full border border-neem-100 bg-chalk-0 px-3 py-1 font-utility text-data text-ink-950 hover:border-neem-600"
+                }
+              >
+                {statusLabels[s]}
+              </button>
+            );
+          })}
+          {current.length > 0 && (
             <button
-              key={s}
               type="button"
-              aria-pressed={on}
-              onClick={() => toggle(s)}
-              className={
-                on
-                  ? "rounded-full bg-ink-950 px-3 py-1 font-utility text-data text-chalk-0"
-                  : "rounded-full border border-neem-100 bg-chalk-0 px-3 py-1 font-utility text-data text-ink-950 hover:border-neem-600"
-              }
+              onClick={() => onChange({ status: "" })}
+              className="rounded-full px-3 py-1 font-utility text-data text-clay-600 underline"
             >
-              {statusLabels[s]}
+              Clear
             </button>
-          );
-        })}
-        {current.length > 0 && (
+          )}
+        </div>
+      </fieldset>
+
+      <div className="flex flex-wrap items-center gap-3">
+        {/* D-53: source, dentist, and date-range filters were declared but had no UI. */}
+        <label className="flex items-center gap-2">
+          <span className="font-utility text-label uppercase text-ink-950/60">Source</span>
+          <select
+            value={filters.source}
+            onChange={(e) => onChange({ source: e.target.value })}
+            className={selectCls}
+          >
+            <option value="">All</option>
+            {SOURCE_OPTIONS.map((src) => (
+              <option key={src} value={src}>
+                {SOURCE_LABELS[src]}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex items-center gap-2">
+          <span className="font-utility text-label uppercase text-ink-950/60">Dentist</span>
+          <select
+            value={filters.dentist}
+            onChange={(e) => onChange({ dentist: e.target.value })}
+            className={selectCls}
+          >
+            <option value="">All</option>
+            {activeDentists.map((d) => (
+              <option key={d.profile_id} value={d.profile_id}>
+                {d.display_name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex items-center gap-2">
+          <span className="font-utility text-label uppercase text-ink-950/60">From</span>
+          <input
+            type="date"
+            value={filters.from}
+            onChange={(e) => onChange({ from: e.target.value })}
+            className={inputCls}
+          />
+        </label>
+
+        <label className="flex items-center gap-2">
+          <span className="font-utility text-label uppercase text-ink-950/60">To</span>
+          <input
+            type="date"
+            value={filters.to}
+            onChange={(e) => onChange({ to: e.target.value })}
+            className={inputCls}
+          />
+        </label>
+
+        {(filters.source || filters.dentist || filters.from || filters.to) && (
           <button
             type="button"
-            onClick={() => onChange({ status: "" })}
-            className="rounded-full px-3 py-1 font-utility text-data text-clay-600 underline"
+            onClick={() => onChange({ source: "", dentist: "", locality: "", from: "", to: "" })}
+            className="font-utility text-data text-clay-600 underline"
           >
-            Clear
+            Clear filters
           </button>
         )}
       </div>
-    </fieldset>
+    </div>
   );
 }
 
@@ -414,7 +527,6 @@ function Row({
   statusLabels,
   patientById,
   dentistByProfile,
-  onActivate,
   onClickRow,
 }: {
   row: Appointment;
@@ -423,7 +535,6 @@ function Row({
   statusLabels: Record<string, string>;
   patientById: BookingsBoardProps["patientById"];
   dentistByProfile: BookingsBoardProps["dentistByProfile"];
-  onActivate: () => void;
   onClickRow: () => void;
 }) {
   const patient = patientById[row.patient_id];
@@ -431,16 +542,16 @@ function Row({
   const when = row.scheduled_for ? formatDateTime(row.scheduled_for) : "—";
   return (
     <tr
-      onClick={onClickRow}
-      onMouseEnter={onActivate}
       tabIndex={-1}
+      aria-current={selected ? "true" : undefined}
+      onClick={onClickRow}
       className={
         "cursor-pointer border-t border-neem-100 " +
         (selected
           ? "bg-neem-100"
           : active
             ? "bg-chalk-0 ring-1 ring-inset ring-neem-600"
-            : "bg-chalk-0 hover:bg-neem-50")
+            : "bg-chalk-0 hover:bg-neem-100/50")
       }
       data-row-active={active}
     >

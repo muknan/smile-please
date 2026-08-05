@@ -42,7 +42,7 @@ export function SlotGrid({
   rescheduleAppointmentId?: string;
 }) {
   const router = useRouter();
-  const [cursor, setCursor] = useState<{ d: number; t: number } | null>(null);
+  const [cursor, setCursor] = useState<{ d: number; t: number }>({ d: 0, t: 0 });
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -126,12 +126,12 @@ export function SlotGrid({
           {message}
         </p>
       )}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto" role="region" aria-label="Available appointment times" tabIndex={0}>
         <div
           ref={gridRef}
           role="grid"
           aria-label="Available appointment times"
-          className="grid min-w-[720px] gap-px"
+          className="grid min-w-[1296px] gap-px sm:min-w-[720px]"
           style={{ gridTemplateColumns: `120px repeat(${days.length}, minmax(84px, 1fr))` }}
         >
           {/* corner + day headers */}
@@ -144,9 +144,6 @@ export function SlotGrid({
             >
               <span className="font-utility text-body-s font-semibold text-ink-950">
                 {day.shortLabel}
-              </span>
-              <span className="font-utility text-body-s text-ink-950/60">
-                {new Date(day.dateKey).toLocaleDateString("en-IN", { month: "short" })}
               </span>
             </div>
           ))}
@@ -197,7 +194,7 @@ function GridRow({
   onFocusCell: (d: number, t: number) => void;
 }) {
   return (
-    <>
+    <div role="row" className="contents">
       <div
         role="rowheader"
         className="flex items-center justify-end pr-4 font-utility text-data tabular-nums text-neem-600"
@@ -218,7 +215,7 @@ function GridRow({
                 aria-disabled={busy || undefined}
                 disabled={busy}
                 onKeyDown={(e) => onMove(e, d, t)}
-                onFocus={() => setCursorIfNeeded(d, t, onFocusCell)}
+                onFocus={() => onFocusCell(d, t)}
                 onClick={() => {
                   onFocusCell(d, t);
                   onPick(slot);
@@ -237,26 +234,23 @@ function GridRow({
                 )}
               </button>
             ) : (
-              <div
+              <button
+                type="button"
+                aria-label={`No appointment available, ${time}, ${day.fullLabel}`}
                 aria-disabled="true"
                 data-cell={`${d}-${t}`}
+                tabIndex={isCursor ? 0 : -1}
+                onKeyDown={(e) => onMove(e, d, t)}
+                onFocus={() => onFocusCell(d, t)}
                 className="flex h-full w-full items-center justify-center rounded border border-transparent bg-neem-100 text-body-s text-ink-950/40"
               >
                 —
-              </div>
+              </button>
             )}
           </div>
         );
       })}
-    </>
+    </div>
   );
 }
 
-/** Moves the roving cursor when a cell receives focus (click or Tab). */
-function setCursorIfNeeded(
-  d: number,
-  t: number,
-  onFocusCell: (d: number, t: number) => void,
-) {
-  onFocusCell(d, t);
-}

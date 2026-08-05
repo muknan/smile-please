@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { notifyAppointmentTransition } from "@/lib/notifications";
 import type { Database } from "@/types/db";
@@ -29,6 +30,7 @@ export async function transitionAsDentist(
   to: Extract<AppointmentStatus, "confirmed" | "completed" | "no_show" | "cancelled_by_dentist">,
   reason?: string,
 ): Promise<DentistState> {
+  await requireRole("dentist");
   const supabase = await createClient();
   const { data: before } = await supabase
     .from("appointments")
@@ -49,7 +51,7 @@ export async function transitionAsDentist(
   }
   // Best-effort patient email after the DB write; never blocks the action.
   if (updated && typeof updated === "object") {
-    void notifyAppointmentTransition(supabase, updated, before?.status ?? to, to);
+    await notifyAppointmentTransition(supabase, updated, before?.status ?? to, to);
   }
   revalidatePath("/dentist/appointments");
   return { ok: true };
@@ -60,6 +62,7 @@ export async function saveClinicalNote(
   appointmentId: string,
   note: string,
 ): Promise<DentistState> {
+  await requireRole("dentist");
   if (note.trim().length === 0) {
     return { ok: false, error: "The note can't be empty." };
   }
@@ -90,6 +93,7 @@ export async function addSingleSlot(
   _prev: SlotFormState,
   formData: FormData,
 ): Promise<SlotFormState> {
+  await requireRole("dentist");
   const date = String(formData.get("date") ?? "");
   const time = String(formData.get("time") ?? "");
   const duration = Number(formData.get("duration") ?? 30);
@@ -137,6 +141,7 @@ export async function addWeeklyPattern(
   _prev: SlotFormState,
   formData: FormData,
 ): Promise<SlotFormState> {
+  await requireRole("dentist");
   const time = String(formData.get("time") ?? "");
   const duration = Number(formData.get("duration") ?? 30);
   const days = formData.getAll("days").map(String);
@@ -179,14 +184,36 @@ export async function addWeeklyPattern(
     return { ok: false, error: "No dates matched that range and pattern." };
   }
 
-  try {
-    const { error } = await supabase.from("availability_slots").insert(inserts);
-    if (error) return { ok: false, error: slotConflictMessage(error) };
-  } catch (err) {
-    return { ok: false, error: slotConflictMessage(err) };
+  // D-24: insert per-row so one clash never fails the whole term. Rows that
+  // hit the overlap exclusion constraint are skipped and reported by date.
+  let added = 0;
+  const skippedDates: string[] = [];
+  for (const row of inserts) {
+    const { error } = await supabase.from("availability_slots").insert(row);
+    if (error && (error as { code?: string })?.code === "23P01") {
+      skippedDates.push(String(row.starts_at).slice(0, 10));
+    } else if (error) {
+      return { ok: false, error: slotConflictMessage(error) };
+    } else {
+      added += 1;
+    }
   }
+
+  if (added === 0) {
+    return {
+      ok: false,
+      error: skippedDates.length
+        ? `Those times all overlap slots you already have (${skippedDates.join(", ")}). Nothing was added.`
+        : "We couldn't add those slots.",
+    };
+  }
+
   revalidatePath("/dentist/availability");
-  return { ok: true, message: `${inserts.length} slots added.` };
+  const suffix =
+    skippedDates.length > 0
+      ? ` Skipped ${skippedDates.length} overlapping: ${skippedDates.join(", ")}.`
+      : "";
+  return { ok: true, message: `Added ${added} slot${added === 1 ? "" : "s"}.${suffix}` };
 }
 
 /** Block an entire Delhi-local day. */
@@ -194,6 +221,7 @@ export async function blockDay(
   _prev: SlotFormState,
   formData: FormData,
 ): Promise<SlotFormState> {
+  await requireRole("dentist");
   const date = String(formData.get("date") ?? "");
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return { ok: false, error: "Choose a date." };
@@ -204,18 +232,20 @@ export async function blockDay(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in again." };
 
-  try {
-    const { error } = await supabase.from("availability_slots").insert({
-      dentist_id: user.id,
-      starts_at: istTimestamp(date, "00:00"),
-      ends_at: istTimestamp(date, "23:59"),
-      created_by: user.id,
-      status: "blocked",
-    });
-    if (error) return { ok: false, error: slotConflictMessage(error) };
-  } catch (err) {
-    return { ok: false, error: slotConflictMessage(err) };
-  }
+  // D-23: block by updating the day's existing open slots rather than inserting
+  // a 00:00–23:59 slot (which would violate the overlap exclusion constraint
+  // whenever the dentist already has slots that day). Booked/held slots are
+  // left untouched so a live appointment is never silently voided.
+  const dayStart = istTimestamp(date, "00:00");
+  const dayEnd = istTimestamp(date, "23:59");
+  const { error } = await supabase
+    .from("availability_slots")
+    .update({ status: "blocked" })
+    .eq("dentist_id", user.id)
+    .eq("status", "open")
+    .gte("starts_at", dayStart)
+    .lt("starts_at", dayEnd);
+  if (error) return { ok: false, error: slotConflictMessage(error) };
   revalidatePath("/dentist/availability");
   return { ok: true, message: `${date} is blocked.` };
 }
@@ -228,6 +258,7 @@ export async function updateDentistProfile(
   _prev: ProfileState,
   formData: FormData,
 ): Promise<ProfileState> {
+  await requireRole("dentist");
   const supabase = await createClient();
   const {
     data: { user },
@@ -278,6 +309,7 @@ export async function updateDentistProfile(
 
 /** Uploads a profile photo to dentist-photos; returns the storage path. */
 export async function uploadProfilePhoto(formData: FormData): Promise<ProfileState> {
+  await requireRole("dentist");
   const file = formData.get("photo");
   if (!(file instanceof File) || file.size === 0) {
     return { ok: false, error: "Choose an image first." };
@@ -285,17 +317,28 @@ export async function uploadProfilePhoto(formData: FormData): Promise<ProfileSta
   if (file.size > 1.5 * 1024 * 1024) {
     return { ok: false, error: "Keep the photo under 1.5 MB." };
   }
+  // D-26: validate the content type server-side and derive the extension from
+  // it — never trust the client filename or extension.
+  const ALLOWED: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+  };
+  const mime = file.type.toLowerCase();
+  const ext = ALLOWED[mime];
+  if (!ext) {
+    return { ok: false, error: "Use a JPG, PNG or WebP image." };
+  }
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in again." };
 
-  const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const path = `${user.id}/${Date.now()}.${ext}`;
   const { error: uploadError } = await supabase.storage
     .from("dentist-photos")
-    .upload(path, file, { contentType: file.type || "image/jpeg" });
+    .upload(path, file, { contentType: mime });
   if (uploadError) return { ok: false, error: "The upload failed. Try again." };
 
   const { error: updateError } = await supabase

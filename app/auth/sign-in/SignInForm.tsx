@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense } from "react";
 import { useActionState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -11,28 +11,22 @@ import { requestSignInLink, type SignInState } from "../actions";
 
 const initial: SignInState = { status: "idle" };
 
-export function SignInForm() {
+export function SignInForm({ renderedAt }: { renderedAt: string }) {
   // useSearchParams must sit under a Suspense boundary so the page can be
   // statically prerendered.
   return (
     <Suspense fallback={null}>
-      <Form />
+      <Form renderedAt={renderedAt} />
     </Suspense>
   );
 }
 
-function Form() {
+function Form({ renderedAt }: { renderedAt: string }) {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/account";
   const reason = searchParams.get("reason");
   const errorParam = searchParams.get("error");
 
-  // Populated on mount; the action enforces a 3-second minimum fill time
-  // against it (Master §9.6).
-  const [startedAt, setStartedAt] = useState(0);
-  useEffect(() => {
-    setStartedAt(Date.now());
-  }, []);
 
   const [state, formAction, pending] = useActionState(requestSignInLink, initial);
 
@@ -82,7 +76,13 @@ function Form() {
           </p>
         )}
 
-        <form action={formAction} className="mt-10 max-w-md space-y-6">
+        <p className="mt-8">
+          <Link href="/" className="font-utility text-body-s font-medium text-neem-600 underline underline-offset-2 hover:underline">
+            ← Back to the site
+          </Link>
+        </p>
+
+        <form action={formAction} className="mt-6 max-w-md space-y-6">
           {/* Honeypot — must stay empty (Master §9.6). */}
           <input
             type="text"
@@ -93,7 +93,7 @@ function Form() {
             aria-hidden="true"
             className="sr-only"
           />
-          <input type="hidden" name="startedAt" value={startedAt} />
+          <input type="hidden" name="renderedAt" value={renderedAt} />
           <input type="hidden" name="next" value={next} />
 
           <Field label="Email" htmlFor="email" required>

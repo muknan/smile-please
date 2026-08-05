@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { clientIp, hashedIpKey } from "@/lib/antispam";
 
 /**
  * Places the 10-minute hold (Phase 5 §5.6/5.7). Anonymous by design — Path B
@@ -13,11 +14,24 @@ export async function POST(request: Request) {
   } catch {
     slotId = undefined;
   }
-  if (typeof slotId !== "string" || slotId.length === 0) {
+  if (
+    typeof slotId !== "string" ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(slotId)
+  ) {
     return NextResponse.json({ ok: false, error: "BAD_REQUEST" }, { status: 400 });
   }
 
+  const ip = await clientIp();
   const supabase = await createClient();
+  const { data: allowed, error: rateError } = await supabase.rpc("check_rate_limit", {
+    p_key: hashedIpKey("hold", ip),
+    p_limit: 30,
+    p_window_seconds: 3600,
+  });
+  if (rateError || allowed !== true) {
+    return NextResponse.json({ ok: false, error: "RATE_LIMITED" }, { status: 429 });
+  }
+
   const { data, error } = await supabase.rpc("hold_slot", { p_slot_id: slotId });
 
   if (error) {

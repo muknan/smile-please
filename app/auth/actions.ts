@@ -1,13 +1,11 @@
 "use server";
 
-import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { signInSchema } from "@/lib/schemas";
-
-const MIN_FILL_MS = 3000;
-const HOURLY_LIMIT = 5;
+import { checkHuman, clientIp, hashedIpKey } from "@/lib/antispam";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const HOURLY_LIMIT = 5;
 
 export type SignInState =
   | { status: "idle" }
@@ -24,19 +22,8 @@ export async function requestSignInLink(
   _prev: SignInState,
   formData: FormData,
 ): Promise<SignInState> {
-  const website = formData.get("website");
-  if (website !== "") {
-    // Honeypot filled — pretend-success path is unnecessary; the form is bad.
-    return { status: "error", error: "The form wasn't filled in by a human. Try again." };
-  }
-
-  const startedAt = Number(formData.get("startedAt"));
-  if (!Number.isFinite(startedAt) || startedAt <= 0 || Date.now() - startedAt < MIN_FILL_MS) {
-    return {
-      status: "error",
-      error: "That submitted too quickly to be a real person. Wait a moment and try again.",
-    };
-  }
+  const human = checkHuman(formData);
+  if (!human.ok) return { status: "error", error: human.error };
 
   const parsed = signInSchema.safeParse({ email: String(formData.get("email") ?? "") });
   if (!parsed.success) {
@@ -47,10 +34,10 @@ export async function requestSignInLink(
   }
   const email = parsed.data.email;
 
-  const ip = await readClientIp();
+  const ip = await clientIp();
   const supabase = await createClient();
   const { data: allowed, error: rateError } = await supabase.rpc("record_signin_attempt", {
-    p_ip: ip,
+    p_ip: hashedIpKey("signin", ip),
   });
   if (rateError || allowed === false) {
     return {
@@ -82,9 +69,3 @@ export async function requestSignInLink(
   return { status: "sent", email };
 }
 
-async function readClientIp(): Promise<string> {
-  const h = await headers();
-  const forwarded = h.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim();
-  return h.get("x-real-ip") ?? "local";
-}

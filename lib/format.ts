@@ -34,6 +34,8 @@ const dayKeyFormatter = new Intl.DateTimeFormat("en-US", {
   day: "2-digit",
 });
 
+
+
 function toDate(d: string | Date): Date {
   return typeof d === "string" ? new Date(d) : d;
 }
@@ -62,6 +64,8 @@ export function formatDayShort(d: string | Date): string {
 export function formatDayShortLabel(d: string | Date): string {
   return dayShortFormatter.format(toDate(d)).replace(",", " ");
 }
+
+/** "August" — grid column month, pinned to Asia/Kolkata. */
 
 /** "Wednesday, 12 August" — accessible names for slot cells. */
 export function fullDayLabel(d: string | Date): string {

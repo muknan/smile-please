@@ -26,7 +26,7 @@ export async function appointmentAction(
   reason: string,
   opts?: { newDentistId?: string; newSlotId?: string; scheduledFor?: string },
 ): Promise<ActionResult> {
-  const profile = await requireRole("admin");
+  await requireRole("admin");
   if (!reason?.trim()) return { ok: false, error: "A one-line reason is required for this action." };
 
   const supabase = await createClient();
@@ -57,12 +57,10 @@ export async function appointmentAction(
 
   await logAudit("booking.action", "appointment", appointmentId, {
     to,
-    reason: reason.trim(),
-    actor: profile.email ?? profile.full_name,
   });
 
   if (updated && typeof updated === "object" && before && typeof before === "object") {
-    void notifyAppointmentTransition(supabase, updated, before.status ?? to, to);
+    await notifyAppointmentTransition(supabase, updated, before.status ?? to, to);
   }
 
   revalidatePath("/admin/bookings");
@@ -71,9 +69,8 @@ export async function appointmentAction(
 }
 
 /**
- * Assign (or reassign) an appointment to a dentist. Reassign first steps the
- * appointment back to `requested` (assigned → requested is an admin-only
- * transition), then assigns it anew — both steps audit one event each.
+ * Assign or reassign an appointment in one atomic RPC transaction. The
+ * appointment remains visible in the triage queue if the slot move fails.
  */
 export async function assignAppointment(
   appointmentId: string,
@@ -92,14 +89,6 @@ export async function assignAppointment(
     .maybeSingle();
   if (!before || typeof before !== "object") return { ok: false, error: "Appointment not found." };
 
-  if (before.status === "assigned") {
-    const un = await supabase.rpc("admin_appointment_action", {
-      p_appointment_id: appointmentId,
-      p_to: "requested",
-      p_reason: `Reassigned: ${reason.trim()}`,
-    });
-    if (un.error) return { ok: false, error: "We couldn't reassign the appointment." };
-  }
 
   const { data: updated, error } = await supabase.rpc("admin_appointment_action", {
     p_appointment_id: appointmentId,
@@ -119,11 +108,10 @@ export async function assignAppointment(
   await logAudit("booking.action", "appointment", appointmentId, {
     to: "assigned",
     dentistId,
-    reason: reason.trim(),
   });
 
   if (updated && typeof updated === "object") {
-    void notifyAppointmentTransition(supabase, updated, before.status ?? "requested", "assigned");
+    await notifyAppointmentTransition(supabase, updated, before.status ?? "requested", "assigned");
   }
 
   revalidatePath("/admin/bookings");
@@ -156,18 +144,12 @@ export async function updateSubmission(
 
 /** Access-log-only: opening a detail drawer is itself an event (§7.8). */
 export async function logBookingView(appointmentId: string): Promise<void> {
-  const profile = await requireRole("admin");
-  await logAudit("booking.view", "appointment", appointmentId, {
-    actor: profile.email ?? profile.full_name,
-  });
+  await logAudit("booking.view", "appointment", appointmentId);
 }
 
 /** Access-log-only: opening a submission drawer is itself an event (§7.8). */
 export async function logSubmissionView(submissionId: string): Promise<void> {
-  const profile = await requireRole("admin");
-  await logAudit("submission.view", "submission", submissionId, {
-    actor: profile.email ?? profile.full_name,
-  });
+  await logAudit("submission.view", "submission", submissionId);
 }
 
 function slugify(name: string): string {
@@ -295,13 +277,14 @@ export async function adminAddSlot(
   time: string,
   locationType: "clinic" | "camp" = "clinic",
 ): Promise<ActionResult> {
-  await requireRole("admin");
+  const profile = await requireRole("admin");
   const supabase = await createClient();
   const starts = new Date(`${date}T${time.length === 5 ? time : `${time}:00`}+05:30`).toISOString();
   const ends = new Date(new Date(starts).getTime() + 30 * 60 * 1000).toISOString();
   const { error } = await supabase.from("availability_slots").insert({
     dentist_id: dentistId,
-    created_by: dentistId,
+    // D-22: attribute the action to the acting admin, not the dentist.
+    created_by: profile.id,
     starts_at: starts,
     ends_at: ends,
     location_type: locationType,
@@ -311,6 +294,7 @@ export async function adminAddSlot(
     if ((error as { code?: string }).code === "23P01") return { ok: false, error: OVERLAP_MSG };
     return { ok: false, error: "We couldn't add the slot." };
   }
+  await logAudit("dentist.update", "dentist", dentistId, { action: "add_slot", date });
   revalidatePath("/admin/dentists");
   revalidatePath("/care/dentists");
   return { ok: true };
@@ -325,13 +309,30 @@ export async function adminBlockDay(
   const supabase = await createClient();
   const dayStart = new Date(`${date}T00:00:00+05:30`);
   const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+  // D-22: do not void a live booking. Refuse if any confirmed/assigned
+  // appointment falls inside the day.
+  const { data: conflicting } = await supabase
+    .from("appointments")
+    .select("id")
+    .eq("dentist_id", dentistId)
+    .in("status", ["confirmed", "assigned"])
+    .gte("scheduled_for", dayStart.toISOString())
+    .lt("scheduled_for", dayEnd.toISOString());
+  if (conflicting && conflicting.length > 0) {
+    return {
+      ok: false,
+      error: "There is a confirmed/assigned appointment that day. Cancel or move it before blocking.",
+    };
+  }
   const { error } = await supabase
     .from("availability_slots")
     .update({ status: "blocked" })
     .eq("dentist_id", dentistId)
+    .eq("status", "open")
     .gte("starts_at", dayStart.toISOString())
     .lt("starts_at", dayEnd.toISOString());
   if (error) return { ok: false, error: "We couldn't block the day." };
+  await logAudit("dentist.update", "dentist", dentistId, { action: "block_day", date });
   revalidatePath("/admin/dentists");
   revalidatePath("/care/dentists");
   return { ok: true };
@@ -367,10 +368,18 @@ export async function saveArticle(input: ArticleInput): Promise<ActionResult & {
   if (input.id) {
     const patch: Database["public"]["Tables"]["articles"]["Update"] = { ...base };
     if (input.status === "published") {
+      // D-25: only stamp published_at on the draft→published transition, so
+      // editing a live article does not reorder /learn.
+      const { data: current } = await supabase
+        .from("articles")
+        .select("published_at")
+        .eq("id", input.id)
+        .maybeSingle();
       patch.status = "published";
-      patch.published_at = new Date().toISOString();
+      if (!current?.published_at) patch.published_at = new Date().toISOString();
     } else {
       patch.status = "draft";
+      // Keep the original published_at when moving back to draft.
     }
     const { error, data } = await supabase
       .from("articles")
@@ -407,12 +416,20 @@ export async function saveArticle(input: ArticleInput): Promise<ActionResult & {
 export async function setArticleStatus(id: string, status: "draft" | "published"): Promise<ActionResult> {
   await requireRole("admin");
   const supabase = await createClient();
+  // D-25: keep the original published_at on unpublish; stamp it only on a first
+  // publish.
+  const patch: Database["public"]["Tables"]["articles"]["Update"] = { status };
+  if (status === "published") {
+    const { data: current } = await supabase
+      .from("articles")
+      .select("published_at")
+      .eq("id", id)
+      .maybeSingle();
+    if (!current?.published_at) patch.published_at = new Date().toISOString();
+  }
   const { error, data } = await supabase
     .from("articles")
-    .update({
-      status,
-      published_at: status === "published" ? new Date().toISOString() : null,
-    })
+    .update(patch)
     .eq("id", id)
     .select("slug")
     .single();

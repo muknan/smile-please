@@ -3,6 +3,12 @@ import { Section } from "@/components/site/Section";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { makeRenderedAt } from "@/lib/antispam";
 import { CONTACT_TABS, type ContactTab } from "@/lib/contact";
+import {
+  CONTACT_EMAIL,
+  CONTACT_PHONE_DISPLAY,
+  CONTACT_PHONE_TEL,
+  GRIEVANCE_EMAIL,
+} from "@/lib/contact-info";
 
 export const metadata: Metadata = {
   title: "Contact us",
@@ -52,13 +58,25 @@ export default async function ContactPage({ searchParams }: PageProps) {
           </div>
           <div>
             <dt className="font-utility text-label uppercase text-neem-600">Email</dt>
-            <dd className="mt-2 text-body">care@example.com</dd>
+            <dd className="mt-2 text-body">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium text-neem-600 underline underline-offset-4">
+                {CONTACT_EMAIL}
+              </a>
+            </dd>
+          </div>
+          <div>
+            <dt className="font-utility text-label uppercase text-neem-600">Phone</dt>
+            <dd className="mt-2 text-body">
+              <a href={`tel:${CONTACT_PHONE_TEL}`} className="font-medium text-neem-600 underline underline-offset-4">
+                {CONTACT_PHONE_DISPLAY}
+              </a>
+            </dd>
           </div>
           <div>
             <dt className="font-utility text-label uppercase text-neem-600">Grievance contact</dt>
-            {/* CLIENT-COPY: replace with the named data-protection contact. */}
             <dd className="mt-2 text-body">
-              [name], [email] — we answer within 7 working days
+              {/* CLIENT-COPY: optional named DPO. Same mailbox handles data requests. */}
+              {GRIEVANCE_EMAIL} — we answer within 7 working days
             </dd>
           </div>
         </dl>

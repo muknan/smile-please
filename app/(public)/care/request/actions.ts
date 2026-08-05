@@ -4,15 +4,17 @@ import { createClient } from "@/lib/supabase/server";
 import { requestBookingSchema } from "@/lib/schemas";
 import { checkHuman, withinRateLimit, clientIp } from "@/lib/antispam";
 import { notify } from "@/lib/email";
+import { CONTACT_PHONE_DISPLAY } from "@/lib/contact-info";
+
+import { issuesFromZod, type FieldError } from "@/lib/form-errors";
 
 export type RequestState =
   | { status: "idle" }
-  | { status: "error"; error: string }
+  | { status: "error"; error: string; issues?: FieldError[] }
   | { status: "success"; ref: string }
   | { status: "guardian" };
 
-const RATE_LIMIT_MSG =
-  "You've sent several messages recently. Please wait an hour, or call us on the number at the bottom of this page.";
+const RATE_LIMIT_MSG = `You've made a few requests recently. Please wait about an hour, or call ${CONTACT_PHONE_DISPLAY}.`;
 
 /**
  * Path A booking request (Phase 5 §5.4). Runs the three anti-spam layers
@@ -25,13 +27,7 @@ export async function submitCareRequest(
   formData: FormData,
 ): Promise<RequestState> {
   const human = checkHuman(formData);
-  if (!human.ok) {
-    // Honeypot-filled or faster than a human: drop the data with a
-    // normal-looking success — never tell a bot it failed. Real people cannot
-    // trip either layer (the honeypot is hidden and a 9-field form takes
-    // longer than three seconds to fill).
-    return { status: "success", ref: `SP-${Math.floor(Math.random() * 9000 + 1000)}` };
-  }
+  if (!human.ok) return { status: "error", error: human.error };
 
   const ip = await clientIp();
   if (!(await withinRateLimit("care-request", ip))) {
@@ -56,11 +52,16 @@ export async function submitCareRequest(
 
   const parsed = requestBookingSchema.safeParse(raw);
   if (!parsed.success) {
-    return { status: "error", error: parsed.error.issues[0]?.message ?? "Check the form." };
+    const issues = issuesFromZod(parsed.error);
+    return { status: "error", error: issues[0]?.message ?? "Check the form.", issues };
   }
   const data = parsed.data;
 
-  if (data.forMinor) {
+  // A minor is anyone under 18 — derived from the age band the user declared,
+  // never from a voluntary checkbox (D-11). Until a verifiable parental-consent
+  // flow exists, both booking paths must stop here.
+  const isMinor = data.ageBand === "under_12" || data.ageBand === "12_17";
+  if (isMinor) {
     return {
       status: "guardian",
     };
@@ -103,7 +104,7 @@ export async function submitCareRequest(
       // non-blocking by design
     }
     // Best-effort acknowledgement (Phase 6 §6.3); the request is already saved.
-    notify("care_request_received", data.email, {
+    await notify("care_request_received", data.email, {
       name: data.fullName,
       locality: data.locality,
       ref: booking.reference_code,

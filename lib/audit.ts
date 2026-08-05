@@ -34,17 +34,15 @@ export async function logAudit(
 ): Promise<void> {
   try {
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    const row: Database["public"]["Tables"]["audit_log"]["Insert"] = {
-      actor_id: user?.id ?? null,
-      action,
-      entity,
-      entity_id: entityId ?? null,
-      metadata: (metadata ?? null) as Database["public"]["Tables"]["audit_log"]["Insert"]["metadata"],
-    };
-    await supabase.from("audit_log").insert(row);
+    await (supabase.rpc as unknown as (name: string, args: Record<string, unknown>) => { error: unknown })(
+      "write_audit",
+      {
+        p_action: action,
+        p_entity: entity,
+        p_entity_id: entityId ?? null,
+        p_metadata: (metadata ?? null) as Database["public"]["Tables"]["audit_log"]["Insert"]["metadata"],
+      },
+    );
   } catch {
     // Logging must never take the admin action it accompanies down with it.
   }

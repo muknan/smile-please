@@ -15,9 +15,9 @@ export const metadata: Metadata = {
 export default async function DentistsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ locality?: string; lang?: string; slots?: string }>;
+  searchParams: Promise<{ locality?: string; lang?: string; slots?: string; err?: string }>;
 }) {
-  const { locality, lang, slots } = await searchParams;
+  const { locality, lang, slots, err } = await searchParams;
   const slotsOnly = slots === "1";
 
   const supabase = await createClient();
@@ -33,7 +33,8 @@ export default async function DentistsPage({
     .from("public_slots")
     .select("dentist_slug, starts_at")
     .gte("starts_at", windowStart.toISOString())
-    .lte("starts_at", windowEnd.toISOString());
+    .lte("starts_at", windowEnd.toISOString())
+    .order("starts_at");
 
   const nextBySlug = new Map<string, string>();
   for (const slot of slotsData ?? []) {
@@ -72,6 +73,12 @@ export default async function DentistsPage({
         Every dentist here is registered with the Dental Council of India and
         gives their time for free. Pick someone near you and choose a slot.
       </p>
+
+      {err === "slot" && (
+        <p role="status" className="mt-6 rounded-card border border-clay-600 bg-chalk-0 px-4 py-3 text-body-s text-clay-600">
+          That slot was just taken or is no longer available — pick another time from the list below.
+        </p>
+      )}
 
       <form
         method="get"

@@ -60,12 +60,19 @@ function esc(value: unknown): string {
     .replace(/"/g, "&quot;");
 }
 
-/** Placeholders in .env.example / .env.local are "your-…" — treat as unset. */
+/**
+ * SMTP is enabled only when SMTP_ENABLED is truthy AND host/user/pass are set
+ * (D-42). A real credential that happens to start with "your" no longer
+ * disables mail. SMTP_ENABLED is an explicit opt-in so a partially-configured
+ * local/dev environment stays a silent no-op rather than throwing.
+ */
 function smtpConfigured(): boolean {
+  const enabled = process.env.SMTP_ENABLED === "1" || process.env.SMTP_ENABLED === "true";
+  if (!enabled) return false;
   const host = process.env.SMTP_HOST?.trim() ?? "";
   const user = process.env.SMTP_USER?.trim() ?? "";
   const pass = process.env.SMTP_PASS?.trim() ?? "";
-  return !!host && !!user && !!pass && !user.startsWith("your") && !pass.startsWith("your");
+  return !!host && !!user && !!pass;
 }
 
 let transport: Transporter | null = null;
@@ -327,7 +334,11 @@ export async function sendTemplate(kind: EmailKind, to: string, vars: Vars = {})
   });
 }
 
-/** Fire-and-forget wrapper for booking actions: never awaited, never throws. */
-export function notify(kind: EmailKind, to: string, vars: Vars = {}): void {
-  void sendTemplate(kind, to, vars);
+/**
+ * Best-effort email send. Never throws; resolves once the send attempt has
+ * finished so serverless actions do not terminate before the mail is sent
+ * (D-50). Callers may await it freely.
+ */
+export function notify(kind: EmailKind, to: string, vars: Vars = {}): Promise<SendResult> {
+  return sendTemplate(kind, to, vars);
 }

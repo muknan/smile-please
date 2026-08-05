@@ -6,6 +6,8 @@ import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Dialog } from "@/components/ui/Dialog";
 import { STATUS_LABELS, AGE_BAND_LABELS, REASON_CATEGORY_LABELS } from "@/lib/booking";
 import { LOCALITIES, AGE_BANDS } from "@/lib/schemas";
 import { formatDate, formatTime } from "@/lib/format";
@@ -18,7 +20,7 @@ type Appointment = Database["public"]["Tables"]["appointments"]["Row"] & {
 type Consent = Database["public"]["Tables"]["consents"]["Row"];
 
 const TONE: Record<string, "neutral" | "success" | "active" | "danger" | "warning"> = {
-  requested: "warning",
+  requested: "neutral",
   assigned: "neutral",
   confirmed: "success",
   completed: "active",
@@ -37,6 +39,8 @@ function AppointmentRow({
 }) {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
   const [pending, startTransition] = useTransition();
 
   const cancellable = ["requested", "assigned", "confirmed"].includes(appointment.status);
@@ -46,16 +50,16 @@ function AppointmentRow({
     new Date(appointment.scheduled_for).getTime() - Date.now() > 24 * 60 * 60 * 1000;
 
   const cancel = () => {
-    const reason = window.prompt("Tell us why you're cancelling (optional)", "");
-    if (reason === null) return;
     startTransition(async () => {
       const state = await cancelAppointment(
         appointment.id,
-        reason.trim() === "" ? "Cancelled by patient" : reason.trim(),
+        cancelReason.trim() === "" ? "Cancelled by patient" : cancelReason.trim(),
       );
       if (state.status === "ok") {
         setMessage(state.message);
         setError(null);
+        setCancelOpen(false);
+        setCancelReason("");
       } else {
         setError(state.status === "error" ? state.error : "Try again.");
       }
@@ -114,15 +118,26 @@ function AppointmentRow({
           {cancellable && (
             <button
               type="button"
-              onClick={cancel}
+              onClick={() => setCancelOpen(true)}
               disabled={pending}
-              className="inline-flex items-center justify-center rounded border border-clay-600 px-4 py-2 font-utility text-body-s font-medium text-clay-600 transition hover:bg-clay-600 hover:text-chalk-0 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex min-h-11 items-center justify-center rounded border border-clay-600 px-4 py-2 font-utility text-body-s font-medium text-clay-600 transition hover:bg-clay-600 hover:text-chalk-0 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {pending ? "Cancelling…" : "Cancel appointment"}
+              Cancel appointment
             </button>
           )}
         </div>
       )}
+
+      <Dialog open={cancelOpen} title="Cancel this appointment?" description="You can request care again later. Tell us why if you would like to." onClose={() => setCancelOpen(false)}>
+        <label className="mt-5 block">
+          <span className="font-utility text-label uppercase text-ink-950">Reason <span className="normal-case text-ink-950/60">(optional)</span></span>
+          <textarea value={cancelReason} onChange={(event) => setCancelReason(event.target.value)} rows={3} maxLength={300} className="mt-2 w-full rounded border border-neem-100 px-3 py-2 text-body" />
+        </label>
+        <div className="mt-5 flex justify-end gap-3">
+          <Button variant="ghost" onClick={() => setCancelOpen(false)}>Keep appointment</Button>
+          <Button variant="danger" onClick={cancel} disabled={pending}>{pending ? "Cancelling…" : "Cancel appointment"}</Button>
+        </div>
+      </Dialog>
 
       {!cancellable && (
         <p className="mt-4 text-body-s text-ink-950/60">
@@ -138,6 +153,7 @@ function AppointmentRow({
 export function AccountClient({
   profile,
   patient,
+  waitingOnUs,
   upcoming,
   past,
   consents,
@@ -145,6 +161,7 @@ export function AccountClient({
 }: {
   profile: Database["public"]["Tables"]["profiles"]["Row"];
   patient: Database["public"]["Tables"]["patients"]["Row"] | null;
+  waitingOnUs: Appointment[];
   upcoming: Appointment[];
   past: Appointment[];
   consents: Consent[];
@@ -159,22 +176,30 @@ export function AccountClient({
   const consentNotice = (purpose: string) =>
     consents.find((c) => c.purpose === purpose && c.withdrawn_at !== null)?.withdrawn_at ?? null;
 
+  const [confirmPurpose, setConfirmPurpose] = useState<"booking" | "awareness_updates" | null>(null);
+
   const withdraw = (purpose: "booking" | "awareness_updates") => {
-    const warning =
-      purpose === "booking"
-        ? "Withdrawing booking consent cancels any pending appointments. Continue?"
-        : "You'll stop receiving awareness updates immediately. Continue?";
-    if (!window.confirm(warning)) return;
     startTransition(async () => {
       const state = await withdrawConsent(purpose);
       setNoticeError(null);
       setNotice(state.status === "ok" ? state.message : state.status === "error" ? state.error : null);
       if (state.status === "error") setNoticeError(state.error);
+      if (state.status === "ok") setConfirmPurpose(null);
     });
   };
 
   return (
     <>
+      {waitingOnUs.length > 0 && (
+        <section aria-labelledby="waiting-heading" className="rounded-card border border-neem-100 bg-neem-100/40 p-8">
+          <h2 id="waiting-heading" className="text-display-m">Waiting on us</h2>
+          <p className="mt-3 max-w-[60ch] text-body text-ink-950/80">Your request is safely with the team. We will contact you when a suitable time is ready.</p>
+          <ul className="mt-6 space-y-4">
+            {waitingOnUs.map((a) => <AppointmentRow key={a.id} appointment={a} dentistSlug={slugByDentist.get(a.dentist_id ?? "")} />)}
+          </ul>
+        </section>
+      )}
+
       {upcoming.length > 0 && (
         <section aria-labelledby="upcoming-heading">
           <h2 id="upcoming-heading" className="text-display-m">
@@ -188,7 +213,7 @@ export function AccountClient({
         </section>
       )}
 
-      {upcoming.length === 0 && (
+      {waitingOnUs.length === 0 && upcoming.length === 0 && (
         <section className="rounded-card border border-neem-100 bg-chalk-0 p-10">
           <h2 className="text-display-m">No upcoming appointments</h2>
           <p className="mt-4 text-body-l text-ink-950/70">
@@ -292,7 +317,7 @@ export function AccountClient({
             {consentGranted("booking") && (
               <button
                 type="button"
-                onClick={() => withdraw("booking")}
+                onClick={() => setConfirmPurpose("booking")}
                 disabled={pending}
                 className="rounded border border-clay-600 px-4 py-2 font-utility text-body-s font-medium text-clay-600 transition hover:bg-clay-600 hover:text-chalk-0 disabled:opacity-50"
               >
@@ -314,7 +339,7 @@ export function AccountClient({
             {consentGranted("awareness_updates") && (
               <button
                 type="button"
-                onClick={() => withdraw("awareness_updates")}
+                onClick={() => setConfirmPurpose("awareness_updates")}
                 disabled={pending}
                 className="rounded border border-neem-100 px-4 py-2 font-utility text-body-s font-medium text-ink-950 transition hover:border-neem-600 disabled:opacity-50"
               >
@@ -334,6 +359,20 @@ export function AccountClient({
           </p>
         )}
       </section>
-    </>
+      <Dialog
+        open={confirmPurpose !== null}
+        title={confirmPurpose === "booking" ? "Withdraw booking consent?" : "Stop awareness updates?"}
+        description={confirmPurpose === "booking" ? "Any pending appointments will be cancelled. You can grant consent again later." : "You will stop receiving awareness updates immediately."}
+        onClose={() => setConfirmPurpose(null)}
+        destructive={confirmPurpose === "booking"}
+      >
+        <div className="mt-5 flex justify-end gap-3">
+          <Button variant="ghost" onClick={() => setConfirmPurpose(null)}>Keep consent</Button>
+          <Button variant={confirmPurpose === "booking" ? "danger" : "secondary"} onClick={() => confirmPurpose && withdraw(confirmPurpose)} disabled={pending}>
+            {pending ? "Updating…" : "Confirm"}
+          </Button>
+        </div>
+      </Dialog>
+      </>
   );
 }

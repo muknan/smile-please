@@ -48,8 +48,10 @@ export default async function AdminBookingsPage({ searchParams }: PageProps) {
   if (statuses.length) query = query.in("status", statuses);
   if (sourceFilter) query = query.eq("source", sourceFilter);
   if (dentist) query = query.eq("dentist_id", dentist);
-  if (from) query = query.gte("scheduled_for", new Date(from).toISOString());
-  if (to) query = query.lt("scheduled_for", new Date(to).toISOString());
+  const fromDate = from && !Number.isNaN(new Date(from).getTime()) ? new Date(`${from}T00:00:00+05:30`) : null;
+  const toDate = to && !Number.isNaN(new Date(to).getTime()) ? new Date(`${to}T00:00:00+05:30`) : null;
+  if (fromDate) query = query.gte("scheduled_for", fromDate.toISOString());
+  if (toDate) query = query.lt("scheduled_for", toDate.toISOString());
 
   const { data: appointments } = await query;
   const list = appointments ?? [];

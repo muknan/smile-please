@@ -1,7 +1,9 @@
 import "server-only";
 
 export function escapeCell(value: unknown): string {
-  const s = value === null || value === undefined ? "" : String(value);
+  const raw = value === null || value === undefined ? "" : String(value);
+  // Spreadsheet programs execute formula-looking cells on open.
+  const s = /^[=+\-@\t\r]/.test(raw) ? `'${raw}` : raw;
   if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
   return s;
 }

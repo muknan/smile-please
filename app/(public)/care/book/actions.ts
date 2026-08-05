@@ -5,10 +5,13 @@ import { bookSlotSchema } from "@/lib/schemas";
 import { checkHuman, withinRateLimit, clientIp } from "@/lib/antispam";
 import { notify } from "@/lib/email";
 import { formatDate, formatTime } from "@/lib/format";
+import { CONTACT_PHONE_DISPLAY } from "@/lib/contact-info";
+
+import { issuesFromZod, type FieldError } from "@/lib/form-errors";
 
 export type BookState =
   | { status: "idle" }
-  | { status: "error"; error: string }
+  | { status: "error"; error: string; issues?: FieldError[] }
   | { status: "success"; ref: string; isReschedule: boolean };
 
 export type BookDetails = {
@@ -34,15 +37,13 @@ export async function confirmSlotBooking(
   formData: FormData,
 ): Promise<BookState> {
   const human = checkHuman(formData);
-  if (!human.ok) {
-    return { status: "success", ref: `SP-${Math.floor(Math.random() * 9000 + 1000)}`, isReschedule: false };
-  }
+  if (!human.ok) return { status: "error", error: human.error };
 
   const ip = await clientIp();
   if (!(await withinRateLimit("care-book", ip))) {
     return {
       status: "error",
-      error: "You've sent several messages recently. Please wait an hour, or call us on the number at the bottom of this page.",
+      error: `You've made a few requests recently. Please wait about an hour, or call ${CONTACT_PHONE_DISPLAY}.`,
     };
   }
 
@@ -59,9 +60,19 @@ export async function confirmSlotBooking(
   };
   const parsed = bookSlotSchema.safeParse(raw);
   if (!parsed.success) {
-    return { status: "error", error: parsed.error.issues[0]?.message ?? "Check the form." };
+    const issues = issuesFromZod(parsed.error);
+    return { status: "error", error: issues[0]?.message ?? "Check the form.", issues };
   }
   const data = parsed.data;
+
+  // Under-18s cannot self-book until a verifiable parental-consent flow exists
+  // (D-11); this mirrors Path A and blocks the age band server-side.
+  if (data.ageBand === "under_12" || data.ageBand === "12_17") {
+    return {
+      status: "error",
+      error: `Someone under 18 needs a parent or guardian to arrange care. Please ask an adult to make this booking, or call ${CONTACT_PHONE_DISPLAY}.`,
+    };
+  }
 
   const supabase = await createClient();
   const { data: booking, error } = await supabase.rpc("confirm_booking", {
@@ -123,7 +134,7 @@ export async function confirmSlotBooking(
           .eq("id", details.rescheduleAppointmentId)
           .maybeSingle();
         if (oldAppt?.scheduled_for) {
-          notify("appointment_rescheduled", data.email, {
+          await notify("appointment_rescheduled", data.email, {
             fromDate: formatDate(oldAppt.scheduled_for),
             fromTime: formatTime(oldAppt.scheduled_for),
             toDate: when.date,
@@ -134,7 +145,7 @@ export async function confirmSlotBooking(
           });
         }
       } else {
-        notify("appointment_confirmed", data.email, {
+        await notify("appointment_confirmed", data.email, {
           ...when,
           dentist: details.dentistName,
           locality: details.dentistLocality || null,

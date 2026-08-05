@@ -4,7 +4,8 @@ import { SectionMarker } from "./SectionMarker";
 /**
  * Public-page section with the master layout: body text on columns 2–9,
  * the arch-gylph section marker in the columns 10–12 margin rail on desktop.
- * The rail collapses below 900px — the marker moves above the section.
+ * The rail appears only at lg (1280px) in this config; below that the marker
+ * moves above the section (D-49 — comment brought in line with `lg:`).
  */
 export function Section({
   marker,

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL } from "@/lib/contact-info";
 
 const CARE_LINKS = [
   { href: "/care", label: "Book a check-up" },
@@ -23,7 +24,7 @@ export function SiteFooter() {
               src="/logo.svg"
               alt="Smile Please"
               width={140}
-              height={36}
+              height={33}
               className="h-[28px] w-auto [filter:brightness(0)_invert(1)]"
             />
             <p className="mt-6 max-w-[28ch] text-body-s text-chalk-0/70">
@@ -68,10 +69,16 @@ export function SiteFooter() {
             <address className="mt-4 space-y-4 text-body-s not-italic text-chalk-0/70">
               <p>New Delhi, India</p>
               <p>
-                <a href="mailto:care@example.com" className="text-chalk-0 transition hover:text-marigold-500">
-                  care@example.com
+                <a href={`mailto:${CONTACT_EMAIL}`} className="text-chalk-0 transition hover:text-marigold-500">
+                  {CONTACT_EMAIL}
                 </a>
               </p>
+              <p>
+                <a href={`tel:${CONTACT_PHONE_TEL}`} className="text-chalk-0 transition hover:text-marigold-500">
+                  {CONTACT_PHONE_DISPLAY}
+                </a>
+              </p>
+              {/* CLIENT-COPY: registration number / trust-detail line not yet supplied. */}
               <p>Registered trust details to be supplied.</p>
             </address>
           </div>
@@ -86,7 +93,7 @@ export function SiteFooter() {
             <Link href="/terms" className="transition hover:text-marigold-500">
               Terms
             </Link>
-            <span>Data queries: [grievance contact to be supplied]</span>
+            <span>Data queries: {CONTACT_EMAIL}</span>
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { lookupSchema } from "@/lib/schemas";
 import { checkHuman, withinRateLimit, clientIp } from "@/lib/antispam";
+import { CONTACT_PHONE_DISPLAY } from "@/lib/contact-info";
 
 export type StatusState =
   | { status: "idle" }
@@ -19,8 +20,7 @@ export type LookupResult = {
   events: { status: string; at: string; by: string | null; reason: string | null }[];
 };
 
-const NOT_FOUND_MSG =
-  "We couldn't find an appointment with those details. Check the reference and phone number, or call us and we'll look it up for you.";
+const NOT_FOUND_MSG = `We couldn't find an appointment with those details. Check the reference and phone number, or call ${CONTACT_PHONE_DISPLAY} and we'll look it up for you.`;
 
 /**
  * Reference + phone lookup (§5.9). Wrong code and wrong phone produce the SAME
@@ -41,7 +41,7 @@ export async function lookupAppointmentAction(
   if (!(await withinRateLimit("care-status", ip))) {
     return {
       status: "error",
-      error: "You've made several lookup attempts recently. Wait an hour, or call us on the number at the bottom of this page.",
+      error: `You've made several lookups recently. Please wait about an hour, or call ${CONTACT_PHONE_DISPLAY}.`,
     };
   }
 

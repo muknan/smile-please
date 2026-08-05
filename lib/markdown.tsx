@@ -7,14 +7,6 @@ import * as React from "react";
  * dangerouslySetInnerHTML. Handles #/##/###, paragraphs, `-` lists,
  * **bold**, *italic*, and [text](url) — exactly what article bodies use.
  */
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 /** hrefs other than http(s) and mailto are dropped — belt-and-braces behind escaping. */
 function safeHref(href: string): string | undefined {
@@ -23,22 +15,23 @@ function safeHref(href: string): string | undefined {
   return undefined;
 }
 
-function renderInline(text: string, key: (label: string) => string): React.ReactNode[] {
+function renderInline(text: string, prefix: string): React.ReactNode[] {
   const nodes: React.ReactNode[] = [];
   let cursor = 0;
+  let k = 0;
   const pattern = /(\*\*([^*]+)\*\*|\*([^*]+)\*|\[([^\]]+)\]\(([^)\s]+)\))/g;
   let match: RegExpExecArray | null;
   while ((match = pattern.exec(text)) !== null) {
     if (match.index > cursor) nodes.push(text.slice(cursor, match.index));
     if (match[2] !== undefined) {
-      nodes.push(<strong key={key("b")}>{match[2]}</strong>);
+      nodes.push(<strong key={`${prefix}-${k++}`}>{match[2]}</strong>);
     } else if (match[3] !== undefined) {
-      nodes.push(<em key={key("i")}>{match[3]}</em>);
+      nodes.push(<em key={`${prefix}-${k++}`}>{match[3]}</em>);
     } else {
       const href = safeHref(match[5]);
       nodes.push(
         <a
-          key={key("a")}
+          key={`${prefix}-${k++}`}
           href={href}
           className="font-medium text-neem-600 underline underline-offset-4"
         >
@@ -54,7 +47,8 @@ function renderInline(text: string, key: (label: string) => string): React.React
 
 /** Block renderer: returns the article body as elements (h2+, p, ul). */
 export function renderMarkdown(md: string): React.ReactNode[] {
-  const lines = escapeHtml(md).split("\n");
+  // React escapes text children; pre-escaping here would display entities literally.
+  const lines = md.split("\n");
   const out: React.ReactNode[] = [];
   let paragraph: string[] = [];
   let list: string[] = [];
@@ -62,15 +56,17 @@ export function renderMarkdown(md: string): React.ReactNode[] {
 
   const flushParagraph = () => {
     if (paragraph.length === 0) return;
-    out.push(<p key={key++}>{renderInline(paragraph.join(" "), () => `p${key}`)}</p>);
+    const base = `p${key++}`;
+    out.push(<p key={base}>{renderInline(paragraph.join(" "), base)}</p>);
     paragraph = [];
   };
   const flushList = () => {
     if (list.length === 0) return;
+    const base = `l${key++}`;
     out.push(
-      <ul key={key++} className="list-disc space-y-2 pl-6">
+      <ul key={base} className="list-disc space-y-2 pl-6">
         {list.map((item, i) => (
-          <li key={i}>{renderInline(item, () => `l${key}-${i}`)}</li>
+          <li key={i}>{renderInline(item, `${base}-${i}`)}</li>
         ))}
       </ul>,
     );
@@ -85,10 +81,10 @@ export function renderMarkdown(md: string): React.ReactNode[] {
     if (heading) {
       flushParagraph();
       flushList();
-      const level = heading[1].length;
-      out.push(
-        React.createElement(`h${level}`, { key: key++ }, renderInline(heading[2], () => `h${key}`)),
-      );
+      // Start at h2 — article pages already own the h1 (D-20).
+      const level = Math.min(4, heading[1].length + 1);
+      const base = `h${key++}`;
+      out.push(React.createElement(`h${level}`, { key: base }, renderInline(heading[2], base)));
     } else if (item) {
       flushParagraph();
       list.push(item[1]);

@@ -42,7 +42,7 @@ export async function cancelAppointment(
   }
   // Best-effort confirmation email; the cancel is already saved.
   if (updated && typeof updated === "object") {
-    void notifyAppointmentTransition(supabase, updated, before?.status ?? "confirmed", "cancelled_by_patient");
+    await notifyAppointmentTransition(supabase, updated, before?.status ?? "confirmed", "cancelled_by_patient");
   }
   revalidatePath("/account");
   return { status: "ok", message: "Appointment cancelled." };

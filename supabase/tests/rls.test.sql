@@ -268,6 +268,97 @@ begin
   raise notice 'test 12 pass: overlapping slots rejected by constraint';
 end $$;
 
+-- Test 13: a patient cannot directly UPDATE their own appointment (D-01).
+-- All status/dentist_id/scheduled_for changes must go through the RPCs.
+-- RLS silently filters UPDATEs for rows without a policy, so assert that zero
+-- rows were changed (not that the statement throws).
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"20000000-0000-0000-0000-0000000000a1"}';
+do $$
+declare n bigint;
+        v_status text;
+begin
+  execute 'update public.appointments set status = ''completed''
+           where patient_id = ''20000000-0000-0000-0000-0000000000a1''';
+  get diagnostics n = row_count;
+  if n <> 0 then
+    raise exception 'TEST 13 FAILED: patient updated own appointment (% rows)', n;
+  end if;
+  select status into v_status from public.appointments
+   where patient_id = '20000000-0000-0000-0000-0000000000a1' limit 1;
+  if v_status = 'completed' then
+    raise exception 'TEST 13 FAILED: patient escalated own appointment to completed';
+  end if;
+  raise notice 'test 13 pass: patient cannot UPDATE own appointment';
+end $$;
+
+-- Test 14: a patient cannot insert a `confirmed` appointment (D-01).
+do $$
+declare rejected boolean := false;
+begin
+  begin
+    execute 'insert into public.appointments
+             (patient_id, source, status, reason_category)
+             values (''20000000-0000-0000-0000-0000000000a1'',''patient_request'',''confirmed'',''pain'')';
+    rejected := true;
+  exception when others then
+    null; -- expected: no INSERT policy
+  end;
+  if rejected then
+    raise exception 'TEST 14 FAILED: patient inserted confirmed appointment';
+  end if;
+  raise notice 'test 14 pass: patient cannot INSERT an appointment';
+end $$;
+
+-- Test 15: a patient cannot create an availability slot (D-02).
+do $$
+declare rejected boolean := false;
+begin
+  begin
+    execute 'insert into public.availability_slots
+             (dentist_id, starts_at, ends_at, created_by)
+             values (
+               ''20000000-0000-0000-0000-0000000000a1'',
+               now() + interval ''1 day'', now() + interval ''1 day 30 minutes'',
+               ''20000000-0000-0000-0000-0000000000a1'')';
+    rejected := true;
+  exception when others then
+    null; -- expected: only dentists may manage slots
+  end;
+  if rejected then
+    raise exception 'TEST 15 FAILED: patient inserted an availability slot';
+  end if;
+  raise notice 'test 15 pass: patient cannot insert an availability slot';
+end $$;
+
+-- Test 16: a patient cannot forge a consent or audit-log row (D-03).
+do $$
+declare rejected_consent boolean := false;
+        rejected_audit boolean := false;
+begin
+  begin
+    execute 'insert into public.consents (subject_type, subject_id, purpose, notice_version)
+             values (''profile'',''20000000-0000-0000-0000-0000000000a1'',''booking'',''v1'')';
+    rejected_consent := true;
+  exception when others then
+    null; -- expected: no INSERT policy
+  end;
+  begin
+    execute 'insert into public.audit_log (actor_id, action, entity)
+             values (''20000000-0000-0000-0000-0000000000a1'',''booking.view'',''appointment'')';
+    rejected_audit := true;
+  exception when others then
+    null; -- expected: no INSERT policy
+  end;
+  if rejected_consent then
+    raise exception 'TEST 16 FAILED: user forged a consent row';
+  end if;
+  if rejected_audit then
+    raise exception 'TEST 16 FAILED: user forged an audit row';
+  end if;
+  raise notice 'test 16 pass: patients cannot forge consent or audit rows';
+end $$;
+
 -- Bonus positive control: admin reads every profile and every submission.
 set local request.jwt.claims = '{"sub":"20000000-0000-0000-0000-0000000000c1"}';
 do $$

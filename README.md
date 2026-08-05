@@ -91,6 +91,7 @@ delete from public.patients where profile_id = (
 | `MAIL_FROM` | From address for outgoing mail |
 | `ADMIN_NOTIFY_EMAIL` | Inbox for admin notifications (new submissions, etc.) |
 | `CRON_SECRET` | Shared secret that guards scheduled jobs |
+| `FORM_SECRET` | Form anti-spam signing secret — required in production, distinct from `CRON_SECRET` |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | WhatsApp deep-link number (digits with country code); leave empty to hide the /contact WhatsApp button |
 | `SENTRY_DSN` | Sentry project DSN (error tracking); app still runs without it |
 
@@ -109,7 +110,7 @@ Actions** (Vercel Hobby cron is limited to once a day — not enough for hold re
 
 Security hardening is applied in `next.config.ts` (HSTS, `nosniff`, `X-Frame-Options:
 DENY`, `Referrer-Policy`, `Permissions-Policy`, and a Content-Security-Policy allowing
-`self`, the Supabase URL, and inline styles/scripts for Next 15's bootstrap). The
+`self`, the Supabase URL, and inline styles/scripts for Next 16’s bootstrap). The
 `npm audit --omit=dev` finding set is tracked in `NOTES.md` (the remaining `next`-bound
 advisories need a breaking Next 16 upgrade — approve before upgrading).
 
@@ -130,6 +131,7 @@ vercel env add SMTP_PASS production
 vercel env add MAIL_FROM production
 vercel env add ADMIN_NOTIFY_EMAIL production
 vercel env add CRON_SECRET production
+vercel env add FORM_SECRET production
 vercel env add NEXT_PUBLIC_WHATSAPP_NUMBER production
 vercel env add SENTRY_DSN production
 vercel --prod
@@ -163,7 +165,8 @@ request reviews" and "Require status checks to pass" for `main`.
 - `npm run dev` — development server
 - `npm run build` — production build (must pass before every commit)
 - `npm run start` — serve the production build
-- `npm run lint` — ESLint
+- `npm run lint` — ESLint (
+  `eslint .`; the old Next 15 `next lint` script was removed)
 
 ## Repository layout
 

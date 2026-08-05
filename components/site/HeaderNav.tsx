@@ -5,8 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/Button";
-import { SignOutForm } from "./SignOutForm";
+import { HeaderProfile } from "./HeaderProfile";
 
 export const NAV_LINKS = [
   { href: "/about", label: "About" },
@@ -14,9 +13,6 @@ export const NAV_LINKS = [
   { href: "/learn", label: "Learn" },
   { href: "/contact", label: "Contact" },
 ];
-
-/** What the header shows for the current (possibly signed-out) visitor. */
-export type HeaderProfile = { firstName: string; home: string } | null;
 
 function useActiveLink() {
   const pathname = usePathname();
@@ -44,7 +40,7 @@ export function DesktopNav() {
   );
 }
 
-export function MobileMenu({ signedIn }: { signedIn: HeaderProfile }) {
+export function MobileMenu() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -115,7 +111,10 @@ export function MobileMenu({ signedIn }: { signedIn: HeaderProfile }) {
         <div
           ref={panelRef}
           id="mobile-menu"
-          className="fixed inset-x-0 bottom-0 top-[60px] z-40 overflow-y-auto bg-mineral-50 sm:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site menu"
+          className="fixed inset-x-0 bottom-0 top-[var(--header-h)] z-40 overflow-y-auto bg-mineral-50 sm:hidden"
         >
           <nav className="container-content flex flex-col gap-2 py-6" aria-label="Mobile menu">
             {NAV_LINKS.map((link) => (
@@ -131,23 +130,9 @@ export function MobileMenu({ signedIn }: { signedIn: HeaderProfile }) {
                 {link.label}
               </Link>
             ))}
-            {signedIn ? (
-              <div className="mt-6 flex items-center justify-between gap-2 rounded border border-neem-100 bg-chalk-0 px-4 py-3">
-                <Link
-                  href={signedIn.home}
-                  className="font-utility text-body-s font-medium text-ink-950 transition hover:text-neem-600"
-                >
-                  {signedIn.firstName}
-                </Link>
-                <SignOutForm />
-              </div>
-            ) : (
-              <div className="mt-6">
-                <Button href="/care" className="w-full">
-                  Book a check-up
-                </Button>
-              </div>
-            )}
+            <div className="mt-6 rounded border border-neem-100 bg-chalk-0 px-4 py-3">
+              <HeaderProfile />
+            </div>
           </nav>
         </div>
       )}
