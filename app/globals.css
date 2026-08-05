@@ -5,11 +5,16 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-    /* Landing-page section snapping. Mandatory + snap-always gives the
-       latch-onto-each-section feel (and works on touch); the sticky header
-       offset is accounted for with scroll-padding. */
-    scroll-snap-type: y mandatory;
+    /* Landing-page section snapping — the smooth, modern pattern:
+       `proximity` latches gently to a section when the user stops near it
+       (instead of forcing a stop at every section), and `snap-stop: normal`
+       (the default) lets a fast flick skip several sections to reach the
+       footer. This avoids the "scroll-jack" fatigue that `mandatory` +
+       `snap-stop: always` causes. scroll-margin-top accounts for the sticky
+       header without shifting the content. */
+    scroll-snap-type: y proximity;
     scroll-padding-top: 64px;
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-mineral-50 text-ink-950 font-body text-body antialiased;
@@ -33,7 +38,10 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  html { scroll-snap-type: none; }
+  html {
+    scroll-snap-type: none;
+    scroll-behavior: auto;
+  }
 }
 
 /* Mobile display sizes */

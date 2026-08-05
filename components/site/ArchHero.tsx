@@ -32,7 +32,7 @@ export function ArchHero() {
   }, []);
 
   return (
-    <section className="flex snap-start snap-always min-h-[100svh] items-center justify-center bg-neem-900">
+    <section className="flex snap-start min-h-[100svh] items-center justify-center bg-neem-900">
       {/* max-w on the wrapper, not the frame: % padding on the frame resolves
           against its containing block, and a stretched flex item would use the
           full-width wrapper. Frame %s must resolve against the frame's own width. */}
