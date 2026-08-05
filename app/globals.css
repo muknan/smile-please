@@ -5,9 +5,11 @@
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
-    /* Landing-page section snapping (scroll-snap). Targets are opt-in via
-       scroll-snap-align, so only pages that mark sections actually snap. */
-    scroll-snap-type: y proximity;
+    /* Landing-page section snapping. Mandatory + snap-always gives the
+       latch-onto-each-section feel (and works on touch); the sticky header
+       offset is accounted for with scroll-padding. */
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 64px;
   }
   body {
     @apply bg-mineral-50 text-ink-950 font-body text-body antialiased;
