@@ -75,6 +75,11 @@ Judgement calls, non-standard choices, and things that need a human decision. Fo
 
 ---
 
+- [phase 8.3 done] Repository: https://github.com/muknan/smile-please (private). Branch main. Only `.env.example` committed; `.env.local` gitignored.
+- [phase 8.4 done] Deployed to Vercel. Production URL: https://smile-please-delta.vercel.app (project mukul-nandas-projects/smile-please; also aliases smile-please-mukul-nandas-projects.vercel.app and smile-please-muknan-mukul-nandas-projects.vercel.app). The clean alias smile-please.vercel.app is owned by an unrelated create-react-app project on this account, not ours.
+- [phase 8.5/8.6] Vercel production env vars set (12 vars; secrets piped, never in transcripts). GitHub vars/secrets set: SITE_URL, CRON_SECRET, SUPABASE_DB_URL, BACKUP_PASSPHRASE. Cron + backup workflows committed but not yet fired once.
+- [phase 8.2] Sentry not yet installed; a free account + SENTRY_DSN is still a human step before first deploy (PII-scrub beforeSend, sendDefaultPii false).
+
 ## Needs a decision from the client
 
 These are deliberately left as placeholders or deferred choices the client must
