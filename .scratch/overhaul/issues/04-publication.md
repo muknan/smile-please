@@ -1,8 +1,8 @@
 # Publish and verify production
-Status: claimed
+Status: resolved
 Blocked by: None
 
-- [ ] Full checks and independent reviews pass.
-- [ ] Migration reviewed and security tested before application.
-- [ ] Commit/push via commit-pusher, deployment to existing project.
-- [ ] Actual production routes and desktop/mobile screenshots verified.
+- [x] Full checks and independent reviews pass.
+- [x] Migration reviewed and security tested before application.
+- [x] Commit/push via commit-pusher, deployment to existing project.
+- [x] Actual production routes and desktop/mobile screenshots verified.
