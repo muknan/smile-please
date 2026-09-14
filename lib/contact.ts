@@ -23,6 +23,31 @@ export const PARTNERSHIP_LABELS: Record<PartnershipType, string> = {
   other: "Other",
 };
 
+export const ORGANIZATION_TYPES = [
+  "corporate",
+  "foundation",
+  "healthcare",
+  "dental_clinic",
+  "school_university",
+  "ngo_community",
+  "supplier",
+  "volunteer_group",
+  "other",
+] as const;
+export type OrganizationType = (typeof ORGANIZATION_TYPES)[number];
+
+export const ORGANIZATION_TYPE_LABELS: Record<OrganizationType, string> = {
+  corporate: "Company / CSR team",
+  foundation: "Foundation",
+  healthcare: "Healthcare organisation",
+  dental_clinic: "Dental clinic or group",
+  school_university: "School or university",
+  ngo_community: "NGO or community organisation",
+  supplier: "Supplier",
+  volunteer_group: "Volunteer organisation",
+  other: "Other",
+};
+
 /**
  * WhatsApp deep links — free, no API, opens straight into the admin's
  * WhatsApp. Hidden entirely when NEXT_PUBLIC_WHATSAPP_NUMBER is unset.

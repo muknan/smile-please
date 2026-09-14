@@ -236,6 +236,17 @@ export async function setDentistStatus(
     return { ok: false, error: "A reason is required to reject a dentist." };
   const supabase = await createClient();
   const isActive = status === "active";
+  if (isActive) {
+    const { data: dentist } = await supabase
+      .from("dentists")
+      .select("dci_registration_no, dci_verified_at")
+      .eq("profile_id", dentistId)
+      .maybeSingle();
+    if (!dentist) return { ok: false, error: "Dentist profile not found." };
+    if (!dentist.dci_registration_no || !dentist.dci_verified_at) {
+      return { ok: false, error: "Verify the dentist's DCI registration before approving them." };
+    }
+  }
   const { error } = await supabase
     .from("dentists")
     .update({
@@ -260,6 +271,13 @@ export async function setDentistStatus(
 export async function verifyDci(dentistId: string): Promise<ActionResult> {
   await requireRole("admin");
   const supabase = await createClient();
+  const { data: dentist } = await supabase
+    .from("dentists")
+    .select("dci_registration_no")
+    .eq("profile_id", dentistId)
+    .maybeSingle();
+  if (!dentist) return { ok: false, error: "Dentist profile not found." };
+  if (!dentist.dci_registration_no?.trim()) return { ok: false, error: "A DCI registration number is required before verification." };
   const { error } = await supabase
     .from("dentists")
     .update({ dci_verified_at: new Date().toISOString() })

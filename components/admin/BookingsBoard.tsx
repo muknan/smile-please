@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatDate, formatDateTime, relativeDays } from "@/lib/format";
 import { appointmentAction, assignAppointment, logBookingView } from "@/app/admin/actions";
@@ -77,6 +77,7 @@ export function BookingsBoard(props: BookingsBoardProps) {
   // `selectedId` is the single source of truth for both the drawer and the
   // action dialog; `cursor` drives only keyboard-navigation highlighting.
   const selected = selectedId ? rows.find((r) => r.id === selectedId) ?? null : null;
+  const safeCursor = Math.min(cursor, Math.max(0, rows.length - 1));
 
   const applyFilters = useCallback(
     (patch: Partial<typeof filters>) => {
@@ -107,6 +108,11 @@ export function BookingsBoard(props: BookingsBoardProps) {
     setError(null);
   }, []);
 
+  const openAssignDialog = useCallback(() => {
+    setAssignDentist("");
+    setDialog({ kind: "assign" });
+  }, []);
+
   // Keyboard shortcuts: j/k move, Enter open, a assign, Escape close, ? help.
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -133,35 +139,25 @@ export function BookingsBoard(props: BookingsBoardProps) {
       if (rows.length === 0) return;
       if (e.key === "j" || e.key === "ArrowDown") {
         e.preventDefault();
-        setCursor((c) => Math.min(c + 1, rows.length - 1));
+        setCursor(Math.min(safeCursor + 1, rows.length - 1));
       }
       if (e.key === "k" || e.key === "ArrowUp") {
         e.preventDefault();
-        setCursor((c) => Math.max(c - 1, 0));
+        setCursor(Math.max(safeCursor - 1, 0));
       }
-      if (e.key === "Enter" && rows[cursor]) {
+      if (e.key === "Enter" && rows[safeCursor]) {
         e.preventDefault();
-        openDrawer(rows[cursor].id);
+        openDrawer(rows[safeCursor].id);
       }
-      if (e.key === "a" && rows[cursor]) {
+      if (e.key === "a" && rows[safeCursor]) {
         e.preventDefault();
-        openDrawer(rows[cursor].id);
-        setDialog({ kind: "assign" });
+        openDrawer(rows[safeCursor].id);
+        openAssignDialog();
         setError(null);
       }
     },
-    [dialog, selectedId, rows, cursor, openDrawer],
+    [dialog, selectedId, rows, safeCursor, openDrawer, openAssignDialog],
   );
-
-  // Keep the cursor within range after filtering.
-  useEffect(() => {
-    if (cursor >= rows.length) setCursor(Math.max(0, rows.length - 1));
-  }, [rows.length, cursor]);
-
-  // Reset the assigned-dentist picker each time the assign dialog opens.
-  useEffect(() => {
-    if (dialog?.kind === "assign" || dialog === null) setAssignDentist("");
-  }, [dialog]);
 
   const run = async (fn: () => Promise<{ ok: boolean; error?: string }>) => {
     setBusy(true);
@@ -350,7 +346,7 @@ export function BookingsBoard(props: BookingsBoardProps) {
                 <Row
                   key={r.id}
                   row={r}
-                  active={i === cursor}
+                  active={i === safeCursor}
                   selected={r.id === selectedId}
                   statusLabels={statusLabels}
                   patientById={patientById}
@@ -377,7 +373,7 @@ export function BookingsBoard(props: BookingsBoardProps) {
           note={notesByAppt[selectedId] ?? null}
           onClose={() => setSelectedId(null)}
           onTransition={transition}
-          onAssign={() => setDialog({ kind: "assign" })}
+          onAssign={openAssignDialog}
         />
       )}
 

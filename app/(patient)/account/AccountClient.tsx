@@ -48,7 +48,7 @@ function AppointmentRow({
   const reschedulable =
     cancellable &&
     !!appointment.scheduled_for &&
-    new Date(appointment.scheduled_for).getTime() - Date.now() > 24 * 60 * 60 * 1000;
+    new Date(appointment.scheduled_for).getTime() - new Date().getTime() > 24 * 60 * 60 * 1000;
 
   const cancel = () => {
     startTransition(async () => {

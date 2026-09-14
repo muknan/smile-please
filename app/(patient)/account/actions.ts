@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { profileEditSchema } from "@/lib/schemas";
 import { CHANGE_WINDOW_MSG } from "@/lib/booking";
 import { notifyAppointmentTransition } from "@/lib/notifications";
+import { requirePatient } from "@/lib/auth";
 
 export type AccountState =
   | { status: "idle" }
@@ -19,6 +20,7 @@ export async function cancelAppointment(
   appointmentId: string,
   reason: string,
 ): Promise<AccountState> {
+  await requirePatient();
   const supabase = await createClient();
   const { data: before } = await supabase
     .from("appointments")
@@ -56,36 +58,14 @@ export async function withdrawConsent(
   purpose: "booking" | "awareness_updates",
 ): Promise<AccountState> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { status: "error", error: "Sign in again." };
+  await requirePatient();
 
-  if (purpose === "booking") {
-    const { data: pending } = await supabase
-      .from("appointments")
-      .select("id, status")
-      .eq("patient_id", user.id)
-      .in("status", ["requested", "assigned", "confirmed"]);
-    for (const appointment of pending ?? []) {
-      await supabase.rpc("transition_appointment", {
-        p_appointment_id: appointment.id,
-        p_to: "cancelled_by_patient",
-        p_reason: "Consent withdrawn",
-      });
-    }
-  }
-
-  const { error } = await supabase
-    .from("consents")
-    .update({ withdrawn_at: new Date().toISOString() })
-    .eq("subject_type", "profile")
-    .eq("subject_id", user.id)
-    .eq("purpose", purpose)
-    .is("withdrawn_at", null);
+  const { error } = await supabase.rpc("withdraw_booking_consent", {
+    p_purpose: purpose,
+  });
 
   if (error) {
-    return { status: "error", error: "We couldn't record the withdrawal. Try again." };
+    return { status: "error", error: "We couldn't withdraw consent just now. Try again." };
   }
   revalidatePath("/account");
   return {
@@ -113,10 +93,8 @@ export async function updateProfile(
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { status: "error", error: "Sign in again." };
+  const profile = await requirePatient();
+  const user = { id: profile.id };
 
   const { error: profileError } = await supabase
     .from("profiles")

@@ -111,9 +111,15 @@ export const contactDentistSchema = z.object({
 export const contactOrganizationSchema = z.object({
   tab: z.literal("organization"),
   organizationName: z.string().trim().min(2, "Enter the organisation's name.").max(160),
+  organizationType: z.enum(["corporate", "foundation", "healthcare", "dental_clinic", "school_university", "ngo_community", "supplier", "volunteer_group", "other"], {
+    message: "Choose the organisation type.",
+  }),
   contactPerson: z.string().trim().min(2, "Enter a contact person's name.").max(120),
   email: z.string().trim().email("Enter a valid email — we reply there.").max(200),
   phone: phoneSchema.optional().or(z.literal("")),
+  organizationWebsite: z.string().trim().max(200, "Keep the website under 200 characters.").refine((v) => v === "" || /^https?:\/\/\S+$/i.test(v), {
+    message: "Enter a website starting with http:// or https://.",
+  }).default(""),
   partnershipType: z.enum(["funding", "venue", "camp_host", "supplies", "other"], {
     message: "Choose a partnership type.",
   }),

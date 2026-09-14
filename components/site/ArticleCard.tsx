@@ -59,7 +59,7 @@ export function ArticleCard({ article }: { article: ArticleTeaser }) {
           {article.excerpt && (
             <p className="mt-1 line-clamp-2 text-body-s text-ink-950/70">{article.excerpt}</p>
           )}
-          <p className="mt-2 font-utility text-data text-ink-950/60 tabular">
+          <p className="mt-2 font-utility text-data text-ink-950/70 tabular">
             {article.published_at ? formatDate(article.published_at) : "Soon"}
             <span aria-hidden="true"> · </span>
             {readMinutes(article.body_md)} min read

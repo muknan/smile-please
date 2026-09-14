@@ -21,7 +21,7 @@ export default async function DentistAppointmentsPage() {
     .from("appointments")
     .select("*")
     .eq("dentist_id", profile.id)
-    .gte("scheduled_for", new Date(Date.now() - 30 * 86_400_000).toISOString())
+    .gte("scheduled_for", new Date(new Date().getTime() - 30 * 86_400_000).toISOString())
     .order("scheduled_for");
 
   const list = (appointments ?? []) as Appointment[];

@@ -16,7 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     data: { user },
   } = await supabase.auth.getUser();
   const lastSignIn = user?.last_sign_in_at ? new Date(user.last_sign_in_at).getTime() : 0;
-  if (user !== null && Date.now() - lastSignIn > ADMIN_SESSION_MS) {
+  if (user !== null && new Date().getTime() - lastSignIn > ADMIN_SESSION_MS) {
     await supabase.auth.signOut();
     redirect("/auth/sign-in?reason=admin_timeout");
   }

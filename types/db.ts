@@ -701,6 +701,10 @@ export type Database = {
         Args: { p_slot_id: string };
         Returns: Tables<"availability_slots">;
       };
+      release_slot_hold: {
+        Args: { p_slot_id: string };
+        Returns: boolean;
+      };
       create_booking_request: {
         Args: {
           p_email: string;
@@ -712,6 +716,7 @@ export type Database = {
           p_preferred_locality?: string | null;
           p_preferred_window?: Json | null;
           p_consent_updates?: boolean | null;
+          p_actor_id?: string | null;
         };
         Returns: Tables<"appointments">;
       };
@@ -756,6 +761,7 @@ export type Database = {
           p_patient_note?: string | null;
           p_consent_updates?: boolean | null;
           p_reschedule_appointment_id?: string | null;
+          p_actor_id?: string | null;
         };
         Returns: Tables<"appointments">;
       };
@@ -766,6 +772,10 @@ export type Database = {
           p_reason?: string | null;
         };
         Returns: Tables<"appointments">;
+      };
+      withdraw_booking_consent: {
+        Args: { p_purpose: Enums<"consent_purpose"> };
+        Returns: undefined;
       };
       lookup_appointment: {
         Args: { p_ref: string; p_phone: string };

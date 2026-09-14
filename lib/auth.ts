@@ -48,6 +48,15 @@ export async function requireRole(role: UserRole): Promise<Profile> {
   return profile;
 }
 
+/** Guards the patient account and routes staff to their operational home. */
+export async function requirePatient(): Promise<Profile> {
+  const profile = await getProfile();
+  if (!profile) redirect("/auth/sign-in");
+  if (profile.role === "admin") redirect("/admin");
+  if (profile.role === "dentist") redirect("/dentist");
+  return profile;
+}
+
 /** Server action: end the session and return to the homepage. */
 export async function signOut() {
   "use server";

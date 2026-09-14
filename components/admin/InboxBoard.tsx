@@ -33,12 +33,15 @@ export function InboxBoard({ submissions }: { submissions: InboxSubmission[] }) 
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [adminNote, setAdminNote] = useState("");
   const [, startTransition] = useTransition();
 
   const selected = submissions.find((s) => s.id === selectedId) ?? null;
 
   const open = (id: string) => {
-    setSelectedId((prev) => (prev === id ? null : id));
+    const nextSelected = selectedId === id ? null : submissions.find((s) => s.id === id) ?? null;
+    setSelectedId(nextSelected?.id ?? null);
+    setAdminNote(nextSelected?.admin_notes ?? "");
     setError(null);
     setNotice(null);
     void logSubmissionView(id);
@@ -193,7 +196,8 @@ export function InboxBoard({ submissions }: { submissions: InboxSubmission[] }) 
             <div className="mt-5">
               <p className="font-utility text-label uppercase text-ink-950/60">Internal notes</p>
               <textarea
-                defaultValue={selected.admin_notes ?? ""}
+                value={adminNote}
+                onChange={(event) => setAdminNote(event.target.value)}
                 rows={3}
                 aria-label="Internal notes"
                 className="mt-2 w-full rounded border border-neem-100 bg-chalk-0 px-3 py-2 font-utility text-body"
@@ -206,12 +210,10 @@ export function InboxBoard({ submissions }: { submissions: InboxSubmission[] }) 
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="font-utility text-label uppercase text-ink-950/60">Status:</span>
               {STATUS_ORDER.map((st) => (
-                <form key={st} action={async (fd) => {
-                  await doStatus(st, String(fd.get("note") ?? ""));
-                }}>
-                  <input type="hidden" name="note" defaultValue={selected.admin_notes ?? ""} />
-                  <button
-                    type="submit"
+                <button
+                  key={st}
+                  type="button"
+                    onClick={() => void doStatus(st, adminNote)}
                     disabled={busy || st === selected.status}
                     className={
                       st === selected.status
@@ -221,7 +223,6 @@ export function InboxBoard({ submissions }: { submissions: InboxSubmission[] }) 
                   >
                     {st}
                   </button>
-                </form>
               ))}
             </div>
 

@@ -174,7 +174,7 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
 
       <Field label="Anything else we should know" htmlFor="note">
         <Textarea id="note" name="note" rows={4} maxLength={500} />
-        <p className="mt-2 text-body-s text-ink-950/60">Up to 500 characters.</p>
+        <p className="mt-2 text-body-s text-ink-950/70">Up to 500 characters.</p>
       </Field>
 
         </div>

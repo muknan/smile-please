@@ -18,7 +18,7 @@ export default async function AvailabilityPage() {
     .select("id, starts_at, ends_at, status, location_type, camp_name, booked_count, capacity")
     .eq("dentist_id", profile.id)
     .gte("starts_at", new Date().toISOString())
-    .lte("starts_at", new Date(Date.now() + 30 * 86_400_000).toISOString())
+    .lte("starts_at", new Date(new Date().getTime() + 30 * 86_400_000).toISOString())
     .order("starts_at")
     .limit(40);
 

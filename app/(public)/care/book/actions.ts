@@ -1,6 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { admin } from "@/lib/supabase/admin";
+import { cookies } from "next/headers";
+import { HOLD_COOKIE, verifyHoldCapability } from "@/lib/booking-server";
 import { bookSlotSchema } from "@/lib/schemas";
 import { checkHuman, withinRateLimit, clientIp } from "@/lib/antispam";
 import { notify } from "@/lib/email";
@@ -65,6 +68,11 @@ export async function confirmSlotBooking(
   }
   const data = parsed.data;
 
+  const cookieStore = await cookies();
+  if (!verifyHoldCapability(cookieStore.get(HOLD_COOKIE)?.value, details.slotId)) {
+    return { status: "error", error: "Your slot hold has expired. Go back and choose a time again." };
+  }
+
   // Under-18s cannot self-book until a verifiable parental-consent flow exists
   // (D-11); this mirrors Path A and blocks the age band server-side.
   if (data.ageBand === "under_12" || data.ageBand === "12_17") {
@@ -74,8 +82,20 @@ export async function confirmSlotBooking(
     };
   }
 
-  const supabase = await createClient();
-  const { data: booking, error } = await supabase.rpc("confirm_booking", {
+  const sessionClient = await createClient();
+  const { data: userData } = await sessionClient.auth.getUser();
+  const actorId = userData.user?.id ?? null;
+  if (details.rescheduleAppointmentId && !actorId) {
+    return { status: "error", error: "Please sign in to change an existing appointment." };
+  }
+  const { data: priorAppointment } = details.rescheduleAppointmentId
+    ? await sessionClient
+        .from("appointments")
+        .select("scheduled_for")
+        .eq("id", details.rescheduleAppointmentId)
+        .maybeSingle()
+    : { data: null };
+  const { data: booking, error } = await admin.rpc("confirm_booking", {
     p_slot_id: details.slotId,
     p_email: data.email,
     p_full_name: data.fullName,
@@ -87,6 +107,7 @@ export async function confirmSlotBooking(
     p_patient_note: data.note || null,
     p_consent_updates: data.consentUpdates,
     p_reschedule_appointment_id: details.rescheduleAppointmentId ?? null,
+    p_actor_id: actorId,
   });
 
   if (error || !booking) {
@@ -103,15 +124,23 @@ export async function confirmSlotBooking(
         error: "Appointments can only be changed up to 24 hours before. Call our team to reschedule.",
       };
     }
+    if (msg.includes("EMAIL_IN_USE")) {
+      return { status: "error", error: "That email already has an account. Sign in before booking with it." };
+    }
     return {
       status: "error",
       error: "We couldn't save the booking just now. Please try again in a moment.",
     };
   }
 
+  // The capability is single-use from the browser's perspective. Clearing it
+  // after the transactional write prevents a successful hold from authorising
+  // a stale replay attempt during the remainder of its ten-minute lifetime.
+  cookieStore.delete(HOLD_COOKIE);
+
   if (data.email) {
     try {
-      await supabase.auth.signInWithOtp({
+      await sessionClient.auth.signInWithOtp({
         email: data.email,
         options: {
           emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback?next=/account`,
@@ -128,15 +157,10 @@ export async function confirmSlotBooking(
         time: formatTime(booking.scheduled_for as string),
       };
       if (details.rescheduleAppointmentId) {
-        const { data: oldAppt } = await supabase
-          .from("appointments")
-          .select("scheduled_for, reference_code")
-          .eq("id", details.rescheduleAppointmentId)
-          .maybeSingle();
-        if (oldAppt?.scheduled_for) {
+        if (priorAppointment?.scheduled_for) {
           await notify("appointment_rescheduled", data.email, {
-            fromDate: formatDate(oldAppt.scheduled_for),
-            fromTime: formatTime(oldAppt.scheduled_for),
+            fromDate: formatDate(priorAppointment.scheduled_for),
+            fromTime: formatTime(priorAppointment.scheduled_for),
             toDate: when.date,
             toTime: when.time,
             dentist: details.dentistName,

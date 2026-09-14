@@ -247,7 +247,7 @@ insert into public.dentists
   (profile_id, slug, display_name, locality, city, specialties, languages, bio, status, is_public)
 values ('30000000-0000-0000-0000-0000000000b1','booking-test-dentist','Dr Booking Test',
         'Seelampur','New Delhi',array['General dentistry'],array['Hindi','English'],
-        'Test only.','active',false);
+        'Test only.','active',true);
 
 -- Slot A (tomorrow 09:00) and slot C (day after 09:00) for the booking tests.
 insert into public.availability_slots (dentist_id, starts_at, ends_at, created_by)
@@ -405,7 +405,7 @@ begin
 end $$;
 
 -- ── Test 5: hold_slot ──────────────────────────────────────────────────────
-set local role anon;
+set local role postgres;
 set local request.jwt.claims = '{"sub":null}';
 do $$
 declare v_slot uuid; v_state text;
@@ -457,8 +457,13 @@ begin
 end $$;
 
 -- 6b: Path B confirm on slot C (fresh email).
-set local role anon;
+set local role postgres;
 delete from tmp_bk;
+select public.hold_slot(
+  (select id from public.availability_slots
+     where dentist_id='30000000-0000-0000-0000-0000000000b1'
+       and starts_at = (((now() at time zone 'Asia/Kolkata')::date + 2) + time '09:00') at time zone 'Asia/Kolkata'
+     limit 1));
 insert into tmp_bk (appt, patient, ref)
 select id, patient_id, reference_code
 from public.confirm_booking(
@@ -485,41 +490,50 @@ begin
   raise notice 'test 6b pass: anon self-booking confirmed, slot booked';
 end $$;
 
--- 6c: reschedule — confirm a day+3 slot for anon C, then move onto a day+4
+-- 6c: reschedule — an authenticated patient confirms a day+3 slot, then
+-- moves onto a day+4 slot. Guest rescheduling is intentionally impossible.
 -- slot. Both are >24h out, so the patient reschedule rule does not apply.
 -- Runs as postgres: slots already held or booked are invisible to anon's
 -- SELECT policy. Anon CALLABILITY of the booking functions is asserted
 -- separately (6d) via has_function_privilege — the definer bodies behave
 -- identically for every caller.
 set local role postgres;
-insert into public.availability_slots (dentist_id, starts_at, ends_at, created_by)
+insert into public.availability_slots (id, dentist_id, starts_at, ends_at, created_by)
 values
-  ('30000000-0000-0000-0000-0000000000b1',
+  ('30000000-0000-0000-0000-0000000000d3', '30000000-0000-0000-0000-0000000000b1',
    (((now() at time zone 'Asia/Kolkata')::date + 3) + time '09:00') at time zone 'Asia/Kolkata',
    (((now() at time zone 'Asia/Kolkata')::date + 3) + time '09:30') at time zone 'Asia/Kolkata',
    '30000000-0000-0000-0000-0000000000b1'),
-  ('30000000-0000-0000-0000-0000000000b1',
+  ('30000000-0000-0000-0000-0000000000d4', '30000000-0000-0000-0000-0000000000b1',
    (((now() at time zone 'Asia/Kolkata')::date + 4) + time '09:00') at time zone 'Asia/Kolkata',
    (((now() at time zone 'Asia/Kolkata')::date + 4) + time '09:30') at time zone 'Asia/Kolkata',
    '30000000-0000-0000-0000-0000000000b1');
+-- confirm_booking is deliberately service-role-only. Keep the patient's JWT
+-- subject for the function's explicit ownership check while using the trusted
+-- role that the server boundary uses in production.
+set local role service_role;
+set local request.jwt.claims = '{"sub":"30000000-0000-0000-0000-0000000000a1"}';
 do $$
 declare v_first uuid; v_second uuid; v_app uuid; v_ra uuid;
 begin
-  select id into v_first from public.availability_slots
-    where dentist_id='30000000-0000-0000-0000-0000000000b1'
-      and starts_at = (((now() at time zone 'Asia/Kolkata')::date + 3) + time '09:00') at time zone 'Asia/Kolkata' limit 1;
-  select id into v_second from public.availability_slots
-    where dentist_id='30000000-0000-0000-0000-0000000000b1'
-      and starts_at = (((now() at time zone 'Asia/Kolkata')::date + 4) + time '09:00') at time zone 'Asia/Kolkata' limit 1;
+  v_first := '30000000-0000-0000-0000-0000000000d3';
+  v_second := '30000000-0000-0000-0000-0000000000d4';
+  perform public.hold_slot(v_first);
   select id into v_ra from public.confirm_booking(
-    v_first, 'anon-c@test.local','Anon C','+919876543212','18_39','Karol Bagh','110005','checkup',null,false,null);
+    v_first, 'btest-pat@test.local','Booking Test Patient','+919876501234','18_39','Karol Bagh','110005','checkup',null,false,null,
+    '30000000-0000-0000-0000-0000000000a1');
+  perform public.hold_slot(v_second);
   select id into v_app from public.confirm_booking(
-    v_second, 'anon-c@test.local','Anon C','+919876543212','18_39','Karol Bagh','110005','checkup',null,false,v_ra);
-  if (select slot_id from public.appointments where id=v_ra) <> v_second then
-    raise exception 'TEST 6c FAILED: appointment did not move slots';
-  end if;
-  if (select status from public.availability_slots where id=v_first) <> 'open'
-     or (select booked_count from public.availability_slots where id=v_first) <> 0 then
+    v_second, 'btest-pat@test.local','Booking Test Patient','+919876501234','18_39','Karol Bagh','110005','checkup',null,false,v_ra,
+    '30000000-0000-0000-0000-0000000000a1');
+end $$;
+set local role postgres;
+do $$
+declare v_ra uuid := (select id from public.appointments where patient_id='30000000-0000-0000-0000-0000000000a1' and slot_id='30000000-0000-0000-0000-0000000000d4');
+begin
+  if v_ra is null then raise exception 'TEST 6c FAILED: appointment did not move slots'; end if;
+  if (select status from public.availability_slots where id='30000000-0000-0000-0000-0000000000d3') <> 'open'
+     or (select booked_count from public.availability_slots where id='30000000-0000-0000-0000-0000000000d3') <> 0 then
     raise exception 'TEST 6c FAILED: old slot not released';
   end if;
   if (select count(*) from public.appointment_events where appointment_id=v_ra and reason like 'Rescheduled%') <> 1 then
@@ -528,25 +542,26 @@ begin
   raise notice 'test 6c pass: reschedule moved appointment, freed old slot, event written';
 end $$;
 
--- ── Test 6d: anonymous callers really CAN execute the booking functions ────
+-- ── Test 6d: anonymous callers cannot execute booking mutations ────────────
 do $$
 begin
-  if not has_function_privilege('anon', 'public.hold_slot(uuid)', 'EXECUTE') then
-    raise exception 'TEST 6d FAILED: anon cannot execute hold_slot';
+  if has_function_privilege('anon', 'public.hold_slot(uuid)', 'EXECUTE') then
+    raise exception 'TEST 6d FAILED: anon can execute hold_slot';
   end if;
-  if not has_function_privilege('anon', 'public.create_booking_request(text,text,text,age_band,reason_category,text,text,jsonb,boolean)', 'EXECUTE') then
-    raise exception 'TEST 6d FAILED: anon cannot execute create_booking_request';
+  if has_function_privilege('anon', 'public.create_booking_request(text,text,text,age_band,reason_category,text,text,jsonb,boolean,uuid)', 'EXECUTE') then
+    raise exception 'TEST 6d FAILED: anon can execute create_booking_request';
   end if;
-  if not has_function_privilege('anon', 'public.confirm_booking(uuid,text,text,text,age_band,text,text,reason_category,text,boolean,uuid)', 'EXECUTE') then
-    raise exception 'TEST 6d FAILED: anon cannot execute confirm_booking';
+  if has_function_privilege('anon', 'public.confirm_booking(uuid,text,text,text,age_band,text,text,reason_category,text,boolean,uuid,uuid)', 'EXECUTE') then
+    raise exception 'TEST 6d FAILED: anon can execute confirm_booking';
   end if;
   if not has_function_privilege('anon', 'public.lookup_appointment(text,text)', 'EXECUTE') then
     raise exception 'TEST 6d FAILED: anon cannot execute lookup_appointment';
   end if;
-  raise notice 'test 6d pass: booking functions executable by anon';
+  raise notice 'test 6d pass: booking mutations are service-only';
 end $$;
 
 -- ── Test 7: lookup — safe fields only; wrong code and wrong phone identical ─
+grant select on tmp_bk to anon;
 set local role anon;
 do $$
 declare v_ref text; v_ok jsonb; v_bad1 jsonb; v_bad2 jsonb;

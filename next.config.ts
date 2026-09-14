@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 if (!SUPABASE_URL) throw new Error("NEXT_PUBLIC_SUPABASE_URL must be configured.");
 const SUPABASE_HOST = new URL(SUPABASE_URL).hostname;
+const DEV_SCRIPT_POLICY = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
 /** @see Phase 8 §8.1 — security response headers. */
 const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
@@ -22,7 +23,7 @@ const securityHeaders = [
       // middleware to mint a per-request nonce and apply it to every inline
       // script; doing that here safely is deferred as a dedicated task.
       // 'unsafe-inline' is retained for scripts with this caveat documented.
-      "script-src 'self' 'unsafe-inline'",
+      `script-src 'self' 'unsafe-inline'${DEV_SCRIPT_POLICY}`,
       // Tailwind + Next inline critical CSS.
       "style-src 'self' 'unsafe-inline'",
       // Supabase Storage images + our own, plus data:/blob: for images.
@@ -38,6 +39,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  turbopack: { root: process.cwd() },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: SUPABASE_HOST, pathname: "/storage/v1/object/public/**" },

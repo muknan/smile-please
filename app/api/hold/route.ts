@@ -1,11 +1,17 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 import { clientIp, hashedIpKey } from "@/lib/antispam";
+import { admin } from "@/lib/supabase/admin";
+import {
+  createHoldCapability,
+  heldSlotFromCapability,
+  HOLD_COOKIE,
+  HOLD_TTL_SECONDS,
+} from "@/lib/booking-server";
 
 /**
- * Places the 10-minute hold (Phase 5 §5.6/5.7). Anonymous by design — Path B
- * booking never requires an account. The hold correctness lives in the
- * hold_slot RPC (row lock first); this route is a thin wrapper.
+ * Places the 10-minute hold. The mutation is service-only; this endpoint is
+ * the narrow validated boundary and issues a signed browser capability.
  */
 export async function POST(request: Request) {
   let slotId: unknown;
@@ -22,8 +28,7 @@ export async function POST(request: Request) {
   }
 
   const ip = await clientIp();
-  const supabase = await createClient();
-  const { data: allowed, error: rateError } = await supabase.rpc("check_rate_limit", {
+  const { data: allowed, error: rateError } = await admin.rpc("check_rate_limit", {
     p_key: hashedIpKey("hold", ip),
     p_limit: 30,
     p_window_seconds: 3600,
@@ -32,7 +37,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "RATE_LIMITED" }, { status: 429 });
   }
 
-  const { data, error } = await supabase.rpc("hold_slot", { p_slot_id: slotId });
+  const cookieStore = await cookies();
+  const previousSlotId = heldSlotFromCapability(cookieStore.get(HOLD_COOKIE)?.value);
+
+  const { data, error } = await admin.rpc("hold_slot", { p_slot_id: slotId });
 
   if (error) {
     const msg = error.message ?? "";
@@ -48,5 +56,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "ERROR" }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, slot: data });
+  if (previousSlotId && previousSlotId !== slotId) {
+    await admin.rpc("release_slot_hold", { p_slot_id: previousSlotId });
+  }
+
+  const response = NextResponse.json({ ok: true, slot: data });
+  response.cookies.set(HOLD_COOKIE, createHoldCapability(slotId), {
+    httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax",
+    maxAge: HOLD_TTL_SECONDS, path: "/",
+  });
+  return response;
 }

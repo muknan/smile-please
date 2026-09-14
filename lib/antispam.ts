@@ -1,7 +1,7 @@
 import "server-only";
 import { createHash, createHmac } from "node:crypto";
 import { headers } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { admin } from "@/lib/supabase/admin";
 
 /**
  * The Master §9.6 / Phase 6 §6.2 public-form protections, applied to every
@@ -79,8 +79,7 @@ export function checkHuman(formData: FormData): HumanCheck {
  * is reachable only through that definer function.
  */
 export async function withinRateLimit(scope: string, ip: string): Promise<boolean> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("check_rate_limit", {
+  const { data, error } = await admin.rpc("check_rate_limit", {
     p_key: hashedIpKey(scope, ip),
     p_limit: HOURLY_LIMIT,
     p_window_seconds: 3600,

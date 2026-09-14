@@ -10,8 +10,8 @@ export function SubmitButton({ pendingLabel = "Saving…", children, ...props }:
 
   useEffect(() => {
     if (!pending) {
-      setShowSpinner(false);
-      return;
+      const timer = window.setTimeout(() => setShowSpinner(false), 0);
+      return () => window.clearTimeout(timer);
     }
     const timer = window.setTimeout(() => setShowSpinner(true), 400);
     return () => window.clearTimeout(timer);

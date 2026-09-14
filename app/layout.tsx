@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Mukta, IBM_Plex_Sans } from "next/font/google";
+import { Fraunces, IBM_Plex_Sans } from "next/font/google";
 import { ArchClipDefs } from "@/components/site/Arch";
 import "./globals.css";
 
@@ -7,8 +7,8 @@ const display = Fraunces({
   subsets: ["latin"], weight: ["500", "600"],
   variable: "--font-display", display: "swap",
 });
-const body = Mukta({
-  subsets: ["latin"], weight: ["300", "400", "600"],
+const body = IBM_Plex_Sans({
+  subsets: ["latin"], weight: ["400", "500", "600"],
   variable: "--font-body", display: "swap",
 });
 const utility = IBM_Plex_Sans({
@@ -25,11 +25,12 @@ export const metadata: Metadata = {
     siteName: "Smile Please",
     locale: "en_IN",
     type: "website",
+    images: [{ url: "/og" }],
   },
   twitter: { card: "summary_large_image" },
 };
 
-export const viewport: Viewport = { themeColor: "#12302A" };
+export const viewport: Viewport = { themeColor: "#183C34" };
 
 export default function RootLayout({
   children,

@@ -123,7 +123,7 @@ function DentistCard({
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <button
-          disabled={busy || d.status === "active"}
+          disabled={busy || d.status === "active" || !d.dci_verified_at}
           onClick={() => onStatus("active")}
           className="rounded bg-neem-900 px-3 py-1.5 font-utility text-body-s font-medium text-chalk-0 disabled:opacity-40"
         >
@@ -171,7 +171,7 @@ function DentistCard({
           onClick={onVerify}
           className="rounded border border-neem-100 px-3 py-1.5 font-utility text-body-s text-ink-950 disabled:opacity-40"
         >
-          {d.dci_verified_at ? "DCI verified" : "I&apos;ve checked the DCI register"}
+          {d.dci_verified_at ? "DCI verified" : "I've checked the DCI register"}
         </button>
       </div>
 

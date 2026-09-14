@@ -53,7 +53,7 @@ export default async function DentistProfilePage({ params, searchParams }: PageP
   if (!dentist) notFound();
 
   const from = new Date();
-  const to = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+  const to = new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000);
   const { data: slots } = await supabase
     .from("public_slots")
     .select("id, dentist_slug, starts_at, ends_at, location_type, camp_name")

@@ -15,6 +15,8 @@ import {
   TAB_LABELS,
   PARTNERSHIP_OPTIONS,
   PARTNERSHIP_LABELS,
+  ORGANIZATION_TYPES,
+  ORGANIZATION_TYPE_LABELS,
   whatsappHref,
   type ContactTab,
 } from "@/lib/contact";
@@ -32,13 +34,17 @@ export function ContactForm({
   initialTab,
   renderedAt,
   whatsappNumberSet,
+  organizationOnly = false,
+  sourcePage = "/contact",
 }: {
   initialTab: ContactTab;
   renderedAt: string;
   whatsappNumberSet: boolean;
+  organizationOnly?: boolean;
+  sourcePage?: "/contact" | "/partners";
 }) {
   const router = useRouter();
-  const [tab, setTab] = useState<ContactTab>(initialTab);
+  const [tab, setTab] = useState<ContactTab>(organizationOnly ? "organization" : initialTab);
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [state, formAction] = useActionState<ContactState, FormData>(submitContact, {
     status: "idle",
@@ -67,7 +73,7 @@ export function ContactForm({
 
   const switchTab = (next: ContactTab) => {
     setTab(next);
-    router.replace(`/contact?tab=${next}`, { scroll: false });
+    router.replace(`${sourcePage}?tab=${next}`, { scroll: false });
   };
 
   if (state.status === "success") {
@@ -105,7 +111,7 @@ export function ContactForm({
         </a>
       )}
 
-      <div role="tablist" aria-label="What best describes you?" className="flex flex-wrap gap-2">
+      {!organizationOnly && <div role="tablist" aria-label="What best describes you?" className="flex flex-wrap gap-2">
         {CONTACT_TABS.map((t, i) => (
           <button
             key={t}
@@ -139,7 +145,7 @@ export function ContactForm({
             {TAB_LABELS[t]}
           </button>
         ))}
-      </div>
+      </div>}
 
       {tab === "dentist" && (
         <p className="max-w-[60ch] rounded-card border border-neem-100 bg-chalk-0 p-6 text-body text-ink-950/80">
@@ -159,6 +165,7 @@ export function ContactForm({
         />
         <input type="hidden" name="renderedAt" value={renderedAt} />
         <input type="hidden" name="tab" value={tab} />
+        <input type="hidden" name="sourcePage" value={sourcePage} />
 
         {tab === "patient" && (
           <>
@@ -171,7 +178,7 @@ export function ContactForm({
               required
               hint="We only call if we need to confirm something about your message." error={fieldError(issues, "phone")}
             >
-              <Input id="contact-phone"  name="phone" value={draftValue("phone")} onChange={setDraftField("phone")} type="tel" inputMode="tel" autoComplete="tel" defaultValue="+91" required />
+              <Input id="contact-phone" name="phone" value={draftValue("phone")} onChange={setDraftField("phone")} type="tel" inputMode="tel" autoComplete="tel" placeholder="+91" required />
             </Field>
             <Field label="Email" htmlFor="contact-email" hint="Optional — reply by email instead of phone." error={fieldError(issues, "email")}>
               <Input id="contact-email"  name="email" value={draftValue("email")} onChange={setDraftField("email")} type="email" autoComplete="email" />
@@ -188,7 +195,7 @@ export function ContactForm({
               <Input id="contact-name"  name="name" value={draftValue("name")} onChange={setDraftField("name")} autoComplete="name" required />
             </Field>
             <Field label="Phone" htmlFor="contact-phone" required>
-              <Input id="contact-phone"  name="phone" value={draftValue("phone")} onChange={setDraftField("phone")} type="tel" inputMode="tel" autoComplete="tel" defaultValue="+91" required />
+              <Input id="contact-phone" name="phone" value={draftValue("phone")} onChange={setDraftField("phone")} type="tel" inputMode="tel" autoComplete="tel" placeholder="+91" required />
             </Field>
             <Field label="Email" htmlFor="contact-email" required hint="We reply here, usually within two working days." error={fieldError(issues, "email")}>
               <Input id="contact-email"  name="email" value={draftValue("email")} onChange={setDraftField("email")} type="email" autoComplete="email" required />
@@ -213,6 +220,12 @@ export function ContactForm({
             <Field label="Organisation name" htmlFor="contact-org" required error={fieldError(issues, "organizationName")}>
               <Input id="contact-org"  name="organizationName" value={draftValue("organizationName")} onChange={setDraftField("organizationName")} autoComplete="organization" required />
             </Field>
+            <Field label="Organisation type" htmlFor="contact-organization-type" required error={fieldError(issues, "organizationType")}>
+              <Select id="contact-organization-type" name="organizationType" value={draftValue("organizationType")} onChange={setDraftField("organizationType")} required>
+                <option value="" disabled>Choose…</option>
+                {ORGANIZATION_TYPES.map((type) => <option key={type} value={type}>{ORGANIZATION_TYPE_LABELS[type]}</option>)}
+              </Select>
+            </Field>
             <Field label="Contact person" htmlFor="contact-person" required error={fieldError(issues, "contactPerson")}>
               <Input id="contact-person"  name="contactPerson" value={draftValue("contactPerson")} onChange={setDraftField("contactPerson")} autoComplete="name" required />
             </Field>
@@ -220,10 +233,13 @@ export function ContactForm({
               <Input id="contact-email"  name="email" value={draftValue("email")} onChange={setDraftField("email")} type="email" autoComplete="email" required />
             </Field>
             <Field label="Phone" htmlFor="contact-phone" hint="Optional.">
-              <Input id="contact-phone"  name="phone" value={draftValue("phone")} onChange={setDraftField("phone")} type="tel" inputMode="tel" autoComplete="tel" defaultValue="+91" />
+              <Input id="contact-phone" name="phone" value={draftValue("phone")} onChange={setDraftField("phone")} type="tel" inputMode="tel" autoComplete="tel" placeholder="+91" />
+            </Field>
+            <Field label="Website" htmlFor="contact-website" hint="Optional — include https:// if you have one." error={fieldError(issues, "organizationWebsite")}>
+              <Input id="contact-website" name="organizationWebsite" value={draftValue("organizationWebsite")} onChange={setDraftField("organizationWebsite")} type="url" inputMode="url" autoComplete="url" placeholder="https://" maxLength={200} />
             </Field>
             <Field label="Partnership type" htmlFor="contact-partnership" required error={fieldError(issues, "partnershipType")}>
-              <Select id="contact-partnership"  name="partnershipType" value={draftValue("partnershipType")} onChange={setDraftField("partnershipType")} required defaultValue="">
+              <Select id="contact-partnership" name="partnershipType" value={draftValue("partnershipType")} onChange={setDraftField("partnershipType")} required>
                 <option value="" disabled>
                   Choose…
                 </option>
@@ -234,8 +250,8 @@ export function ContactForm({
                 ))}
               </Select>
             </Field>
-            <Field label="Your message" htmlFor="contact-message" required error={fieldError(issues, "message")}>
-              <Textarea id="contact-message"  name="message" value={draftValue("message")} onChange={setDraftField("message")} rows={5} maxLength={1000} required />
+            <Field label="Message and proposed contribution" htmlFor="contact-message" required hint="Tell us what you could contribute, who it could help, and anything you would like us to understand." error={fieldError(issues, "message")}>
+              <Textarea id="contact-message"  name="message" value={draftValue("message")} onChange={setDraftField("message")} rows={6} maxLength={1000} required />
             </Field>
           </>
         )}
@@ -254,7 +270,7 @@ export function ContactForm({
               <label htmlFor="consentContact" className="text-body">
                 {CONSENT_COPY[tab]}
               </label>
-              <p className="mt-2 text-body-s text-ink-950/60">
+              <p className="mt-2 text-body-s text-ink-950/70">
                 <Link href="/privacy" className="font-medium text-neem-600 underline underline-offset-4">
                   Read the full privacy notice
                 </Link>{" "}

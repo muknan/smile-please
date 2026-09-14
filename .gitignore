@@ -38,11 +38,14 @@ yarn-error.log*
 # database dumps
 *.dump
 
-# vercel
-.vercel
-
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
 .vercel
+.env*.local
+
+# Local QA artifacts
+.scratch/**/screens/
+playwright-report/
+test-results/

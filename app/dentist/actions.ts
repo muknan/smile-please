@@ -72,6 +72,18 @@ export async function saveClinicalNote(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in again." };
 
+  const { data: appointment } = await supabase
+    .from("appointments")
+    .select("status, dentist_id")
+    .eq("id", appointmentId)
+    .maybeSingle();
+  if (!appointment || appointment.dentist_id !== user.id) {
+    return { ok: false, error: "Appointment not found." };
+  }
+  if (appointment.status !== "completed") {
+    return { ok: false, error: "Clinical notes can only be saved for completed appointments." };
+  }
+
   const { error } = await supabase.from("clinical_notes").upsert(
     {
       appointment_id: appointmentId,

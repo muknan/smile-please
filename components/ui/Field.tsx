@@ -41,7 +41,7 @@ export function Field({ label, htmlFor, hint, error, required, children }: Field
       </label>
       {child}
       {hint && !error && (
-        <p id={hintId} className="text-body-s text-ink-950/60">
+        <p id={hintId} className="text-body-s text-ink-950/70">
           {hint}
         </p>
       )}

@@ -3,132 +3,29 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    -webkit-text-size-adjust: 100%;
-    /* Landing-page section snapping — the smooth, modern pattern:
-       `proximity` latches gently to a section when the user stops near it
-       (instead of forcing a stop at every section), and `snap-stop: normal`
-       (the default) lets a fast flick skip several sections to reach the
-       footer. This avoids the "scroll-jack" fatigue that `mandatory` +
-       `snap-stop: always` causes. scroll-margin-top accounts for the sticky
-       header without shifting the content. */
-    scroll-snap-type: y proximity;
-    scroll-padding-top: 60px; /* sticky header height on mobile (sm+ below) */
-    scroll-behavior: smooth;
-  }
-  @media (min-width: 768px) {
-    html {
-      scroll-padding-top: 72px; /* sticky header height at sm and up */
-    }
-  }
-  body {
-    @apply bg-mineral-50 text-ink-950 font-body text-body antialiased;
-  }
-  h1, h2, h3 { @apply font-display; }
-  :focus-visible {
-    outline: 2px solid #2E6B54;
-    outline-offset: 2px;
-  }
-  ::selection { background: #E9A227; color: #101A16; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 88px; scroll-behavior: smooth; }
+  body { @apply bg-mineral-50 text-ink-950 font-body text-body antialiased; }
+  h1, h2, h3 { @apply font-display; text-wrap: balance; }
+  :focus-visible { outline: 3px solid #32634F; outline-offset: 4px; }
+  ::selection { background: #E0B54B; color: #1B3029; }
+  input, select, textarea { scroll-margin-top: 100px; }
+  input::placeholder, textarea::placeholder { color: #626D64; opacity: 1; }
 }
-
 @layer components {
-  .container-content { @apply mx-auto w-full max-w-content px-4 sm:px-6; }
+  .container-content { @apply mx-auto w-full max-w-content px-6 sm:px-8; }
   .tabular { font-variant-numeric: tabular-nums; }
-
-  /* Light, consistent treatment for native checkboxes/radios — one shared
-     control across every form so they read as designed rather than as raw
-     browser defaults. Native input + accent-color is kept (accessibility),
-     with a visible focus ring matching the global :focus-visible below. */
-  .choice-control {
-    @apply h-5 w-5 shrink-0 cursor-pointer accent-neem-600;
-  }
-  .choice-control:focus-visible {
-    outline: 2px solid #2E6B54;
-    outline-offset: 2px;
-  }
-
-  /* Landing hero arch padding — default breathing room, tightened only on
-     short viewports so the CTA row never falls below the fold on laptops
-     (taller screens keep the standard rhythm). */
-  .hero-frame-pad {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
-  }
-  @media (min-width: 768px) {
-    .hero-frame-pad {
-      padding-top: 6rem;
-      padding-bottom: 4rem;
-    }
-  }
-  @media (max-height: 800px) {
-    .hero-frame-pad {
-      padding-top: 3rem;
-      padding-bottom: 0.75rem;
-    }
-  }
-
-  /* Space between the hero paragraph and the CTA row; tightened at short
-     heights to keep both buttons above the fold. */
-  .hero-cta-gap {
-    margin-top: 2.25rem;
-  }
-  @media (min-width: 768px) {
-    .hero-cta-gap {
-      margin-top: 3rem;
-    }
-  }
-  @media (max-height: 800px) {
-    .hero-cta-gap {
-      margin-top: 0.75rem;
-    }
-  }
-
-  /* Inner hero content inset (below the arch keyline). */
-  .hero-body-pad {
-    padding-top: 1rem;
-  }
-  @media (min-width: 768px) {
-    .hero-body-pad {
-      padding-top: 3rem;
-    }
-  }
-  @media (max-height: 800px) {
-    .hero-body-pad {
-      padding-top: 1.5rem;
-    }
-  }
+  .choice-control { @apply h-5 w-5 shrink-0 cursor-pointer accent-neem-600; }
+  .eyebrow { @apply font-utility text-label uppercase; letter-spacing: .13em; }
+  .text-link { @apply inline-flex min-h-11 items-center gap-3 font-utility text-body-s font-medium underline underline-offset-4 decoration-neem-600/40 hover:decoration-neem-600; }
+  .public-section { padding-block: clamp(3.5rem, 7vw, 6rem); }
+  .hero-heading { font-size: clamp(3rem, 5.4vw, 5rem); line-height: 1.04; letter-spacing: -.045em; font-weight: 500; }
+  .public-section > .container-content { min-width: 0; }
 }
-
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-  html {
-    scroll-snap-type: none;
-    scroll-behavior: auto;
-  }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  html { scroll-behavior: auto; }
 }
-
-/* Mobile display sizes */
 @media (max-width: 767px) {
-  .text-display-xl { font-size: 2.5rem; }
-  .text-display-l  { font-size: 2rem; }
-}
-
-/* Landing hero keyline draw — runs once per session (guard in ArchHero). */
-.hero-keyline { stroke-dasharray: 3; stroke-dashoffset: 3; }
-.hero-keyline-draw {
-  stroke-dashoffset: 0;
-  transition: stroke-dashoffset 700ms ease-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero-keyline,
-  .hero-keyline-draw {
-    stroke-dashoffset: 0 !important;
-    transition: none !important;
-  }
+  .text-display-xl { font-size: 2.75rem; }
+  .text-display-l { font-size: 2.25rem; }
 }

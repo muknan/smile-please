@@ -1,6 +1,6 @@
-import { requireUser } from "@/lib/auth";
+import { requirePatient } from "@/lib/auth";
 
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
-  await requireUser();
+  await requirePatient();
   return <>{children}</>;
 }

@@ -8,10 +8,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        neem: { 900: "#12302A", 600: "#2E6B54", 100: "#DCE7E0" },
-        marigold: { 500: "#E9A227" },
-        mineral: { 50: "#F1F4F1" },
-        ink: { 950: "#101A16" },
+        neem: { 900: "#183C34", 600: "#32634F", 100: "#D9DFD2" },
+        marigold: { 500: "#E0B54B" },
+        mineral: { 50: "#F8F5ED" },
+        ink: { 950: "#1B3029" },
         chalk: { 0: "#FFFFFF" },
         clay: { 600: "#B4472F" },
       },

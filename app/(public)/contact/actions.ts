@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { admin } from "@/lib/supabase/admin";
 import {
   contactDentistSchema,
   contactOrganizationSchema,
@@ -46,6 +46,8 @@ export async function submitContact(
   const tab: SubmissionType =
     tabRaw === "dentist" ? "dentist" : tabRaw === "organization" ? "organization" : "patient";
 
+  const sourcePageRaw = String(formData.get("sourcePage") ?? "/contact");
+  const sourcePage: "/contact" | "/partners" = sourcePageRaw === "/partners" ? "/partners" : "/contact";
   const raw: Record<string, unknown> = {
     tab,
     name: String(formData.get("name") ?? ""),
@@ -53,11 +55,13 @@ export async function submitContact(
     email: String(formData.get("email") ?? ""),
     message: String(formData.get("message") ?? ""),
     organizationName: String(formData.get("organizationName") ?? ""),
+    organizationType: String(formData.get("organizationType") ?? ""),
     contactPerson: String(formData.get("contactPerson") ?? ""),
     dciRegNo: String(formData.get("dciRegNo") ?? ""),
     clinicArea: String(formData.get("clinicArea") ?? ""),
     availability: String(formData.get("availability") ?? ""),
     partnershipType: String(formData.get("partnershipType") ?? ""),
+    organizationWebsite: String(formData.get("organizationWebsite") ?? ""),
     consentContact: formData.get("consentContact") === "on",
   };
 
@@ -74,8 +78,6 @@ export async function submitContact(
   }
   const d = parsed.data;
 
-  const supabase = await createClient();
-
   let args: {
     p_type: "patient" | "dentist" | "organization";
     p_name: string;
@@ -87,7 +89,7 @@ export async function submitContact(
     p_availability: string | null;
     p_partnership_type: Database["public"]["Enums"]["partnership_type"] | null;
     p_message: string;
-    p_source_page: "/contact";
+    p_source_page: "/contact" | "/partners";
     p_ip_hash: string;
   };
   let submitterName: string;
@@ -103,7 +105,7 @@ export async function submitContact(
       p_availability: null,
       p_partnership_type: null,
       p_message: d.message,
-      p_source_page: "/contact",
+      p_source_page: sourcePage,
       p_ip_hash: hashedIpKey("contact", ip),
     };
     submitterName = d.name;
@@ -119,11 +121,17 @@ export async function submitContact(
       p_availability: d.availability || null,
       p_partnership_type: null,
       p_message: d.message,
-      p_source_page: "/contact",
+      p_source_page: sourcePage,
       p_ip_hash: hashedIpKey("contact", ip),
     };
     submitterName = d.name;
   } else {
+    const organizationMessage = [
+      `[Organisation type] ${d.organizationType}`,
+      d.organizationWebsite ? `[Website] ${d.organizationWebsite}` : null,
+      `[Interest] ${d.partnershipType}`,
+      `[Message and proposed contribution]\n${d.message}`,
+    ].filter(Boolean).join("\n");
     args = {
       p_type: "organization",
       p_name: d.contactPerson,
@@ -134,18 +142,17 @@ export async function submitContact(
       p_clinic_area: null,
       p_availability: null,
       p_partnership_type: d.partnershipType,
-      p_message: d.message,
-      p_source_page: "/contact",
+      p_message: organizationMessage,
+      p_source_page: sourcePage,
       p_ip_hash: hashedIpKey("contact", ip),
     };
     submitterName = d.contactPerson;
   }
 
-  // Save through the DEFINER RPC: anon has no SELECT on contact_submissions
-  // (Phase 2 RLS), so a plain "insert ... returning" can't read the ref back.
-  // The function also writes the purpose='contact' consent row in the same
-  // call and hashes the IP itself — never the raw IP.
-  const { data: row, error } = await supabase.rpc("submit_contact", args);
+  // Save through the DEFINER RPC using the server-only service-role client.
+  // Public execute is intentionally revoked; the function still writes the
+  // purpose='contact' consent row in the same call and hashes the IP itself.
+  const { data: row, error } = await admin.rpc("submit_contact", args);
   if (error || !row || typeof row !== "object" || !("reference_code" in row)) {
     return {
       status: "error",

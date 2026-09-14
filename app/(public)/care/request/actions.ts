@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { admin } from "@/lib/supabase/admin";
 import { requestBookingSchema } from "@/lib/schemas";
 import { checkHuman, withinRateLimit, clientIp } from "@/lib/antispam";
 import { notify } from "@/lib/email";
@@ -67,8 +68,9 @@ export async function submitCareRequest(
     };
   }
 
-  const supabase = await createClient();
-  const { data: booking, error } = await supabase.rpc("create_booking_request", {
+  const sessionClient = await createClient();
+  const { data: userData } = await sessionClient.auth.getUser();
+  const { data: booking, error } = await admin.rpc("create_booking_request", {
     p_email: data.email,
     p_full_name: data.fullName,
     p_phone: data.phone,
@@ -81,9 +83,13 @@ export async function submitCareRequest(
       times: data.preferredTimes,
     },
     p_consent_updates: data.consentUpdates,
+    p_actor_id: userData.user?.id ?? null,
   });
 
   if (error || !booking) {
+    if (error?.message.includes("EMAIL_IN_USE")) {
+      return { status: "error", error: "That email already has an account. Sign in before requesting care." };
+    }
     return {
       status: "error",
       error: "We couldn't save your request just now. Please try again in a moment.",
@@ -94,7 +100,7 @@ export async function submitCareRequest(
   // down the request is already saved and the patient tracks via ref + phone.
   if (data.email) {
     try {
-      await supabase.auth.signInWithOtp({
+      await sessionClient.auth.signInWithOtp({
         email: data.email,
         options: {
           emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback?next=/account`,

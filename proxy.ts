@@ -11,7 +11,7 @@ export const config = {
  * authorisation boundary — roles are checked in each area's layout, against
  * the database (Task 3.3).
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -47,8 +47,7 @@ export async function middleware(request: NextRequest) {
   if (!user && needsAuth) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/sign-in";
-    url.search = "";
-    url.searchParams.set("next", pathname);
+    url.searchParams.set("next", `${pathname}${request.nextUrl.search}`);
     return NextResponse.redirect(url);
   }
 

@@ -29,7 +29,7 @@ export function ConsentBlock({ disabled }: { disabled?: boolean }) {
             above so a dentist can be arranged for me, and can contact me about this
             appointment. I can withdraw this at any time.
           </label>
-          <p id="consent-booking-note" className="mt-2 text-body-s text-ink-950/60">
+          <p id="consent-booking-note" className="mt-2 text-body-s text-ink-950/70">
             <Link href="/privacy" className="font-medium text-neem-600 underline underline-offset-4">
               Read the full privacy notice
             </Link>{" "}

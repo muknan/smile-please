@@ -28,7 +28,7 @@ export default async function DentistsPage({
 
   // Next available slot per dentist within 14 days (for the card + filter).
   const windowStart = new Date();
-  const windowEnd = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+  const windowEnd = new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000);
   const { data: slotsData } = await supabase
     .from("public_slots")
     .select("dentist_slug, starts_at")
