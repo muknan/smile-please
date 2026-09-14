@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 const publicPages = [
-  { path: "/", heading: /good care\. for every smile/i },
+  { path: "/", heading: /a painful tooth should not have to wait/i },
   { path: "/partners", heading: /make room for better care/i },
   { path: "/care/request", heading: /tell us what's wrong/i },
 ];

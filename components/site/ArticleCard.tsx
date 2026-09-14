@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { formatDate } from "@/lib/format";
-import { CategoryIcon } from "./CategoryIcon";
 
 export type ArticleTeaser = {
   slug: string;
@@ -23,48 +22,46 @@ function coverUrl(path: string): string {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/article-covers/${path}`;
 }
 
-/**
- * Compact card — a small icon/thumbnail tile beside the text instead of a large
- * full-width cover, so more articles fit on screen. Tile shows the real cover
- * photo when one exists and a meaningful per-category icon otherwise.
- */
-export function ArticleCard({ article }: { article: ArticleTeaser }) {
-  return (
-    <article className="group flex flex-col overflow-hidden rounded-card border border-neem-100 bg-chalk-0 transition hover:border-neem-600 hover:shadow-sm">
-      <div className="flex items-start gap-4 p-5">
-        <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-card bg-neem-100 text-neem-600">
-          {article.cover_path ? (
-            <Image
-              src={coverUrl(article.cover_path)}
-              alt=""
-              fill
-              sizes="56px"
-              className="object-cover"
-            />
-          ) : (
-            <CategoryIcon category={article.category} size={28} />
-          )}
+/** Editorial article teaser, with an optional lead treatment for the first story. */
+export function ArticleCard({ article, featured = false }: { article: ArticleTeaser; featured?: boolean }) {
+  if (featured) {
+    return (
+      <article className="grid gap-8 border-y border-neem-100 py-8 md:grid-cols-5 md:gap-10 md:py-10">
+        {article.cover_path && (
+          <div className="relative aspect-[16/9] overflow-hidden bg-neem-100 md:col-span-2 md:aspect-auto">
+            <Image src={coverUrl(article.cover_path)} alt="" fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
+          </div>
+        )}
+        <div className={article.cover_path ? "md:col-span-3" : "md:col-span-5"}>
+          <p className="font-utility text-label text-neem-600">{article.category}</p>
+          <h2 className="mt-3 font-display text-display-m leading-tight md:text-display-l">
+            <Link href={`/learn/${article.slug}`} className="text-ink-950 transition hover:text-neem-600">{article.title}</Link>
+          </h2>
+          {article.excerpt && <p className="mt-4 max-w-[58ch] text-body-l text-ink-950/70">{article.excerpt}</p>}
+          <p className="mt-6 font-utility text-data text-ink-950/70 tabular">
+            {article.published_at ? formatDate(article.published_at) : "Soon"}<span aria-hidden="true"> · </span>{readMinutes(article.body_md)} min read
+          </p>
         </div>
+      </article>
+    );
+  }
 
-        <div className="min-w-0 flex-1">
-          <p className="font-utility text-label uppercase text-neem-600">{article.category}</p>
-          <h3 className="mt-1 font-display text-body-l font-medium leading-snug">
+  return (
+    <article className="group border-b border-neem-100 py-5">
+      <div className="min-w-0">
+        <p className="font-utility text-label text-neem-600">{article.category}</p>
+        <h3 className="mt-1 font-display text-body-l font-medium leading-snug">
             <Link
               href={`/learn/${article.slug}`}
               className="line-clamp-2 text-ink-950 transition hover:text-neem-600"
             >
               {article.title}
             </Link>
-          </h3>
-          {article.excerpt && (
-            <p className="mt-1 line-clamp-2 text-body-s text-ink-950/70">{article.excerpt}</p>
-          )}
-          <p className="mt-2 font-utility text-data text-ink-950/70 tabular">
-            {article.published_at ? formatDate(article.published_at) : "Soon"}
-            <span aria-hidden="true"> · </span>
-            {readMinutes(article.body_md)} min read
-          </p>
-        </div>
+        </h3>
+        {article.excerpt && <p className="mt-1 line-clamp-2 text-body-s text-ink-950/70">{article.excerpt}</p>}
+        <p className="mt-2 font-utility text-data text-ink-950/70 tabular">
+          {article.published_at ? formatDate(article.published_at) : "Soon"}<span aria-hidden="true"> · </span>{readMinutes(article.body_md)} min read
+        </p>
       </div>
     </article>
   );

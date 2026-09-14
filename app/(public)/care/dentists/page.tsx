@@ -73,6 +73,9 @@ export default async function DentistsPage({
         Every dentist here is registered with the Dental Council of India and
         gives their time for free. Pick someone near you and choose a slot.
       </p>
+      <Link href="/care/request" className="mt-6 inline-flex min-h-11 items-center justify-center rounded bg-marigold-500 px-5 font-utility text-body-s font-medium text-ink-950 transition hover:brightness-95">
+        Request care
+      </Link>
 
       {err === "slot" && (
         <p role="status" className="mt-6 rounded-card border border-clay-600 bg-chalk-0 px-4 py-3 text-body-s text-clay-600">
@@ -82,16 +85,16 @@ export default async function DentistsPage({
 
       <form
         method="get"
-        className="mt-12 flex flex-wrap items-end gap-4"
+        className="mt-12 flex flex-wrap items-end gap-3"
         aria-label="Filter dentists"
       >
         <label className="flex flex-col gap-2" htmlFor="filter-locality">
-          <span className="font-utility text-label uppercase text-ink-950">Area</span>
+          <span className="font-utility text-label text-ink-950">Area</span>
           <select
             id="filter-locality"
             name="locality"
             defaultValue={locality ?? ""}
-            className="rounded border border-neem-100 bg-chalk-0 px-4 py-3 text-body"
+            className="h-11 rounded border border-neem-100 bg-chalk-0 px-3 text-body-s"
           >
             <option value="">Any area</option>
             {LOCALITIES.map((l) => (
@@ -103,12 +106,12 @@ export default async function DentistsPage({
         </label>
 
         <label className="flex flex-col gap-2" htmlFor="filter-lang">
-          <span className="font-utility text-label uppercase text-ink-950">Language</span>
+          <span className="font-utility text-label text-ink-950">Language</span>
           <select
             id="filter-lang"
             name="lang"
             defaultValue={lang ?? ""}
-            className="rounded border border-neem-100 bg-chalk-0 px-4 py-3 text-body"
+            className="h-11 rounded border border-neem-100 bg-chalk-0 px-3 text-body-s"
           >
             <option value="">Any language</option>
             {allLanguages.map((l) => (
@@ -119,7 +122,7 @@ export default async function DentistsPage({
           </select>
         </label>
 
-        <label className="flex items-center gap-3 pb-3" htmlFor="filter-slots">
+        <label className="flex min-h-11 items-center gap-3" htmlFor="filter-slots">
           <input
             type="checkbox"
             id="filter-slots"
@@ -128,24 +131,25 @@ export default async function DentistsPage({
             defaultChecked={slotsOnly}
             className="choice-control"
           />
-          <span className="text-body">Only dentists with open slots in the next 14 days</span>
+          <span className="text-body-s">Only dentists with open slots in the next 14 days</span>
         </label>
 
         <button
           type="submit"
-          className="rounded bg-marigold-500 px-6 py-3 font-utility text-body-s font-medium text-ink-950 transition hover:brightness-95"
+          className="h-11 rounded bg-marigold-500 px-5 font-utility text-body-s font-medium text-ink-950 transition hover:brightness-95"
         >
           Filter
         </button>
       </form>
 
+      <p className="mt-8 font-utility text-body-s text-ink-950/70" role="status">
+        {list.length} {list.length === 1 ? "dentist" : "dentists"} available
+      </p>
+
       {list.length > 0 ? (
-        <div className="mt-16 flex flex-wrap justify-center gap-6">
+        <div className="mt-4 grid gap-x-8 md:grid-cols-2">
           {list.map((dentist) => (
-            <div
-              key={dentist.slug}
-              className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
-            >
+            <div key={dentist.slug}>
               <DentistCard dentist={dentist} />
             </div>
           ))}

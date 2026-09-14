@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL } from "@/lib/contact-info";
+import { Logo } from "./Logo";
 
 const CARE_LINKS = [
   { href: "/care", label: "Book a check-up" },
@@ -20,13 +20,9 @@ export function SiteFooter() {
       <div className="container-content">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Image
-              src="/logo.svg"
-              alt="Smile Please"
-              width={140}
-              height={33}
-              className="h-[28px] w-auto [filter:brightness(0)_invert(1)]"
-            />
+            <Link href="/" aria-label="Smile Please — home" className="inline-flex rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-marigold-500">
+              <Logo className="text-chalk-0" />
+            </Link>
             <p className="mt-6 max-w-[28ch] text-body-s text-chalk-0/70">
               Free dental care and oral health awareness for underserved communities in Delhi.
             </p>

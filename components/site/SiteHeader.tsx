@@ -4,9 +4,9 @@ import { HeaderProfile } from "./HeaderProfile";
 import { Logo } from "./Logo";
 
 export function SiteHeader() {
-  return <header className="sticky top-0 z-50 border-b border-neem-100 bg-mineral-50 [--header-h:76px] sm:[--header-h:88px]">
-    <div className="container-content flex h-[76px] items-center justify-between gap-6 sm:h-[88px]">
-      <Link href="/" aria-label="Smile Please — home"><Logo /></Link>
+  return <header className="sticky top-0 z-50 border-b border-neem-100 bg-mineral-50/95 [--header-h:64px] backdrop-blur sm:[--header-h:72px]">
+    <div className="container-content flex h-[64px] items-center justify-between gap-5 sm:h-[72px]">
+      <Link href="/" aria-label="Smile Please — home" className="rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 focus-visible:ring-offset-4"><Logo /></Link>
       <DesktopNav />
       <div className="hidden items-center gap-4 md:flex"><HeaderProfile /></div>
       <MobileMenu />

@@ -5,8 +5,8 @@ import path from "node:path";
 export const runtime = "nodejs";
 
 /**
- * One reusable Open Graph image: neem-900 field, the arch in marigold-500,
- * the page title in Fraunces. Used via /og?title=... from generateMetadata.
+ * One reusable Open Graph image: the Smile Please mark, page title and a
+ * calm neem field. Used via /og?title=... from generateMetadata.
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -36,18 +36,9 @@ export async function GET(request: Request) {
           padding: "0 96px 96px",
         }}
       >
-        <svg
-          width="720"
-          height="330"
-          viewBox="0 0 720 330"
-          style={{ position: "absolute", top: 68 }}
-        >
-          <path
-            d="M140,330 L140,180 C140,110 250,40 360,8 C470,40 580,110 580,180 L580,330"
-            fill="none"
-            stroke="#E9A227"
-            strokeWidth="8"
-          />
+        <svg width="160" height="160" viewBox="0 0 48 48" fill="none" style={{ position: "absolute", top: 64 }}>
+          <path d="M9 24c3.1 8.2 9.3 12.3 15 12.3S35.9 32.2 39 24" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" />
+          <path d="m33 4 2.2 6.8L42 13l-6.8 2.2L33 22l-2.2-6.8L24 13l6.8-2.2L33 4Z" fill="#E0B54B" />
         </svg>
         <div
           style={{

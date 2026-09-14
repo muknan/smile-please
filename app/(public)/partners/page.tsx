@@ -39,7 +39,7 @@ export default function PartnersPage() {
           <div className="divide-y divide-neem-100 border-y border-neem-100">
             {COLLABORATIONS.map(([title, body], index) => (
               <div key={title} className="grid gap-3 py-7 sm:grid-cols-[3rem_1fr] sm:gap-7">
-                <p className="font-utility text-label text-marigold-600">0{index + 1}</p>
+                <p className="font-utility text-label font-semibold text-marigold-700">0{index + 1}</p>
                 <div>
                   <h3 className="text-heading-m">{title}</h3>
                   <p className="mt-2 max-w-[58ch] text-body text-ink-950/70">{body}</p>
@@ -70,7 +70,7 @@ export default function PartnersPage() {
               ["Agree a next step", "If there is a workable path, we will define the next conversation or activity together."],
             ].map(([title, body], index) => (
               <li key={title} className="grid gap-3 py-6 sm:grid-cols-[3rem_1fr] sm:gap-7">
-                <span className="font-utility text-label text-marigold-600">0{index + 1}</span>
+                <span className="font-utility text-label font-semibold text-marigold-700">0{index + 1}</span>
                 <div><h3 className="text-heading-m">{title}</h3><p className="mt-2 text-body text-ink-950/70">{body}</p></div>
               </li>
             ))}

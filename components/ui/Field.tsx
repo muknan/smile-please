@@ -29,7 +29,7 @@ export function Field({ label, htmlFor, hint, error, required, children }: Field
 
   return (
     <div className="space-y-2">
-      <label htmlFor={htmlFor} className="text-label uppercase text-ink-950">
+      <label htmlFor={htmlFor} className="font-utility text-body-s font-semibold text-ink-950">
         {label}
         {/* Visible asterisk; the aria-required attribute lives on the input itself. */}
         {required && (

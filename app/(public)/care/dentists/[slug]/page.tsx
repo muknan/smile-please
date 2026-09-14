@@ -114,7 +114,7 @@ export default async function DentistProfilePage({ params, searchParams }: PageP
           <p className="mt-6 text-body text-ink-950/80">{(dentist.specialties ?? []).join(" · ")}</p>
         )}
         {(dentist.languages ?? []).length > 0 && (
-          <p className="mt-2 text-body-s text-ink-950/60">Speaks {(dentist.languages ?? []).join(", ")}</p>
+          <p className="mt-2 text-body-s text-ink-950/75">Speaks {(dentist.languages ?? []).join(", ")}</p>
         )}
         {dentist.bio && <p className="mt-6 max-w-[65ch] text-body text-ink-950/80">{dentist.bio}</p>}
       </Section>

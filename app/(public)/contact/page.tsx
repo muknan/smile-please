@@ -27,15 +27,19 @@ export default async function ContactPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <Section marker="Contact" className="pt-24">
-        <h1 className="max-w-[24ch] text-display-l">Talk to us</h1>
-        <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
+      <Section className="pt-16 sm:pt-20">
+        <div className="grid gap-8 border-b border-neem-100 pb-12 lg:grid-cols-12 lg:items-end">
+          <div className="lg:col-span-7">
+            <p className="eyebrow">Contact</p>
+            <h1 className="mt-4 max-w-[24ch] text-display-l">Talk to a real person</h1>
+          </div>
+          <p className="max-w-[58ch] text-body-l text-ink-950/70 lg:col-span-5">
           A question about care, a dentist who wants to give a few hours a month, a school or
-          clinic that wants to host a camp — one page, whichever you are. A real person reads
-          every message, usually within two working days.
-        </p>
+          clinic that wants to host a camp — choose the route that fits. We usually reply within two working days.
+          </p>
+        </div>
 
-        <div className="mt-16">
+        <div className="mt-12">
           <ContactForm
             initialTab={initialTab}
             renderedAt={makeRenderedAt()}
@@ -44,14 +48,15 @@ export default async function ContactPage({ searchParams }: PageProps) {
         </div>
       </Section>
 
-      <Section marker="Escalation" className="border-t border-neem-100 py-24">
+      <Section className="border-t border-neem-100 bg-neem-50 py-16">
+        <p className="eyebrow">Formal requests</p>
         <h2 className="text-display-m">Complaints and data requests</h2>
         <p className="mt-4 max-w-[65ch] text-body-l text-ink-950/70">
           For email and phone, see the Contact block in the footer. This channel is for
           anything formal — a complaint, a request about your data, or an escalation.
         </p>
         <dl className="mt-8 max-w-[65ch]">
-          <dt className="font-utility text-label uppercase text-neem-600">Grievance contact</dt>
+          <dt className="font-utility text-body-s font-semibold text-neem-600">Grievance contact</dt>
           <dd className="mt-2 text-body">
             {/* CLIENT-COPY: optional named DPO. Same mailbox handles data requests. */}
             <a

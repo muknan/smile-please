@@ -12,20 +12,23 @@
   input::placeholder, textarea::placeholder { color: #626D64; opacity: 1; }
 }
 @layer components {
-  .container-content { @apply mx-auto w-full max-w-content px-6 sm:px-8; }
+  .container-content { @apply mx-auto w-full max-w-content px-5 sm:px-8; }
   .tabular { font-variant-numeric: tabular-nums; }
   .choice-control { @apply h-5 w-5 shrink-0 cursor-pointer accent-neem-600; }
-  .eyebrow { @apply font-utility text-label uppercase; letter-spacing: .13em; }
+  .eyebrow { @apply font-utility text-label font-semibold; letter-spacing: .02em; }
   .text-link { @apply inline-flex min-h-11 items-center gap-3 font-utility text-body-s font-medium underline underline-offset-4 decoration-neem-600/40 hover:decoration-neem-600; }
-  .public-section { padding-block: clamp(3.5rem, 7vw, 6rem); }
-  .hero-heading { font-size: clamp(3rem, 5.4vw, 5rem); line-height: 1.04; letter-spacing: -.045em; font-weight: 500; }
+  .public-section { padding-block: clamp(3.5rem, 6vw, 5.5rem); }
+  .hero-heading { font-size: clamp(2.75rem, 5vw, 4.75rem); line-height: 1.02; letter-spacing: -.04em; font-weight: 600; }
   .public-section > .container-content { min-width: 0; }
+  .surface-soft { @apply rounded-panel border border-neem-100 bg-chalk-0; }
+  .consent-surface { @apply rounded-panel border border-neem-200 bg-neem-50 p-6 sm:p-8; }
+  .form-control { @apply min-h-12 rounded border border-[#718078] bg-chalk-0 px-4 py-3 text-body transition hover:border-neem-600 focus:border-neem-600; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   html { scroll-behavior: auto; }
 }
 @media (max-width: 767px) {
-  .text-display-xl { font-size: 2.75rem; }
-  .text-display-l { font-size: 2.25rem; }
+  .text-display-xl { font-size: 2.5rem; }
+  .text-display-l { font-size: 2rem; }
 }

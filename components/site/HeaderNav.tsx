@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HeaderProfile } from "./HeaderProfile";
+import { Logo } from "./Logo";
 
 export const NAV_LINKS = [
   { href: "/about", label: "About" },
@@ -23,14 +24,14 @@ function useActiveLink() {
 export function DesktopNav() {
   const isActive = useActiveLink();
   return (
-    <nav className="hidden items-center gap-5 md:flex" aria-label="Main">
+    <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
       {NAV_LINKS.map((link) => (
         <Link
           key={link.href}
           href={link.href}
           aria-current={isActive(link.href) ? "page" : undefined}
           className={cn(
-            "inline-flex min-h-11 items-center font-utility text-[13px] font-medium text-ink-950 transition hover:text-neem-600",
+            "inline-flex min-h-11 items-center rounded px-3 font-utility text-[13px] font-medium text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600",
             isActive(link.href) && "text-neem-600",
           )}
         >
@@ -49,7 +50,6 @@ export function MobileMenu() {
   const panelRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
-  // Escape closes the menu; focus returns to the toggle when it closes.
   useEffect(() => {
     if (!menuOpen) return;
     const panel = panelRef.current;
@@ -58,23 +58,25 @@ export function MobileMenu() {
     );
     const first = focusables?.[0];
     const last = focusables?.[focusables.length - 1];
+    const toggleButton = toggleRef.current;
     first?.focus();
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Tab") {
-        if (!first || !last) return;
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setOpen(false);
+        return;
       }
-      if (e.key === "Escape") setOpen(false);
+      if (event.key !== "Tab" || !first || !last) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", onKeyDown);
-    const toggleButton = toggleRef.current;
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       toggleButton?.focus();
@@ -96,10 +98,10 @@ export function MobileMenu() {
       <button
         ref={toggleRef}
         type="button"
-        className="flex h-11 w-11 items-center justify-center rounded text-ink-950 transition hover:text-neem-600 md:hidden"
+        className={cn("h-11 w-11 items-center justify-center rounded text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 md:hidden motion-reduce:transition-none", menuOpen ? "hidden" : "flex")}
         aria-expanded={menuOpen}
         aria-controls="mobile-menu"
-        aria-label={menuOpen ? "Close menu" : "Open menu"}
+        aria-label="Open menu"
         onClick={() => {
           if (menuOpen) setOpen(false);
           else {
@@ -108,7 +110,7 @@ export function MobileMenu() {
           }
         }}
       >
-        {menuOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
+        <Menu size={22} aria-hidden="true" />
       </button>
 
       {menuOpen && (
@@ -118,29 +120,40 @@ export function MobileMenu() {
           role="dialog"
           aria-modal="true"
           aria-label="Site menu"
-          className="fixed inset-x-0 bottom-0 top-[var(--header-h)] z-40 overflow-y-auto bg-mineral-50 md:hidden"
+          className="fixed inset-0 z-50 h-dvh overflow-y-auto bg-mineral-50 md:hidden motion-safe:animate-[mobile-menu-in_150ms_ease-out]"
         >
-          <nav className="container-content flex flex-col gap-2 py-6" aria-label="Mobile menu">
-            <button type="button" onClick={() => setOpen(false)} className="ml-auto flex min-h-11 items-center gap-2 px-3">Close menu <X size={20} aria-hidden="true" /></button>
+          <div className="container-content flex h-[var(--header-h)] items-center justify-between border-b border-neem-100">
+            <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className="order-2 flex h-11 w-11 items-center justify-center rounded text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600">
+              <X size={22} aria-hidden="true" />
+            </button>
+            <Link href="/" aria-label="Smile Please — home" className="order-1"><Logo /></Link>
+          </div>
+          <nav className="container-content flex min-h-[calc(100dvh-var(--header-h))] flex-col bg-mineral-50 py-5" aria-label="Mobile menu">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 aria-current={pathname === link.href ? "page" : undefined}
                 className={cn(
-                  "rounded px-4 py-3 font-display text-display-m text-ink-950 transition hover:text-neem-600",
+                  "flex min-h-11 items-center border-b border-neem-100 py-3 font-display text-display-m text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 motion-reduce:transition-none",
                   pathname === link.href && "text-neem-600",
                 )}
               >
                 {link.label}
               </Link>
             ))}
-            <div className="mt-6 rounded border border-neem-100 bg-chalk-0 px-4 py-3">
+            <div className="mt-6 border-t border-neem-100 pt-5">
               <HeaderProfile />
             </div>
           </nav>
         </div>
       )}
+      <style jsx global>{`
+        @keyframes mobile-menu-in {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </>
   );
 }

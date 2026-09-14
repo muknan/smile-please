@@ -52,7 +52,7 @@ export default function CarePage() {
         </Link>
       </div>
 
-      <p className="mt-16 text-body-s text-ink-950/60">
+      <p className="mt-16 text-body-s text-ink-950/75">
         Already booked?{" "}
         <Link href="/care/status" className="font-medium text-neem-600 underline underline-offset-4 hover:underline">
           Track your appointment

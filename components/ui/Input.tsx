@@ -8,7 +8,7 @@ export function Input({ className, "aria-invalid": ariaInvalid, ...rest }: Input
   return (
     <input
       className={cn(
-        "w-full rounded border border-[#7D8B7E] bg-chalk-0 px-4 py-3 text-body",
+        "form-control w-full",
         "focus:border-neem-600",
         invalid && "border-clay-600 focus:border-clay-600",
         className,

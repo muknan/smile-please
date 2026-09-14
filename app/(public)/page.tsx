@@ -1,205 +1,92 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen } from "lucide-react";
-import { ArchHero } from "@/components/site/ArchHero";
-import { Section } from "@/components/site/Section";
+import { ArrowRight, BookOpen, HeartHandshake, MapPin, ShieldCheck, Stethoscope } from "lucide-react";
 import { ArticleCard, type ArticleTeaser } from "@/components/site/ArticleCard";
+import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/server";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-
 export const revalidate = 60;
-
 export const metadata: Metadata = {
   title: "Free dental care in Delhi — Smile Please",
-  description:
-    "Smile Please is a dental health NGO in New Delhi. Real dentists, registered with the DCI, give free check-ups and care to communities who otherwise go without.",
+  description: "Smile Please connects people in Delhi with registered dentists who provide free check-ups and essential dental care.",
   alternates: { canonical: `${SITE_URL}/` },
   openGraph: { images: [{ url: "/og?title=Free dental care for Delhi" }] },
 };
 
 async function getLatestArticles(limit: number): Promise<ArticleTeaser[] | null> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from("articles")
-    .select("slug, title, excerpt, category, published_at, body_md, cover_path")
-    .eq("status", "published")
-    .order("published_at", { ascending: false })
-    .limit(limit);
+  const { data } = await supabase.from("articles").select("slug, title, excerpt, category, published_at, body_md, cover_path").eq("status", "published").order("published_at", { ascending: false }).limit(limit);
   return data;
 }
 
-/** Stylised molar — custom icon, no icon library needed. */
-function ToothIcon() {
-  return (
-    <svg
-      width="40"
-      height="40"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className="text-neem-600"
-    >
-      <path d="M12 3.4c-2.3 0-3.6 1.3-5 1.6-1.7.4-3 1.9-3.2 4.5-.3 3.3.7 7 1.6 10.1.3 1.2.9 1.8 1.8 1.7.9-.2 1.3-.9 1.6-1.8.2-.7.5-1.4.9-1.7.5-.4 1.2-.5 1.9-.5s1.4.1 1.9.5c.4.3.7 1 .9 1.7.3.9.7 1.6 1.6 1.8.9.1 1.5-.5 1.8-1.7.9-3.1 1.9-6.8 1.6-10.1-.2-2.6-1.5-4.1-3.2-4.5-1.4-.3-2.7-1.6-5-1.6z" />
-    </svg>
-  );
-}
-
 const steps = [
-  {
-    title: "Tell us what's wrong",
-    body: "A short form or a phone call — two minutes, and you don't need an account to start.",
-  },
-  {
-    title: "We match you with a dentist near you",
-    body: "Usually within two working days. We ask for your area so you're not crossing the city.",
-  },
-  {
-    title: "You go. It's free.",
-    body: "The appointment is confirmed by phone, and the clinic handles everything after.",
-  },
-];
-
-const trust = [
-  "Every dentist is registered with the Dental Council of India",
-  "We ask for the minimum we need and tell you why",
-  "Your phone number is never shown publicly or sold",
-  "A named person reads every message you send",
-];
+  ["Tell us what you need", "Share a few details online. It takes about two minutes and you do not need an account."],
+  ["We find nearby care", "Our team checks your request and matches you with a registered dentist near your area."],
+  ["Confirm and visit", "We confirm by phone. Your appointment and essential treatment are free."],
+] as const;
 
 export default async function HomePage() {
   const articles = await getLatestArticles(3);
-
   return (
     <>
-      <ArchHero />
-
-      <Section marker="What we do" className="pt-24" snap>
-        <h2 className="text-display-l">Two things, both free.</h2>
-        <div className="mt-16 grid gap-16 md:grid-cols-2 md:gap-6">
-          <div>
-            <ToothIcon />
-            <h3 className="mt-6 text-display-m">Treatment at camps and clinics</h3>
-            <p className="mt-4 max-w-[52ch] text-body text-ink-950/80">
-              Our dentists run regular camp days and see patients at partner clinics across Delhi.
-              Check-ups, cleanings, and extractions are free. Nobody here is turned away for being
-              unable to pay.
-            </p>
+      <section className="overflow-hidden bg-neem-950 text-chalk-0">
+        <div className="container-content grid min-h-[610px] items-center gap-12 py-16 md:grid-cols-12 md:py-24">
+          <div className="md:col-span-7 lg:col-span-6">
+            <p className="font-utility text-body-s font-semibold text-marigold-500">Free dental care in Delhi</p>
+            <h1 className="hero-heading mt-5 max-w-[13ch]">A painful tooth should not have to wait.</h1>
+            <p className="mt-6 max-w-[52ch] text-body-l text-chalk-0/80">Tell us what is wrong. We connect people who cannot afford treatment with registered dentists who give their time for free.</p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Button href="/care/request">Request free care <ArrowRight size={18} aria-hidden="true" /></Button>
+              <Button href="/care/dentists" variant="ghost" className="border-chalk-0/45 text-chalk-0 hover:border-chalk-0 hover:bg-chalk-0/10">Browse dentists</Button>
+            </div>
+            <p className="mt-6 flex items-center gap-2 font-utility text-body-s text-chalk-0/70"><ShieldCheck size={18} aria-hidden="true" /> No payment. No account needed to start.</p>
           </div>
-          <div>
-            <BookOpen className="text-neem-600" size={40} strokeWidth={1.5} aria-hidden="true" />
-            <h3 className="mt-6 text-display-m">Awareness in schools and communities</h3>
-            <p className="mt-4 max-w-[52ch] text-body text-ink-950/80">
-              We run short, plain sessions about what cavities actually are, how brushing works,
-              and when a small problem needs a dentist. No jargon, no fear, no sales — just the
-              facts that keep teeth out of trouble.
-            </p>
-          </div>
-        </div>
-      </Section>
-
-      <Section marker="How it works" className="border-t border-neem-100 py-24" snap>
-        <h2 className="text-display-l">Three steps, then we&apos;re out of your way.</h2>
-        <ol className="mt-16 space-y-16">
-          {steps.map((step, i) => (
-            <li key={step.title} className="grid gap-4 md:grid-cols-12 md:gap-6">
-              {/* The only places on the site where numbered markers are honest: this is a sequence. */}
-              <span
-                aria-hidden="true"
-                className="flex h-16 w-16 items-center justify-center rounded-full border border-neem-600 font-utility text-data font-semibold text-neem-600"
-              >
-                {i + 1}
-              </span>
-              <div className="md:col-span-11">
-                <h3 className="text-display-m">{step.title}</h3>
-                <p className="mt-4 max-w-[60ch] text-body text-ink-950/80">{step.body}</p>
+          <div className="md:col-span-5 md:col-start-8 lg:col-start-8" aria-label="Care available across Delhi">
+            <div className="rounded-panel bg-neem-900 p-6 ring-1 ring-chalk-0/15 sm:p-8">
+              <div className="flex items-center justify-between border-b border-chalk-0/15 pb-6">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-marigold-500 text-neem-950"><Stethoscope size={24} aria-hidden="true" /></span>
+                <span className="rounded-full bg-chalk-0/10 px-3 py-1 font-utility text-label font-semibold text-chalk-0/80">Delhi</span>
               </div>
-            </li>
-          ))}
-        </ol>
-      </Section>
-
-      <Section marker="Trust" className="bg-neem-100 py-24" snap>
-        <h2 className="text-display-l">The ground rules.</h2>
-        <ul className="mt-16 grid gap-10 md:grid-cols-2 md:gap-x-6 md:gap-y-10">
-          {trust.map((claim) => (
-            <li key={claim} className="flex gap-4">
-              <span aria-hidden="true" className="mt-2.5 h-2.5 w-2.5 shrink-0 rounded-full bg-neem-600" />
-              <p className="max-w-[45ch] text-body-l">{claim}</p>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section marker="Learn" className="py-24" snap>
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <h2 className="max-w-[20ch] text-display-l">
-            What the dentists tell people every day.
-          </h2>
-          <Link
-            href="/learn"
-            className="font-utility text-body-s font-medium text-neem-600 underline-offset-4 hover:underline"
-          >
-            All articles
-          </Link>
-        </div>
-        {articles && articles.length > 0 ? (
-          <div className="mt-16 grid gap-6 md:grid-cols-3">
-            {articles.map((article) => (
-              <ArticleCard key={article.slug} article={article} />
-            ))}
-          </div>
-        ) : (
-          <p className="mt-16 max-w-[50ch] text-body-l text-ink-950/70">
-            Our latest articles haven&apos;t been published yet. Check back soon, or book a
-            check-up and ask us in person.
-          </p>
-        )}
-      </Section>
-
-      <section className="snap-start bg-neem-900 py-24 text-chalk-0">
-        <div className="container-content grid gap-10 lg:grid-cols-12 lg:gap-6">
-          <div className="lg:col-span-8 lg:col-start-2">
-            <h2 className="text-display-l">Are you a dentist or an organisation?</h2>
-            <p className="mt-6 max-w-[55ch] text-body-l text-chalk-0/80">
-              Volunteer a few hours a month, host a camp, or fund a clinic day. We&apos;ll be in
-              touch within two working days.
-            </p>
-            <div className="mt-12 flex flex-wrap gap-4">
-              <Link
-                href="/contact?tab=dentist"
-                className="inline-flex items-center justify-center rounded bg-marigold-500 px-6 py-3 font-utility text-body-s font-medium text-ink-950 transition hover:brightness-95"
-              >
-                I&apos;m a dentist
-              </Link>
-              <Link
-                href="/contact?tab=organization"
-                className="inline-flex items-center justify-center rounded border border-chalk-0/40 px-6 py-3 font-utility text-body-s font-medium text-chalk-0 transition hover:border-marigold-500 hover:text-marigold-500"
-              >
-                We&apos;re an organisation
-              </Link>
+              <p className="mt-8 font-display text-display-m">Care that starts with a person listening.</p>
+              <dl className="mt-8 grid grid-cols-2 gap-6 border-t border-chalk-0/15 pt-6">
+                <div><dt className="text-body-s text-chalk-0/60">Response</dt><dd className="mt-1 font-utility text-body-s font-semibold">Within 2 working days</dd></div>
+                <div><dt className="text-body-s text-chalk-0/60">Dentists</dt><dd className="mt-1 font-utility text-body-s font-semibold">DCI registered</dd></div>
+              </dl>
             </div>
           </div>
         </div>
       </section>
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "NGO",
-            name: "Smile Please",
-            description:
-              "Free dental care and oral health awareness for underserved communities in New Delhi.",
-            areaServed: "New Delhi",
-            url: SITE_URL,
-          }),
-        }}
-      />
+      <section className="border-b border-neem-100 bg-chalk-0">
+        <div className="container-content grid gap-6 py-7 font-utility text-body-s text-ink-950/75 sm:grid-cols-3">
+          <p className="flex items-center gap-3"><MapPin className="text-neem-600" size={20} aria-hidden="true" /> Matched near your area</p>
+          <p className="flex items-center gap-3"><ShieldCheck className="text-neem-600" size={20} aria-hidden="true" /> Details kept private</p>
+          <p className="flex items-center gap-3"><HeartHandshake className="text-neem-600" size={20} aria-hidden="true" /> A real person replies</p>
+        </div>
+      </section>
+
+      <section className="public-section">
+        <div className="container-content grid gap-12 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-4"><p className="eyebrow">How care works</p><h2 className="mt-4 text-display-l">Three clear steps.</h2><p className="mt-5 max-w-[42ch] text-body text-ink-950/70">We ask only for what we need to arrange care, and explain each step before you continue.</p></div>
+          <ol className="divide-y divide-neem-100 border-y border-neem-100 lg:col-span-7 lg:col-start-6">
+            {steps.map(([title, body], index) => <li key={title} className="grid grid-cols-[2.5rem_1fr] gap-4 py-7"><span className="font-utility text-body-s font-semibold text-neem-600">0{index + 1}</span><div><h3 className="font-display text-display-m">{title}</h3><p className="mt-2 max-w-[52ch] text-body text-ink-950/70">{body}</p></div></li>)}
+          </ol>
+        </div>
+      </section>
+
+      <section className="bg-neem-100/65 py-16 sm:py-20"><div className="container-content grid gap-8 md:grid-cols-2">
+        <div className="border-b border-neem-600/20 pb-8 md:border-b-0 md:border-r md:pb-0 md:pr-10"><Stethoscope className="text-neem-600" size={28} aria-hidden="true" /><h2 className="mt-5 text-display-m">Need treatment?</h2><p className="mt-3 max-w-[48ch] text-body text-ink-950/75">Request help and let our team find a suitable dentist, or browse the public directory yourself.</p><Link className="text-link mt-5 text-neem-700" href="/care">Find free care <ArrowRight size={17} aria-hidden="true" /></Link></div>
+        <div className="md:pl-4"><BookOpen className="text-neem-600" size={28} aria-hidden="true" /><h2 className="mt-5 text-display-m">Want practical guidance?</h2><p className="mt-3 max-w-[48ch] text-body text-ink-950/75">Read short, plain-language advice about brushing, pain, children’s teeth and gum health.</p><Link className="text-link mt-5 text-neem-700" href="/learn">Explore oral-health guides <ArrowRight size={17} aria-hidden="true" /></Link></div>
+      </div></section>
+
+      <section className="public-section"><div className="container-content">
+        <div className="flex flex-col gap-4 border-b border-neem-100 pb-7 sm:flex-row sm:items-end sm:justify-between"><div><p className="eyebrow">Useful now</p><h2 className="mt-3 text-display-l">Advice from our dentists.</h2></div><Link href="/learn" className="text-link text-neem-700">View all guides <ArrowRight size={17} aria-hidden="true" /></Link></div>
+        {articles?.length ? <div className="divide-y divide-neem-100">{articles.map((article) => <ArticleCard key={article.slug} article={article} />)}</div> : <p className="py-10 text-body-l text-ink-950/70">New guides are being prepared. If something hurts, request care now.</p>}
+      </div></section>
+
+      <section className="bg-neem-950 py-16 text-chalk-0 sm:py-20"><div className="container-content grid gap-8 lg:grid-cols-12 lg:items-end"><div className="lg:col-span-7"><p className="font-utility text-body-s font-semibold text-marigold-500">Help more people get care</p><h2 className="mt-4 text-display-l">Dentists, schools and organisations are part of the work.</h2></div><div className="flex flex-wrap gap-3 lg:col-span-4 lg:col-start-9"><Button href="/contact?tab=dentist">Volunteer as a dentist</Button><Button href="/partners" variant="ghost" className="border-chalk-0/45 text-chalk-0 hover:bg-chalk-0/10">Partner with us</Button></div></div></section>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "NGO", name: "Smile Please", description: "Free dental care and oral health awareness for underserved communities in New Delhi.", areaServed: "New Delhi", url: SITE_URL }) }} />
     </>
   );
 }

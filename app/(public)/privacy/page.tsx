@@ -97,7 +97,7 @@ export default function PrivacyPage() {
             </tbody>
           </table>
         </div>
-        <p className="mt-8 max-w-[65ch] text-body-s text-ink-950/60">
+        <p className="mt-8 max-w-[65ch] text-body-s text-ink-950/75">
           We never collect your date of birth (only an age band, and for under-18s no details at
           all — a parent or guardian books in their own name), a street address, your DCI
           registration number, or anything from public records about you. Your clinical note is

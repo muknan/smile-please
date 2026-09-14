@@ -40,14 +40,11 @@ export default async function LearnPage({
         articles without jargon, so the advice works when you&apos;re not in the clinic.
       </p>
 
-      <div className="mt-8 flex flex-wrap gap-2" role="group" aria-label="Filter by topic">
+      <nav className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-b border-neem-100" aria-label="Filter by topic">
         <Link
           href="/learn"
           aria-current={!active ? "page" : undefined}
-          className={cn(
-            "rounded border border-neem-100 bg-chalk-0 px-4 py-2 font-utility text-body-s font-medium text-ink-950 transition hover:border-neem-600",
-            !active && "border-neem-600 bg-neem-600 text-chalk-0",
-          )}
+            className={cn("min-h-11 border-b-2 px-0 font-utility text-body-s font-medium text-ink-950 transition hover:text-neem-600", !active ? "border-neem-600" : "border-transparent")}
         >
           All
         </Link>
@@ -56,21 +53,21 @@ export default async function LearnPage({
             key={c}
             href={`/learn?category=${c}`}
             aria-current={active === c ? "page" : undefined}
-            className={cn(
-              "rounded border border-neem-100 bg-chalk-0 px-4 py-2 font-utility text-body-s font-medium text-ink-950 transition hover:border-neem-600",
-              active === c && "border-neem-600 bg-neem-600 text-chalk-0",
-            )}
+            className={cn("min-h-11 border-b-2 px-0 font-utility text-body-s font-medium text-ink-950 transition hover:text-neem-600", active === c ? "border-neem-600" : "border-transparent")}
           >
             {c}
           </Link>
         ))}
-      </div>
+      </nav>
 
       {articles.length > 0 ? (
-        <div className="mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => (
-            <ArticleCard key={article.slug} article={article} />
-          ))}
+        <div className="mt-14">
+          <ArticleCard article={articles[0]} featured />
+          {articles.length > 1 && (
+            <div className="mt-8 grid gap-x-8 md:grid-cols-2">
+              {articles.slice(1).map((article) => <ArticleCard key={article.slug} article={article} />)}
+            </div>
+          )}
         </div>
       ) : (
         <div className="mt-16 max-w-[60ch] rounded-card border border-neem-100 bg-chalk-0 p-10">

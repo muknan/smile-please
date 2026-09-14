@@ -34,34 +34,32 @@ export function DentistCard({ dentist }: { dentist: DirectoryDentist }) {
     .join("");
 
   return (
-    <article className="flex flex-col rounded-card border border-neem-100 bg-chalk-0">
-      <div className="overflow-hidden">
+    <article className="flex h-full gap-4 border-t border-neem-100 py-6 sm:gap-5">
+      <div className="shrink-0">
         {dentist.photo_path ? (
           <div
-            className="relative h-40 w-full"
-            style={{ clipPath: "url(#arch-clip)" }}
+            className="relative h-20 w-20 overflow-hidden rounded-full bg-neem-100 sm:h-24 sm:w-24"
           >
             <Image
               src={coverUrl(dentist.photo_path)}
               alt=""
               fill
-              sizes="(max-width: 1024px) 45vw, 25vw"
+              sizes="96px"
               className="object-cover"
             />
           </div>
         ) : (
           <div
             aria-hidden="true"
-            className="flex h-40 w-full items-center justify-center bg-neem-100"
-            style={{ clipPath: "url(#arch-clip)" }}
+            className="flex h-20 w-20 items-center justify-center rounded-full bg-neem-100 sm:h-24 sm:w-24"
           >
-            <span className="font-display text-display-l text-neem-600/50">{initials}</span>
+            <span className="font-display text-display-m text-neem-700">{initials}</span>
           </div>
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-6">
-        <h3 className="text-display-m">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <h3 className="text-display-m leading-tight">
           <Link
             href={`/care/dentists/${dentist.slug}`}
             className="text-ink-950 transition hover:text-neem-600"
@@ -77,25 +75,24 @@ export function DentistCard({ dentist }: { dentist: DirectoryDentist }) {
           </p>
         )}
         {dentist.languages.length > 0 && (
-          <p className="mt-1 text-body-s text-ink-950/60">
+          <p className="mt-1 text-body-s text-ink-950/75">
             Speaks {dentist.languages.join(", ")}
           </p>
         )}
 
-        <div className="mt-auto pt-6">
+        <div className="mt-auto pt-5">
           {dentist.next_slot_at ? (
             <p className="rounded border border-neem-100 bg-mineral-50 px-4 py-3 font-utility text-body-s tabular-nums text-ink-950">
               Next free: {formatDateTime(dentist.next_slot_at)}
             </p>
           ) : (
-            <p className="text-body-s text-ink-950/60">No open slots in the next two weeks.</p>
+            <p className="text-body-s text-ink-950/75">No times posted for the next 14 days</p>
           )}
-          <Link
-            href={`/care/dentists/${dentist.slug}`}
-            className="mt-4 inline-flex items-center justify-center rounded border border-neem-100 px-4 py-2 font-utility text-body-s font-medium text-ink-950 transition hover:border-neem-600"
-          >
-            See times
-          </Link>
+          {dentist.next_slot_at && (
+            <Link href={`/care/dentists/${dentist.slug}`} className="mt-3 inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline decoration-neem-600/40 underline-offset-4 transition hover:text-neem-900">
+              See times
+            </Link>
+          )}
         </div>
       </div>
     </article>

@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, IBM_Plex_Sans } from "next/font/google";
-import { ArchClipDefs } from "@/components/site/Arch";
 import "./globals.css";
 
 const display = Fraunces({
@@ -40,7 +39,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${utility.variable}`}>
       <body className="antialiased">
-        <ArchClipDefs />
         {children}
       </body>
     </html>

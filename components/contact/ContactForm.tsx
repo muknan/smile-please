@@ -78,8 +78,8 @@ export function ContactForm({
 
   if (state.status === "success") {
     return (
-      <div className="max-w-[65ch] rounded-card border border-neem-100 bg-chalk-0 p-10">
-        <p className="font-utility text-label uppercase text-neem-600">Message received</p>
+      <div className="max-w-[65ch] rounded-panel border border-neem-200 bg-neem-50 p-8 sm:p-10">
+        <p className="font-utility text-body-s font-semibold text-neem-600">Message received</p>
         <h2 ref={successRef} tabIndex={-1} role="status" className="mt-4 text-display-m focus:outline-none">Thanks — it&apos;s with a real person now.</h2>
         <p className="mt-4 text-body text-ink-950/80">
           Your reference is <strong className="text-neem-600">{state.ref}</strong>.{" "}
@@ -97,21 +97,19 @@ export function ContactForm({
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-9">
       {/* WhatsApp alternative — hidden entirely when the env var is unset. */}
       {wa && (
         <a
           href={wa}
-          className="inline-flex items-center gap-3 rounded-card border border-neem-100 bg-chalk-0 px-6 py-4 transition hover:border-neem-600"
+          className="text-link w-fit text-neem-700"
         >
-          <span className="text-body font-medium text-ink-950">Prefer WhatsApp?</span>
-          <span className="font-utility text-body-s text-neem-600">
-            Message us directly about “{TAB_LABELS[tab]}”
-          </span>
+          <span className="font-semibold">Prefer WhatsApp?</span>
+          <span>Message us about “{TAB_LABELS[tab]}” →</span>
         </a>
       )}
 
-      {!organizationOnly && <div role="tablist" aria-label="What best describes you?" className="flex flex-wrap gap-2">
+      {!organizationOnly && <div role="tablist" aria-label="What best describes you?" className="flex max-w-[65ch] gap-1 overflow-x-auto border-b border-neem-200">
         {CONTACT_TABS.map((t, i) => (
           <button
             key={t}
@@ -138,8 +136,8 @@ export function ContactForm({
             }}
             className={
               tab === t
-                ? "rounded-full bg-neem-900 px-5 py-2.5 font-utility text-body-s font-medium text-chalk-0 transition"
-                : "rounded-full border border-neem-100 bg-chalk-0 px-5 py-2.5 font-utility text-body-s font-medium text-ink-950 transition hover:border-neem-600"
+                ? "min-h-12 shrink-0 border-b-2 border-neem-900 px-4 py-3 font-utility text-body-s font-semibold text-neem-900"
+                : "min-h-12 shrink-0 border-b-2 border-transparent px-4 py-3 font-utility text-body-s font-medium text-ink-950/75 transition hover:text-neem-700"
             }
           >
             {TAB_LABELS[t]}
@@ -148,13 +146,14 @@ export function ContactForm({
       </div>}
 
       {tab === "dentist" && (
-        <p className="max-w-[60ch] rounded-card border border-neem-100 bg-chalk-0 p-6 text-body text-ink-950/80">
+        <p className="max-w-[60ch] border-l-4 border-marigold-500 bg-marigold-100/50 px-5 py-4 text-body text-ink-950/80">
           We&apos;re looking for dentists who can give a few hours a month. Tell us when
           you&apos;re free and we&apos;ll be in touch.
         </p>
       )}
 
-      <form ref={formRef} action={formAction} id="contact-panel" className="max-w-[65ch] space-y-8" aria-label={`${TAB_LABELS[tab]} form`}>
+      <div id="contact-panel" role={!organizationOnly ? "tabpanel" : undefined} aria-labelledby={!organizationOnly ? `contact-tab-${tab}` : undefined}>
+      <form ref={formRef} action={formAction} className="max-w-[65ch] space-y-7" aria-label={`${TAB_LABELS[tab]} form`}>
         <input
           type="text"
           name="website"
@@ -256,18 +255,21 @@ export function ContactForm({
           </>
         )}
 
-        <fieldset className="space-y-4 rounded-card border border-neem-100 bg-chalk-0 p-6">
-          <legend className="font-utility text-label uppercase text-ink-950">Consent</legend>
+        <fieldset className={`consent-surface space-y-4 transition hover:border-neem-600 ${fieldError(issues, "consentContact") ? "border-clay-600" : ""}`}>
+          <legend className="rounded-full bg-neem-900 px-3 py-1 font-utility text-label font-semibold text-chalk-0">Consent and privacy</legend>
           <div className="flex gap-4">
             <input
               type="checkbox"
               id="consentContact"
               name="consentContact"
               required
+              aria-invalid={fieldError(issues, "consentContact") ? true : undefined}
+              aria-describedby={fieldError(issues, "consentContact") ? "consent-contact-error" : undefined}
               className="choice-control mt-1"
             />
             <div>
               <label htmlFor="consentContact" className="text-body">
+                <span className="mr-2 inline-flex rounded-full bg-marigold-100 px-2 py-0.5 font-utility text-label font-semibold">Required</span>
                 {CONSENT_COPY[tab]}
               </label>
               <p className="mt-2 text-body-s text-ink-950/70">
@@ -278,6 +280,7 @@ export function ContactForm({
               </p>
             </div>
           </div>
+          {fieldError(issues, "consentContact") && <p id="consent-contact-error" role="alert" className="text-body-s font-medium text-clay-600">{fieldError(issues, "consentContact")}</p>}
         </fieldset>
 
         {state.status === "error" && (
@@ -288,6 +291,7 @@ export function ContactForm({
 
         <SubmitButton pendingLabel="Sending…">Send message</SubmitButton>
       </form>
+      </div>
     </div>
   );
 }

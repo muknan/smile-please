@@ -6,13 +6,13 @@ import Link from "next/link";
  * booking consent (required, carries its own text) and a distinct,
  * never-pre-ticked awareness-updates opt-in.
  */
-export function ConsentBlock({ disabled }: { disabled?: boolean }) {
+export function ConsentBlock({ disabled, error }: { disabled?: boolean; error?: string }) {
   return (
     <fieldset
       disabled={disabled}
-      className="space-y-6 rounded-card border border-neem-100 bg-chalk-0 p-6"
+      className={`consent-surface space-y-6 transition hover:border-neem-600 disabled:cursor-not-allowed disabled:opacity-60 ${error ? "border-clay-600" : ""}`}
     >
-      <legend className="font-utility text-label uppercase text-ink-950">Consent</legend>
+      <legend className="rounded-full bg-neem-900 px-3 py-1 font-utility text-label font-semibold text-chalk-0">Consent and privacy</legend>
 
       <div className="flex gap-4">
         <input
@@ -20,11 +20,13 @@ export function ConsentBlock({ disabled }: { disabled?: boolean }) {
           id="consentBooking"
           name="consentBooking"
           required
-          aria-describedby="consent-booking-note"
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? "consent-booking-error consent-booking-note" : "consent-booking-note"}
           className="choice-control mt-1"
         />
         <div>
           <label htmlFor="consentBooking" className="text-body">
+            <span className="mr-2 inline-flex rounded-full bg-marigold-100 px-2 py-0.5 font-utility text-label font-semibold">Required</span>
             I agree that Smile Please can store my name, phone number and the details
             above so a dentist can be arranged for me, and can contact me about this
             appointment. I can withdraw this at any time.
@@ -38,6 +40,8 @@ export function ConsentBlock({ disabled }: { disabled?: boolean }) {
         </div>
       </div>
 
+      {error && <p id="consent-booking-error" role="alert" className="text-body-s font-medium text-clay-600">{error}</p>}
+
       <div className="flex gap-4">
         <input
           type="checkbox"
@@ -46,6 +50,7 @@ export function ConsentBlock({ disabled }: { disabled?: boolean }) {
           className="choice-control mt-1"
         />
         <label htmlFor="consentUpdates" className="text-body">
+          <span className="mr-2 inline-flex rounded-full border border-neem-200 bg-chalk-0 px-2 py-0.5 font-utility text-label font-semibold">Optional</span>
           I&apos;d also like occasional updates about camp dates and oral health. This is
           separate from booking consent — you can unsubscribe any time.
         </label>

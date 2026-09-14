@@ -268,7 +268,7 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
             </p>
           )}
 
-          <ConsentBlock disabled={forMinor} />
+          <ConsentBlock disabled={forMinor} error={fieldError(issues, "consentBooking")} />
         </div>
       </section>
 
