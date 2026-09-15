@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { admin } from "@/lib/supabase/admin";
 import { cookies } from "next/headers";
-import { HOLD_COOKIE, verifyHoldCapability } from "@/lib/booking-server";
+import { HOLD_COOKIE, HOLD_OWNER_COOKIE, holdOwnerFromCookie, verifyHoldCapability } from "@/lib/booking-server";
 import { bookSlotSchema } from "@/lib/schemas";
 import { checkHuman, withinRateLimit, clientIp } from "@/lib/antispam";
 import { notify } from "@/lib/email";
@@ -69,7 +69,8 @@ export async function confirmSlotBooking(
   const data = parsed.data;
 
   const cookieStore = await cookies();
-  if (!verifyHoldCapability(cookieStore.get(HOLD_COOKIE)?.value, details.slotId)) {
+  const holdOwner = holdOwnerFromCookie(cookieStore.get(HOLD_OWNER_COOKIE)?.value);
+  if (!holdOwner || !verifyHoldCapability(cookieStore.get(HOLD_COOKIE)?.value, details.slotId, holdOwner)) {
     return { status: "error", error: "Your slot hold has expired. Go back and choose a time again." };
   }
 
@@ -108,6 +109,7 @@ export async function confirmSlotBooking(
     p_consent_updates: data.consentUpdates,
     p_reschedule_appointment_id: details.rescheduleAppointmentId ?? null,
     p_actor_id: actorId,
+    p_hold_owner: holdOwner,
   });
 
   if (error || !booking) {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Section } from "@/components/site/Section";
+import { Button } from "@/components/ui/Button";
 import {
   SlotGrid,
   type GridSlot,
@@ -136,10 +137,16 @@ export default async function DentistProfilePage({ params, searchParams }: PageP
               rescheduleAppointmentId={reschedule}
             />
           ) : (
-            <p className="max-w-[55ch] text-body-l text-ink-950/70">
-              This dentist has no open slots in the next two weeks right now. Try
-              another dentist, or tell us what you need and we&apos;ll find someone.
-            </p>
+            <div className="max-w-[58ch]">
+              <p className="text-body-l text-ink-950/70">
+                This dentist has no open slots in the next two weeks right now. You can
+                browse another dentist or ask our team to find care near you.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Button href="/care/dentists" variant="ghost">Browse other dentists</Button>
+                <Button href="/care/request">Request care</Button>
+              </div>
+            </div>
           )}
         </div>
       </Section>

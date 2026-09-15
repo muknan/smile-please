@@ -4,9 +4,12 @@ import { clientIp, hashedIpKey } from "@/lib/antispam";
 import { admin } from "@/lib/supabase/admin";
 import {
   createHoldCapability,
-  heldSlotFromCapability,
   HOLD_COOKIE,
+  HOLD_OWNER_COOKIE,
   HOLD_TTL_SECONDS,
+  createHoldOwner,
+  holdOwnerFromCookie,
+  refreshHoldOwner,
 } from "@/lib/booking-server";
 
 /**
@@ -27,6 +30,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "BAD_REQUEST" }, { status: 400 });
   }
 
+  const cookieStore = await cookies();
+  const holdOwner = holdOwnerFromCookie(cookieStore.get(HOLD_OWNER_COOKIE)?.value);
+  // Set the signed owner first. A browser cannot send a newly set HttpOnly
+  // cookie until its next request, so this request intentionally performs no
+  // hold mutation; the client retries once after receiving this response.
+  if (!holdOwner) {
+    const response = NextResponse.json({ ok: false, error: "HOLD_OWNER_INITIALIZED" }, { status: 428 });
+    response.cookies.set(HOLD_OWNER_COOKIE, createHoldOwner(), {
+      httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax",
+      maxAge: HOLD_TTL_SECONDS, path: "/",
+    });
+    return response;
+  }
+
   const ip = await clientIp();
   const { data: allowed, error: rateError } = await admin.rpc("check_rate_limit", {
     p_key: hashedIpKey("hold", ip),
@@ -37,10 +54,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "RATE_LIMITED" }, { status: 429 });
   }
 
-  const cookieStore = await cookies();
-  const previousSlotId = heldSlotFromCapability(cookieStore.get(HOLD_COOKIE)?.value);
-
-  const { data, error } = await admin.rpc("hold_slot", { p_slot_id: slotId });
+  const { data, error } = await admin.rpc("hold_slot", { p_slot_id: slotId, p_hold_owner: holdOwner });
 
   if (error) {
     const msg = error.message ?? "";
@@ -56,12 +70,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "ERROR" }, { status: 500 });
   }
 
-  if (previousSlotId && previousSlotId !== slotId) {
-    await admin.rpc("release_slot_hold", { p_slot_id: previousSlotId });
-  }
-
   const response = NextResponse.json({ ok: true, slot: data });
-  response.cookies.set(HOLD_COOKIE, createHoldCapability(slotId), {
+  // A replacement selection starts a fresh ten-minute lease. Renew the owner
+  // token to the same deadline so the browser can confirm for the full hold.
+  response.cookies.set(HOLD_OWNER_COOKIE, refreshHoldOwner(holdOwner), {
+    httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax",
+    maxAge: HOLD_TTL_SECONDS, path: "/",
+  });
+  response.cookies.set(HOLD_COOKIE, createHoldCapability(slotId, holdOwner), {
     httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax",
     maxAge: HOLD_TTL_SECONDS, path: "/",
   });

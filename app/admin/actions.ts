@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { delhiTimestamp, isValidDelhiDate, isValidDelhiTime, nextDelhiMidnight } from "@/lib/delhi-time";
 import { createClient } from "@/lib/supabase/server";
 import { admin } from "@/lib/supabase/admin";
 import { requireRole } from "@/lib/auth";
@@ -296,8 +297,11 @@ export async function adminAddSlot(
   locationType: "clinic" | "camp" = "clinic",
 ): Promise<ActionResult> {
   const profile = await requireRole("admin");
+  if (!isValidDelhiDate(date) || !isValidDelhiTime(time)) {
+    return { ok: false, error: "Choose a valid date and time." };
+  }
   const supabase = await createClient();
-  const starts = new Date(`${date}T${time.length === 5 ? time : `${time}:00`}+05:30`).toISOString();
+  const starts = delhiTimestamp(date, time);
   const ends = new Date(new Date(starts).getTime() + 30 * 60 * 1000).toISOString();
   const { error } = await supabase.from("availability_slots").insert({
     dentist_id: dentistId,
@@ -324,9 +328,12 @@ export async function adminBlockDay(
   date: string,
 ): Promise<ActionResult> {
   await requireRole("admin");
+  if (!isValidDelhiDate(date)) {
+    return { ok: false, error: "Choose a valid date." };
+  }
   const supabase = await createClient();
-  const dayStart = new Date(`${date}T00:00:00+05:30`);
-  const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+  const dayStart = delhiTimestamp(date, "00:00");
+  const dayEnd = nextDelhiMidnight(date);
   // D-22: do not void a live booking. Refuse if any confirmed/assigned
   // appointment falls inside the day.
   const { data: conflicting } = await supabase
@@ -334,8 +341,8 @@ export async function adminBlockDay(
     .select("id")
     .eq("dentist_id", dentistId)
     .in("status", ["confirmed", "assigned"])
-    .gte("scheduled_for", dayStart.toISOString())
-    .lt("scheduled_for", dayEnd.toISOString());
+    .gte("scheduled_for", dayStart)
+    .lt("scheduled_for", dayEnd);
   if (conflicting && conflicting.length > 0) {
     return {
       ok: false,
@@ -347,8 +354,8 @@ export async function adminBlockDay(
     .update({ status: "blocked" })
     .eq("dentist_id", dentistId)
     .eq("status", "open")
-    .gte("starts_at", dayStart.toISOString())
-    .lt("starts_at", dayEnd.toISOString());
+    .gte("starts_at", dayStart)
+    .lt("starts_at", dayEnd);
   if (error) return { ok: false, error: "We couldn't block the day." };
   await logAudit("dentist.update", "dentist", dentistId, { action: "block_day", date });
   revalidatePath("/admin/dentists");

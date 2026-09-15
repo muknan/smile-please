@@ -418,13 +418,10 @@ begin
   if v_state <> 'held' then
     raise exception 'TEST 5a FAILED: hold_slot did not hold (state %)', v_state;
   end if;
-  begin
-    perform public.hold_slot(v_slot);
-    raise exception 'TEST 5a FAILED: second hold succeeded while held';
-  exception when others then
-    if SQLERRM not like '%SLOT_HELD%' then raise; end if;
-  end;
-  raise notice 'test 5a pass: hold placed; second hold refused while held';
+  if (public.hold_slot(v_slot)).status <> 'held' then
+    raise exception 'TEST 5a FAILED: repeated owner hold was not idempotent';
+  end if;
+  raise notice 'test 5a pass: hold placed; repeated owner hold is idempotent';
 end $$;
 
 -- ── Test 6: anon booking paths ─────────────────────────────────────────────
@@ -545,13 +542,13 @@ end $$;
 -- ── Test 6d: anonymous callers cannot execute booking mutations ────────────
 do $$
 begin
-  if has_function_privilege('anon', 'public.hold_slot(uuid)', 'EXECUTE') then
+  if has_function_privilege('anon', 'public.hold_slot(uuid,uuid)', 'EXECUTE') then
     raise exception 'TEST 6d FAILED: anon can execute hold_slot';
   end if;
   if has_function_privilege('anon', 'public.create_booking_request(text,text,text,age_band,reason_category,text,text,jsonb,boolean,uuid)', 'EXECUTE') then
     raise exception 'TEST 6d FAILED: anon can execute create_booking_request';
   end if;
-  if has_function_privilege('anon', 'public.confirm_booking(uuid,text,text,text,age_band,text,text,reason_category,text,boolean,uuid,uuid)', 'EXECUTE') then
+  if has_function_privilege('anon', 'public.confirm_booking(uuid,text,text,text,age_band,text,text,reason_category,text,boolean,uuid,uuid,uuid)', 'EXECUTE') then
     raise exception 'TEST 6d FAILED: anon can execute confirm_booking';
   end if;
   if not has_function_privilege('anon', 'public.lookup_appointment(text,text)', 'EXECUTE') then

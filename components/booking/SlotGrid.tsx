@@ -114,12 +114,22 @@ export function SlotGrid({
     setBusy(true);
     setMessage(null);
     try {
-      const res = await fetch("/api/hold", {
+      let res = await fetch("/api/hold", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slotId: slot.id }),
       });
-      const body = (await res.json()) as { ok: boolean; error?: string };
+      let body = (await res.json()) as { ok: boolean; error?: string };
+      // The first hold request creates an HttpOnly owner cookie and cannot
+      // mutate until the browser returns it on this retry.
+      if (res.status === 428 && body.error === "HOLD_OWNER_INITIALIZED") {
+        res = await fetch("/api/hold", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slotId: slot.id }),
+        });
+        body = (await res.json()) as { ok: boolean; error?: string };
+      }
       if (res.ok && body.ok) {
         const q = rescheduleAppointmentId
           ? `?reschedule=${rescheduleAppointmentId}`
@@ -371,4 +381,3 @@ function GridRow({
     </div>
   );
 }
-

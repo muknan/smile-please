@@ -76,7 +76,7 @@ export default function TermsPage() {
               These terms can change as the service grows. When they do, the date below moves and
               the change is noted on this page. Continued use after a change means you accept it.
             </p>
-            <p className="mt-8 border-t border-neem-100 pt-8 font-utility text-body-s text-ink-950/70">
+            <p className="mt-8 font-utility text-body-s text-ink-950/70">
               Terms version: v1 — 2026-08-04
             </p>
           </section>

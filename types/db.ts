@@ -193,6 +193,7 @@ export type Database = {
           booked_count: number;
           status: Database["public"]["Enums"]["slot_status"];
           held_until: string | null;
+          hold_owner: string | null;
           location_type: Database["public"]["Enums"]["location_type"];
           camp_name: string | null;
           created_by: string;
@@ -207,6 +208,7 @@ export type Database = {
           booked_count?: number;
           status?: Database["public"]["Enums"]["slot_status"];
           held_until?: string | null;
+          hold_owner?: string | null;
           location_type?: Database["public"]["Enums"]["location_type"];
           camp_name?: string | null;
           created_by: string;
@@ -221,6 +223,7 @@ export type Database = {
           booked_count?: number;
           status?: Database["public"]["Enums"]["slot_status"];
           held_until?: string | null;
+          hold_owner?: string | null;
           location_type?: Database["public"]["Enums"]["location_type"];
           camp_name?: string | null;
           created_by?: string;
@@ -698,11 +701,11 @@ export type Database = {
         Returns: boolean;
       };
       hold_slot: {
-        Args: { p_slot_id: string };
+        Args: { p_slot_id: string; p_hold_owner?: string | null };
         Returns: Tables<"availability_slots">;
       };
       release_slot_hold: {
-        Args: { p_slot_id: string };
+        Args: { p_slot_id: string; p_hold_owner?: string | null };
         Returns: boolean;
       };
       create_booking_request: {
@@ -762,6 +765,7 @@ export type Database = {
           p_consent_updates?: boolean | null;
           p_reschedule_appointment_id?: string | null;
           p_actor_id?: string | null;
+          p_hold_owner?: string | null;
         };
         Returns: Tables<"appointments">;
       };

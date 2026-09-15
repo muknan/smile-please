@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { formatDate, relativeDays } from "@/lib/format";
 import { updateSubmission, convertToDentist, logSubmissionView } from "@/app/admin/actions";
 import { Badge } from "@/components/ui/Badge";
+import { Dialog } from "@/components/ui/Dialog";
 import type { InboxSubmission } from "@/app/admin/inbox/page";
 import type { Database } from "@/types/db";
 
@@ -121,24 +122,14 @@ export function InboxBoard({ submissions }: { submissions: InboxSubmission[] }) 
       </table>
 
       {selected && (
-        <div className="fixed inset-0 z-40 flex justify-end bg-ink-950/30" onClick={() => open(selected.id)}>
-          <div
-            className="h-full w-full max-w-lg overflow-y-auto bg-chalk-0 p-6 shadow-lg"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="font-utility text-xl font-bold text-ink-950">
-                  {selected.reference_code}
-                </h2>
-                <p className="font-utility text-body-s text-ink-950/70">
-                  {TYPE_LABEL[selected.type]} · <Badge tone={STATUS_TONE[selected.status]}>{selected.status}</Badge>
-                </p>
-              </div>
-              <button onClick={() => open(selected.id)} aria-label="Close" className="rounded p-2 hover:bg-neem-100">
-                ✕
-              </button>
-            </div>
+        <Dialog
+          open
+          variant="drawer"
+          title={selected.reference_code}
+          description={`${TYPE_LABEL[selected.type]} submission`}
+          onClose={() => open(selected.id)}
+        >
+            <p className="mt-3"><Badge tone={STATUS_TONE[selected.status]}>{selected.status}</Badge></p>
 
             <dl className="mt-5 space-y-3 font-utility text-body">
               <div>
@@ -244,8 +235,7 @@ export function InboxBoard({ submissions }: { submissions: InboxSubmission[] }) 
                 {notice}
               </p>
             )}
-          </div>
-        </div>
+        </Dialog>
       )}
     </div>
   );

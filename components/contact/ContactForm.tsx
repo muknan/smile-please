@@ -102,18 +102,19 @@ export function ContactForm({
       {wa && (
         <a
           href={wa}
-          className="text-link w-fit text-neem-700"
+          className="group flex w-fit max-w-[65ch] flex-col gap-1 font-utility text-body-s text-neem-700 sm:flex-row sm:items-center sm:gap-3"
         >
           <span className="font-semibold">Prefer WhatsApp?</span>
-          <span>Message us about “{TAB_LABELS[tab]}” →</span>
+          <span className="underline decoration-neem-600/40 underline-offset-4 group-hover:decoration-neem-600">Message us about “{TAB_LABELS[tab]}” →</span>
         </a>
       )}
 
-      {!organizationOnly && <div role="tablist" aria-label="What best describes you?" className="flex max-w-[65ch] gap-1 overflow-x-auto border-b border-neem-200">
+      {!organizationOnly && <div role="tablist" aria-label="What best describes you?" className="grid max-w-[65ch] grid-cols-3 gap-1 rounded-lg bg-neem-100/60 p-1 sm:flex sm:w-fit">
         {CONTACT_TABS.map((t, i) => (
           <button
             key={t}
             role="tab"
+            aria-label={TAB_LABELS[t]}
             id={`contact-tab-${t}`}
             aria-selected={tab === t}
             aria-controls="contact-panel"
@@ -130,17 +131,18 @@ export function ContactForm({
               if (next !== null) {
                 e.preventDefault();
                 const target = CONTACT_TABS[next];
-                setTab(target);
+                switchTab(target);
                 document.getElementById(`contact-tab-${target}`)?.focus();
               }
             }}
             className={
               tab === t
-                ? "min-h-12 shrink-0 border-b-2 border-neem-900 px-4 py-3 font-utility text-body-s font-semibold text-neem-900"
-                : "min-h-12 shrink-0 border-b-2 border-transparent px-4 py-3 font-utility text-body-s font-medium text-ink-950/75 transition hover:text-neem-700"
+                ? "min-h-12 min-w-0 rounded-md bg-neem-900 px-2 py-2 font-utility text-data font-semibold text-chalk-0 sm:px-4 sm:text-body-s"
+                : "min-h-12 min-w-0 rounded-md px-2 py-2 font-utility text-data font-medium text-ink-950/75 transition hover:bg-chalk-0/70 hover:text-neem-700 sm:px-4 sm:text-body-s"
             }
           >
-            {TAB_LABELS[t]}
+            <span className="sm:hidden">{t === "organization" ? "Organisation" : TAB_LABELS[t]}</span>
+            <span className="hidden sm:inline">{TAB_LABELS[t]}</span>
           </button>
         ))}
       </div>}

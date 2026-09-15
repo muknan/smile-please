@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { displayFirstName } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
@@ -15,13 +14,10 @@ const ROLE_HOME: Record<UserRole, string> = {
 };
 
 const signedOut = (
-  <div className="flex items-center gap-4">
-    <Link
-      href="/auth/sign-in"
-      className="font-utility text-body-s font-medium text-ink-950 transition hover:text-neem-600"
-    >
+  <div className="flex flex-wrap items-center gap-2">
+    <Button href="/auth/sign-in" variant="ghost" size="sm">
       Sign in
-    </Link>
+    </Button>
     <Button href="/care" size="sm" className="min-w-[8rem]">
       Book a check-up
     </Button>
@@ -72,13 +68,10 @@ export function HeaderProfile() {
 
   if (state === "in" && profile) {
     return (
-      <div className="flex items-center gap-4">
-        <Link
-          href={profile.home}
-          className="font-utility text-body-s font-medium text-ink-950 transition hover:text-neem-600"
-        >
+      <div className="flex flex-wrap items-center gap-2">
+        <Button href={profile.home} variant="ghost" size="sm">
           {profile.name}
-        </Link>
+        </Button>
         <SignOutForm />
       </div>
     );

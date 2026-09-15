@@ -5,6 +5,7 @@ import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { notifyAppointmentTransition } from "@/lib/notifications";
 import type { Database } from "@/types/db";
+import { delhiTimestamp, isValidDelhiDate, isValidDelhiTime, nextDelhiMidnight } from "@/lib/delhi-time";
 
 type AppointmentStatus = Database["public"]["Enums"]["appointment_status"];
 export type DentistState = { ok: boolean; error?: string };
@@ -13,7 +14,7 @@ const OVERLAP_MSG = "That overlaps a slot you already have on that date.";
 
 /** Converts a Delhi-local date+time into an ISO timestamptz. */
 function istTimestamp(date: string, time: string): string {
-  return new Date(`${date}T${time.length === 5 ? time : `${time}:00`}+05:30`).toISOString();
+  return delhiTimestamp(date, time);
 }
 
 function slotConflictMessage(err: unknown): string {
@@ -112,7 +113,7 @@ export async function addSingleSlot(
   const isCamp = formData.get("locationType") === "camp";
   const campName = String(formData.get("campName") ?? "").trim() || null;
 
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) {
+  if (!isValidDelhiDate(date) || !isValidDelhiTime(time)) {
     return { ok: false, error: "Choose a date and time." };
   }
   const supabase = await createClient();
@@ -162,7 +163,7 @@ export async function addWeeklyPattern(
   const isCamp = formData.get("locationType") === "camp";
   const campName = String(formData.get("campName") ?? "").trim() || null;
 
-  if (days.length === 0 || !/^\d{2}:\d{2}$/.test(time) || !/^\d{4}-\d{2}-\d{2}$/.test(from) || !/^\d{4}-\d{2}-\d{2}$/.test(to)) {
+  if (days.length === 0 || !isValidDelhiTime(time) || !isValidDelhiDate(from) || !isValidDelhiDate(to)) {
     return { ok: false, error: "Pick the days, time, and a date range." };
   }
   if (from > to) return { ok: false, error: "The range ends before it starts." };
@@ -235,7 +236,7 @@ export async function blockDay(
 ): Promise<SlotFormState> {
   await requireRole("dentist");
   const date = String(formData.get("date") ?? "");
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  if (!isValidDelhiDate(date)) {
     return { ok: false, error: "Choose a date." };
   }
   const supabase = await createClient();
@@ -249,7 +250,7 @@ export async function blockDay(
   // whenever the dentist already has slots that day). Booked/held slots are
   // left untouched so a live appointment is never silently voided.
   const dayStart = istTimestamp(date, "00:00");
-  const dayEnd = istTimestamp(date, "23:59");
+  const dayEnd = nextDelhiMidnight(date);
   const { error } = await supabase
     .from("availability_slots")
     .update({ status: "blocked" })

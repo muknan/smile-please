@@ -103,3 +103,20 @@ test("core tasks reflow at a 320px CSS viewport", async ({ page }) => {
     expect(dimensions.scrollWidth).toBeLessThanOrEqual(dimensions.clientWidth + 1);
   }
 });
+
+test("wide-tablet composition and global recovery pages", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 1024, height: 900 });
+  for (const [name, path] of [["home", "/"], ["care-request", "/care/request"], ["learn", "/learn"], ["privacy", "/privacy"]] as const) {
+    await page.goto(path);
+    await expect(page.locator("h1").first()).toBeVisible();
+    await page.screenshot({ path: `.scratch/overhaul-v2/screens/wide-tablet/${testInfo.project.name}-${name}.png`, fullPage: true });
+  }
+
+  await page.goto("/403");
+  await expect(page.getByRole("heading", { name: /don't have access/i })).toBeVisible();
+  await page.screenshot({ path: `.scratch/overhaul-v2/screens/wide-tablet/${testInfo.project.name}-403.png`, fullPage: true });
+
+  await page.goto("/this-route-does-not-exist");
+  await expect(page.getByRole("heading", { name: "That page is not here" })).toBeVisible();
+  await page.screenshot({ path: `.scratch/overhaul-v2/screens/wide-tablet/${testInfo.project.name}-not-found.png`, fullPage: true });
+});

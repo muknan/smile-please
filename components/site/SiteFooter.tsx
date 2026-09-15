@@ -16,10 +16,10 @@ const LEARN_LINKS = [
 
 export function SiteFooter() {
   return (
-    <footer className="bg-neem-900 py-16 text-chalk-0">
+    <footer className="bg-neem-900 py-12 text-chalk-0 sm:py-16">
       <div className="container-content">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          <div>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4 lg:gap-10">
+          <div className="col-span-2 lg:col-span-1">
             <Link href="/" aria-label="Smile Please — home" className="inline-flex rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-marigold-500">
               <Logo className="text-chalk-0" />
             </Link>
@@ -60,7 +60,7 @@ export function SiteFooter() {
             </ul>
           </nav>
 
-          <div>
+          <div className="col-span-2 lg:col-span-1">
             <h2 className="font-utility text-label uppercase text-neem-100">Contact</h2>
             <address className="mt-4 space-y-4 text-body-s not-italic text-chalk-0/70">
               <p>New Delhi, India</p>
@@ -74,8 +74,6 @@ export function SiteFooter() {
                   {CONTACT_PHONE_DISPLAY}
                 </a>
               </p>
-              {/* CLIENT-COPY: registration number / trust-detail line not yet supplied. */}
-              <p>Registered trust details to be supplied.</p>
             </address>
           </div>
         </div>

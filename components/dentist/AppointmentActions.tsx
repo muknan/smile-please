@@ -2,12 +2,13 @@
 
 import { useState, useTransition } from "react";
 import { saveClinicalNote, transitionAsDentist } from "@/app/dentist/actions";
+import { Button } from "@/components/ui/Button";
+import { Dialog } from "@/components/ui/Dialog";
+import { Textarea } from "@/components/ui/Textarea";
 import type { Database } from "@/types/db";
 
 type Appointment = Database["public"]["Tables"]["appointments"]["Row"];
 type ClinicalNote = Database["public"]["Tables"]["clinical_notes"]["Row"];
-
-const CANCEL_PROMPT = "Why are you cancelling? This reason goes in the record.";
 
 /** Per-appointment dentist actions: confirm, complete, no-show, cancel with a
  * reason, and clinical notes on completed visits. Every status change routes
@@ -23,17 +24,21 @@ export function AppointmentActions({
   const [error, setError] = useState<string | null>(null);
   const [noteOpen, setNoteOpen] = useState(false);
   const [note, setNote] = useState(existingNote?.note ?? "");
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState("");
 
-  const act = (to: "confirmed" | "completed" | "no_show" | "cancelled_by_dentist") => {
-    let reason: string | null = null;
-    if (to === "cancelled_by_dentist") {
-      reason = window.prompt(CANCEL_PROMPT, "");
-      if (reason === null) return;
-    }
+  const act = (
+    to: "confirmed" | "completed" | "no_show" | "cancelled_by_dentist",
+    reason?: string,
+  ) => {
     setError(null);
     startTransition(async () => {
-      const state = await transitionAsDentist(appointment.id, to, reason ?? undefined);
+      const state = await transitionAsDentist(appointment.id, to, reason);
       if (!state.ok) setError(state.error ?? "Try again.");
+      else if (to === "cancelled_by_dentist") {
+        setCancelOpen(false);
+        setCancelReason("");
+      }
     });
   };
 
@@ -66,7 +71,7 @@ export function AppointmentActions({
           </>
         )}
         {["requested", "assigned", "confirmed"].includes(status) && (
-          <ActionButton pending={pending} onClick={() => act("cancelled_by_dentist")} danger>
+          <ActionButton pending={pending} onClick={() => setCancelOpen(true)} danger>
             Cancel with reason
           </ActionButton>
         )}
@@ -113,6 +118,42 @@ export function AppointmentActions({
           {error}
         </p>
       )}
+
+      <Dialog
+        open={cancelOpen}
+        title="Cancel this appointment?"
+        description="Tell the patient why the clinic cannot keep this appointment. The reason is saved in the record."
+        onClose={() => {
+          if (!pending) setCancelOpen(false);
+        }}
+      >
+        <div className="mt-5">
+          <label htmlFor={`cancel-reason-${appointment.id}`} className="font-utility text-body-s font-semibold text-ink-950">
+            Reason for cancelling
+          </label>
+          <Textarea
+            id={`cancel-reason-${appointment.id}`}
+            value={cancelReason}
+            onChange={(event) => setCancelReason(event.target.value)}
+            rows={4}
+            maxLength={500}
+            className="mt-2"
+          />
+          <div className="mt-5 flex flex-wrap justify-end gap-3">
+            <Button variant="ghost" size="sm" onClick={() => setCancelOpen(false)} disabled={pending}>
+              Keep appointment
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => act("cancelled_by_dentist", cancelReason.trim())}
+              disabled={pending || cancelReason.trim().length === 0}
+            >
+              {pending ? "Cancelling…" : "Cancel appointment"}
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

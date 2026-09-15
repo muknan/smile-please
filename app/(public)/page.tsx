@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const revalidate = 60;
 export const metadata: Metadata = {
-  title: "Free dental care in Delhi — Smile Please",
+  title: { absolute: "Smile Please — Free dental care in Delhi" },
   description: "Smile Please connects people in Delhi with registered dentists who provide free check-ups and essential dental care.",
   alternates: { canonical: `${SITE_URL}/` },
   openGraph: { images: [{ url: "/og?title=Free dental care for Delhi" }] },

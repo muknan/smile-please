@@ -128,21 +128,29 @@ export function MobileMenu() {
             </button>
             <Link href="/" aria-label="Smile Please — home" className="order-1"><Logo /></Link>
           </div>
-          <nav className="container-content flex min-h-[calc(100dvh-var(--header-h))] flex-col bg-mineral-50 py-5" aria-label="Mobile menu">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={pathname === link.href ? "page" : undefined}
-                className={cn(
-                  "flex min-h-11 items-center border-b border-neem-100 py-3 font-display text-display-m text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 motion-reduce:transition-none",
-                  pathname === link.href && "text-neem-600",
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <div className="mt-6 border-t border-neem-100 pt-5">
+          <nav className="container-content flex min-h-[calc(100dvh-var(--header-h))] flex-col bg-mineral-50 py-7" aria-label="Mobile menu">
+            <div className="space-y-1">
+              {NAV_LINKS.map((link) => {
+                const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-12 items-center rounded-lg px-3 py-2 font-display text-display-m text-ink-950 transition-colors hover:bg-neem-100/50 hover:text-neem-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 motion-reduce:transition-none",
+                      active && "bg-neem-100/70 text-neem-700",
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="mt-auto pb-4 pt-10">
+              <p className="mb-3 max-w-xs px-1 font-utility text-body-s text-ink-950/65">
+                Need care? You can start without an account.
+              </p>
               <HeaderProfile />
             </div>
           </nav>

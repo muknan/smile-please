@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Section } from "@/components/site/Section";
 import { NOTICE_VERSION } from "@/lib/consent";
+import { GRIEVANCE_EMAIL } from "@/lib/contact-info";
 
 export const metadata: Metadata = {
   title: "Privacy notice",
@@ -55,22 +56,23 @@ export default function PrivacyPage() {
         <dl className="mt-8 space-y-6">
           <div>
             <dt className="font-utility text-label uppercase text-neem-600">Data fiduciary</dt>
-            <dd className="mt-2 text-body">Smile Please (registered public charitable trust)</dd>
+            <dd className="mt-2 text-body">Smile Please, New Delhi</dd>
           </div>
           <div>
             <dt className="font-utility text-label uppercase text-neem-600">Registered address</dt>
-            {/* CLIENT-COPY: replace with the trust's registered address. */}
-            <dd className="mt-2 text-body">c/o [clinic name], New Delhi — [pin]</dd>
+            <dd className="mt-2 text-body">New Delhi, India. Full registered details are available on request.</dd>
           </div>
           <div>
             <dt className="font-utility text-label uppercase text-neem-600">Grievance contact</dt>
-            {/* CLIENT-COPY: replace with the named data-protection contact. */}
-            <dd className="mt-2 text-body">[name], [email] — we answer within 7 working days</dd>
+            <dd className="mt-2 text-body">
+              <a href={`mailto:${GRIEVANCE_EMAIL}`} className="font-medium text-neem-600 underline underline-offset-4">{GRIEVANCE_EMAIL}</a>
+              {" "}— we answer within 7 working days
+            </dd>
           </div>
         </dl>
       </Section>
 
-      <Section marker="What we collect" className="border-t border-neem-100 py-24" snap={false}>
+      <Section marker="What we collect" className="py-16 sm:py-20" snap={false}>
         <h2 className="text-display-m">2. What we collect</h2>
         <p className="mt-6 max-w-[65ch] text-body">
           Only what the service needs. If a field is optional, it stays optional.
@@ -105,7 +107,7 @@ export default function PrivacyPage() {
         </p>
       </Section>
 
-      <Section marker="Why we collect it" className="border-t border-neem-100 py-24" snap={false}>
+      <Section marker="Why we collect it" className="py-16 sm:py-20" snap={false}>
         <h2 className="text-display-m">3. Why we collect it</h2>
         <ul className="mt-10 space-y-10">
           {purposes.map(([purpose, why]) => (
@@ -117,7 +119,7 @@ export default function PrivacyPage() {
         </ul>
       </Section>
 
-      <Section marker="How long we keep it" className="border-t border-neem-100 py-24" snap={false}>
+      <Section marker="How long we keep it" className="py-16 sm:py-20" snap={false}>
         <h2 className="text-display-m">4. How long we keep it</h2>
         <ul className="mt-8 max-w-[65ch] list-disc space-y-4 pl-6 text-body">
           <li>Booking records and consent records: 12 months after the last activity.</li>
@@ -127,7 +129,7 @@ export default function PrivacyPage() {
         </ul>
       </Section>
 
-      <Section marker="Who we share it with" className="border-t border-neem-100 py-24" snap={false}>
+      <Section marker="Who we share it with" className="py-16 sm:py-20" snap={false}>
         <h2 className="text-display-m">5. Who we share it with</h2>
         <p className="mt-6 max-w-[65ch] text-body">
           We do not sell data, and we do not show your details publicly. The named processors
@@ -161,7 +163,7 @@ export default function PrivacyPage() {
         </div>
       </Section>
 
-      <Section marker="Your rights" className="border-t border-neem-100 py-24" snap={false}>
+      <Section marker="Your rights" className="py-16 sm:py-20" snap={false}>
         <h2 className="text-display-m">6. Your rights</h2>
         <ul className="mt-8 max-w-[65ch] list-disc space-y-4 pl-6 text-body">
           <li>
@@ -186,7 +188,7 @@ export default function PrivacyPage() {
         </ul>
       </Section>
 
-      <Section marker="Withdrawing consent" className="border-t border-neem-100 py-24" snap={false}>
+      <Section marker="Withdrawing consent" className="py-16 sm:py-20" snap={false}>
         <h2 className="text-display-m">7. How to withdraw consent</h2>
         <p className="mt-6 max-w-[65ch] text-body">
           Consent is per purpose. Withdrawal is as easy as granting it: open your account, see
@@ -202,7 +204,7 @@ export default function PrivacyPage() {
         </Link>
       </Section>
 
-      <Section marker="Children" className="border-t border-neem-100 py-24" snap={false}>
+      <Section marker="Children" className="py-16 sm:py-20" snap={false}>
         <h2 className="text-display-m">8. Children&apos;s data</h2>
         <p className="mt-6 max-w-[65ch] text-body">
           Bookings for anyone under 18 must be made by a parent or guardian, who stands as the
@@ -212,7 +214,7 @@ export default function PrivacyPage() {
         </p>
       </Section>
 
-      <Section marker="Complaints" className="border-t border-neem-100 py-24" snap={false}>
+      <Section marker="Complaints" className="py-16 sm:py-20" snap={false}>
         <h2 className="text-display-m">9. How to complain</h2>
         <p className="mt-6 max-w-[65ch] text-body">
           Tried us first and not satisfied? You can complain to the Data Protection Board of

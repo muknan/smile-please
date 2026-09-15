@@ -4,10 +4,10 @@ begin;
 
 do $$
 begin
-  if has_function_privilege('anon', 'public.hold_slot(uuid)', 'EXECUTE') then raise exception 'SECURITY TEST FAILED: anon can execute hold_slot'; end if;
-  if has_function_privilege('authenticated', 'public.confirm_booking(uuid,text,text,text,age_band,text,text,reason_category,text,boolean,uuid,uuid)', 'EXECUTE') then raise exception 'SECURITY TEST FAILED: authenticated can execute confirm_booking'; end if;
-  if not has_function_privilege('service_role', 'public.confirm_booking(uuid,text,text,text,age_band,text,text,reason_category,text,boolean,uuid,uuid)', 'EXECUTE') then raise exception 'SECURITY TEST FAILED: service_role cannot execute confirm_booking'; end if;
-  if has_function_privilege('anon', 'public.release_slot_hold(uuid)', 'EXECUTE') or not has_function_privilege('service_role', 'public.release_slot_hold(uuid)', 'EXECUTE') then raise exception 'SECURITY TEST FAILED: release_slot_hold grants are unsafe'; end if;
+  if has_function_privilege('anon', 'public.hold_slot(uuid,uuid)', 'EXECUTE') then raise exception 'SECURITY TEST FAILED: anon can execute hold_slot'; end if;
+  if has_function_privilege('authenticated', 'public.confirm_booking(uuid,text,text,text,age_band,text,text,reason_category,text,boolean,uuid,uuid,uuid)', 'EXECUTE') then raise exception 'SECURITY TEST FAILED: authenticated can execute confirm_booking'; end if;
+  if not has_function_privilege('service_role', 'public.confirm_booking(uuid,text,text,text,age_band,text,text,reason_category,text,boolean,uuid,uuid,uuid)', 'EXECUTE') then raise exception 'SECURITY TEST FAILED: service_role cannot execute confirm_booking'; end if;
+  if has_function_privilege('anon', 'public.release_slot_hold(uuid,uuid)', 'EXECUTE') or not has_function_privilege('service_role', 'public.release_slot_hold(uuid,uuid)', 'EXECUTE') then raise exception 'SECURITY TEST FAILED: release_slot_hold grants are unsafe'; end if;
   if has_function_privilege('anon', 'public.submit_contact(submission_type,text,text,text,text,text,text,text,partnership_type,text,text,text)', 'EXECUTE') then raise exception 'SECURITY TEST FAILED: anon can execute submit_contact'; end if;
   if has_function_privilege('authenticated', 'public.submit_contact(submission_type,text,text,text,text,text,text,text,partnership_type,text,text,text)', 'EXECUTE') then raise exception 'SECURITY TEST FAILED: authenticated can execute submit_contact'; end if;
   if not has_function_privilege('service_role', 'public.submit_contact(submission_type,text,text,text,text,text,text,text,partnership_type,text,text,text)', 'EXECUTE') then raise exception 'SECURITY TEST FAILED: service_role cannot execute submit_contact'; end if;
@@ -55,6 +55,33 @@ insert into public.consents (subject_type,subject_id,purpose,notice_version) val
   ('profile','40000000-0000-0000-0000-0000000000a1','booking','test'),
   ('profile','40000000-0000-0000-0000-0000000000a1','awareness_updates','test'),
   ('profile','40000000-0000-0000-0000-0000000000a2','booking','test');
+
+-- A single owner may have only one live hold, even if its requests overlap.
+insert into public.availability_slots (id,dentist_id,starts_at,ends_at,created_by) values
+  ('40000000-0000-0000-0000-000000000108','40000000-0000-0000-0000-0000000000d1',now()+interval '54 hours',now()+interval '54 hours 30 minutes','40000000-0000-0000-0000-0000000000d1'),
+  ('40000000-0000-0000-0000-000000000109','40000000-0000-0000-0000-0000000000d1',now()+interval '55 hours',now()+interval '55 hours 30 minutes','40000000-0000-0000-0000-0000000000d1');
+set local role service_role;
+do $$
+begin
+  perform public.hold_slot('40000000-0000-0000-0000-000000000108', '40000000-0000-0000-0000-0000000000b1');
+  perform public.hold_slot('40000000-0000-0000-0000-000000000109', '40000000-0000-0000-0000-0000000000b1');
+end $$;
+set local role postgres;
+do $$
+declare denied boolean := false;
+begin
+  if exists (select 1 from public.availability_slots where id='40000000-0000-0000-0000-000000000108' and status='held')
+     or not exists (select 1 from public.availability_slots where id='40000000-0000-0000-0000-000000000109' and status='held' and hold_owner='40000000-0000-0000-0000-0000000000b1') then raise exception 'SECURITY TEST FAILED: owner replacement stranded a hold'; end if;
+end $$;
+set local role service_role;
+do $$
+declare denied boolean := false;
+begin
+  begin perform public.hold_slot('40000000-0000-0000-0000-000000000109', '40000000-0000-0000-0000-0000000000b2'); exception when others then if SQLERRM like '%SLOT_HELD%' then denied := true; else raise; end if; end;
+  if not denied then raise exception 'SECURITY TEST FAILED: different owner claimed live hold'; end if;
+  if not public.release_slot_hold('40000000-0000-0000-0000-000000000109', '40000000-0000-0000-0000-0000000000b1') then raise exception 'SECURITY TEST FAILED: owner could not release its hold'; end if;
+end $$;
+set local role postgres;
 
 -- Only a future slot from an active public dentist can be held, and a live
 -- hold is mandatory when the trusted boundary confirms a booking.

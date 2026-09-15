@@ -28,7 +28,7 @@ export default async function ContactPage({ searchParams }: PageProps) {
   return (
     <>
       <Section className="pt-16 sm:pt-20">
-        <div className="grid gap-8 border-b border-neem-100 pb-12 lg:grid-cols-12 lg:items-end">
+        <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-7">
             <p className="eyebrow">Contact</p>
             <h1 className="mt-4 max-w-[24ch] text-display-l">Talk to a real person</h1>

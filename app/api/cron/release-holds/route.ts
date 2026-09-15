@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
   const { data, error } = await admin
     .from("availability_slots")
-    .update({ status: "open", held_until: null })
+    .update({ status: "open", held_until: null, hold_owner: null })
     .eq("status", "held")
     .lt("held_until", new Date().toISOString())
     .select("id");
