@@ -1,13 +1,13 @@
 "use client";
 
 import { Suspense, useActionState, type ReactNode } from "react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft, MailCheck, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { Logo, SmileMark } from "@/components/site/Logo";
+import { PageTopLink } from "@/components/site/PageTopLink";
 import { requestSignInLink, type SignInState } from "../actions";
 
 const initial: SignInState = { status: "idle" };
@@ -20,10 +20,10 @@ function AuthHeader() {
   return (
     <header className="border-b border-neem-100 bg-mineral-50">
       <div className="container-content flex h-16 items-center justify-between sm:h-[72px]">
-        <Link href="/" className="rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 focus-visible:ring-offset-4" aria-label="Smile Please — home"><Logo /></Link>
-        <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded px-2 font-utility text-body-s font-medium text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600">
+        <PageTopLink href="/" className="rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 focus-visible:ring-offset-4" aria-label="Smile Please — home"><Logo /></PageTopLink>
+        <PageTopLink href="/" className="inline-flex min-h-11 items-center gap-2 rounded px-2 font-utility text-body-s font-medium text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600">
           <ArrowLeft size={18} aria-hidden="true" /> Back to site
-        </Link>
+        </PageTopLink>
       </div>
     </header>
   );
@@ -73,8 +73,8 @@ function Form({ renderedAt }: { renderedAt: string }) {
         <p className="mt-3 text-body-s text-ink-950/70">It expires in one hour. If it is not in your inbox, check the spam folder before requesting another.</p>
       </div>
       <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:gap-6">
-        <Link href="/auth/sign-in" className="inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline underline-offset-4 hover:text-neem-900">Use a different email</Link>
-        <Link href="/" className="inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline underline-offset-4 hover:text-neem-900">Back to the site</Link>
+        <PageTopLink href="/auth/sign-in" className="inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline underline-offset-4 hover:text-neem-900">Use a different email</PageTopLink>
+        <PageTopLink href="/" className="inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline underline-offset-4 hover:text-neem-900">Back to the site</PageTopLink>
       </div>
     </AuthShell></>;
   }
@@ -104,6 +104,6 @@ function Form({ renderedAt }: { renderedAt: string }) {
         <p><strong className="font-medium text-ink-950">Private and password-free.</strong> The link works once and expires after one hour.</p>
       </div>
     </div>
-    <p className="mt-5 text-body-s text-ink-950/70">Need care but do not have an account? <Link href="/care/request" className="font-medium text-neem-700 underline decoration-neem-600/40 underline-offset-4 hover:decoration-neem-700">Start a care request instead.</Link></p>
+    <p className="mt-5 text-body-s text-ink-950/70">Need care but do not have an account? <PageTopLink href="/care/request" className="font-medium text-neem-700 underline decoration-neem-600/40 underline-offset-4 hover:decoration-neem-700">Start a care request instead.</PageTopLink></p>
   </AuthShell></>;
 }

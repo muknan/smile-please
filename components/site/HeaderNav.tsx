@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HeaderProfile } from "./HeaderProfile";
 import { Logo } from "./Logo";
+import { PageTopLink } from "./PageTopLink";
 
 export const PRIMARY_NAV_LINKS = [
   { href: "/about", label: "About" },
@@ -29,7 +29,7 @@ export function DesktopNav() {
   return (
     <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
       {PRIMARY_NAV_LINKS.map((link) => (
-        <Link
+        <PageTopLink
           key={link.href}
           href={link.href}
           aria-current={isActive(link.href) ? "page" : undefined}
@@ -39,7 +39,7 @@ export function DesktopNav() {
           )}
         >
           {link.label}
-        </Link>
+        </PageTopLink>
       ))}
     </nav>
   );
@@ -52,6 +52,20 @@ export function MobileMenu() {
   const menuOpen = open && openPath === pathname;
   const panelRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const restoreToggleFocusRef = useRef(true);
+  const backgroundScrollRef = useRef<number | null>(null);
+
+  const restoreBackgroundScroll = () => {
+    if (backgroundScrollRef.current === null) return;
+    window.scrollTo({ top: backgroundScrollRef.current, left: 0, behavior: "auto" });
+    backgroundScrollRef.current = null;
+  };
+
+  const closeForNavigation = () => {
+    restoreToggleFocusRef.current = false;
+    restoreBackgroundScroll();
+    setOpen(false);
+  };
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -62,11 +76,12 @@ export function MobileMenu() {
     const first = focusables?.[0];
     const last = focusables?.[focusables.length - 1];
     const toggleButton = toggleRef.current;
-    first?.focus();
+    first?.focus({ preventScroll: true });
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
+        restoreBackgroundScroll();
         setOpen(false);
         return;
       }
@@ -82,7 +97,8 @@ export function MobileMenu() {
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      toggleButton?.focus();
+      if (restoreToggleFocusRef.current) toggleButton?.focus({ preventScroll: true });
+      restoreToggleFocusRef.current = true;
     };
   }, [menuOpen]);
 
@@ -108,6 +124,8 @@ export function MobileMenu() {
         onClick={() => {
           if (menuOpen) setOpen(false);
           else {
+            restoreToggleFocusRef.current = true;
+            backgroundScrollRef.current = window.scrollY;
             setOpenPath(pathname);
             setOpen(true);
           }
@@ -126,19 +144,20 @@ export function MobileMenu() {
           className="fixed inset-0 z-50 h-dvh overflow-y-auto bg-mineral-50 md:hidden motion-safe:animate-[mobile-menu-in_150ms_ease-out]"
         >
           <div className="container-content flex h-[var(--header-h)] items-center justify-between border-b border-neem-100">
-            <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className="order-2 flex h-11 w-11 items-center justify-center rounded text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600">
+            <button type="button" aria-label="Close menu" onClick={() => { restoreBackgroundScroll(); setOpen(false); }} className="order-2 flex h-11 w-11 items-center justify-center rounded text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600">
               <X size={22} aria-hidden="true" />
             </button>
-            <Link href="/" aria-label="Smile Please — home" className="order-1"><Logo /></Link>
+            <PageTopLink href="/" aria-label="Smile Please — home" className="order-1" onClick={closeForNavigation}><Logo /></PageTopLink>
           </div>
           <nav className="container-content flex min-h-[calc(100dvh-var(--header-h))] flex-col bg-mineral-50 py-7" aria-label="Mobile menu">
             <div className="space-y-1">
               {PRIMARY_NAV_LINKS.map((link) => {
                 const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
                 return (
-                  <Link
+                  <PageTopLink
                     key={link.href}
                     href={link.href}
+                    onClick={closeForNavigation}
                     aria-current={active ? "page" : undefined}
                     className={cn(
                       "flex min-h-12 items-center rounded-lg px-3 py-2 font-display text-display-m text-ink-950 transition-colors hover:bg-neem-100/50 hover:text-neem-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 motion-reduce:transition-none",
@@ -146,7 +165,7 @@ export function MobileMenu() {
                     )}
                   >
                     {link.label}
-                  </Link>
+                  </PageTopLink>
                 );
               })}
             </div>
@@ -158,14 +177,15 @@ export function MobileMenu() {
             </div>
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-neem-100 px-3 pt-4">
               {SUPPORT_NAV_LINKS.map((link) => (
-                <Link
+                <PageTopLink
                   key={link.href}
                   href={link.href}
+                  onClick={closeForNavigation}
                   aria-current={pathname === link.href || pathname.startsWith(`${link.href}/`) ? "page" : undefined}
                   className="inline-flex min-h-11 items-center rounded font-utility text-body-s font-medium text-ink-950/70 hover:text-neem-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600"
                 >
                   {link.label}
-                </Link>
+                </PageTopLink>
               ))}
             </div>
           </nav>

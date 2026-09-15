@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Fraunces, IBM_Plex_Sans } from "next/font/google";
+import { PageTopNavigationManager } from "@/components/site/PageTopLink";
 import "./globals.css";
 
 const display = Fraunces({
@@ -39,6 +41,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${utility.variable}`}>
       <body className="antialiased">
+        <Suspense fallback={null}>
+          <PageTopNavigationManager />
+        </Suspense>
         {children}
       </body>
     </html>

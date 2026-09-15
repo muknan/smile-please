@@ -40,7 +40,7 @@ export default async function LearnPage({
         articles without jargon, so the advice works when you&apos;re not in the clinic.
       </p>
 
-      <nav className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-b border-neem-100" aria-label="Filter by topic">
+      <nav className="mt-10 flex flex-wrap gap-x-6 gap-y-2" aria-label="Filter by topic">
         <Link
           href="/learn"
           aria-current={!active ? "page" : undefined}
@@ -61,7 +61,7 @@ export default async function LearnPage({
       </nav>
 
       {articles.length > 0 ? (
-        <div className="mt-8 md:mt-14">
+        <div className="mt-6 md:mt-10">
           <ArticleCard article={articles[0]} featured />
           {articles.length > 1 && (
             <div className="mt-8 grid gap-x-8 md:grid-cols-2">

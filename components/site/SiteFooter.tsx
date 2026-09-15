@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL } from "@/lib/contact-info";
 import { Logo } from "./Logo";
+import { PageTopLink } from "./PageTopLink";
 
 const CARE_LINKS = [
   { href: "/care", label: "Book a check-up" },
@@ -20,9 +20,9 @@ export function SiteFooter() {
       <div className="container-content">
         <div className="grid grid-cols-2 gap-x-6 gap-y-7 sm:gap-y-10 lg:grid-cols-4 lg:gap-10">
           <div className="col-span-2 lg:col-span-1">
-            <Link href="/" aria-label="Smile Please — home" className="inline-flex rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-marigold-500">
+            <PageTopLink href="/" aria-label="Smile Please — home" className="inline-flex rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-marigold-500">
               <Logo className="text-chalk-0" />
-            </Link>
+            </PageTopLink>
             <p className="mt-4 max-w-[34ch] text-body-s text-chalk-0/70 sm:mt-6 sm:max-w-[28ch]">
               Free dental care and oral health awareness for underserved communities in Delhi.
             </p>
@@ -33,12 +33,12 @@ export function SiteFooter() {
             <ul className="mt-3 space-y-2 sm:mt-4 sm:space-y-4">
               {CARE_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link
+                  <PageTopLink
                     href={link.href}
                     className="text-body-s text-chalk-0 transition hover:text-marigold-500"
                   >
                     {link.label}
-                  </Link>
+                  </PageTopLink>
                 </li>
               ))}
             </ul>
@@ -49,12 +49,12 @@ export function SiteFooter() {
             <ul className="mt-3 space-y-2 sm:mt-4 sm:space-y-4">
               {LEARN_LINKS.map((link) => (
                 <li key={link.href}>
-                  <Link
+                  <PageTopLink
                     href={link.href}
                     className="text-body-s text-chalk-0 transition hover:text-marigold-500"
                   >
                     {link.label}
-                  </Link>
+                  </PageTopLink>
                 </li>
               ))}
             </ul>
@@ -81,12 +81,12 @@ export function SiteFooter() {
         <div className="mt-9 flex flex-col gap-3 border-t border-chalk-0/20 pt-5 text-body-s text-chalk-0/70 sm:mt-16 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pt-6">
           <p>© 2026 Smile Please</p>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
-            <Link href="/privacy" className="transition hover:text-marigold-500">
+            <PageTopLink href="/privacy" className="transition hover:text-marigold-500">
               Privacy
-            </Link>
-            <Link href="/terms" className="transition hover:text-marigold-500">
+            </PageTopLink>
+            <PageTopLink href="/terms" className="transition hover:text-marigold-500">
               Terms
-            </Link>
+            </PageTopLink>
             <span>Data queries: {CONTACT_EMAIL}</span>
           </div>
         </div>

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 @layer base {
-  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 88px; scroll-behavior: smooth; }
+  html { -webkit-text-size-adjust: 100%; scroll-padding-top: 88px; }
   body { @apply bg-mineral-50 text-ink-950 font-body text-body antialiased; }
   h1, h2, h3 { @apply font-display; text-wrap: balance; }
   :focus-visible { outline: 3px solid #32634F; outline-offset: 4px; }
@@ -27,7 +27,6 @@
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  html { scroll-behavior: auto; }
 }
 @media (max-width: 767px) {
   .text-display-xl { font-size: 2.5rem; }

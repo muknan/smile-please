@@ -1,6 +1,6 @@
 import * as React from "react";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { PageTopLink } from "@/components/site/PageTopLink";
 
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
   primary: "bg-marigold-500 text-ink-950 shadow-[inset_0_-1px_0_rgba(0,0,0,.16)] hover:bg-marigold-600",
@@ -42,9 +42,9 @@ export function Button({
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <PageTopLink href={href} className={classes}>
         {children}
-      </Link>
+      </PageTopLink>
     );
   }
   return (

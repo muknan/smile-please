@@ -10,6 +10,7 @@ test("Learn filters connect visually to the article results", async ({ page }) =
   expect(filterBox).not.toBeNull();
   expect(articleBox).not.toBeNull();
   expect(articleBox!.y - (filterBox!.y + filterBox!.height)).toBeLessThanOrEqual(40);
+  await expect(page.getByRole("navigation", { name: "Filter by topic" })).toHaveCSS("border-bottom-width", "0px");
 });
 
 for (const route of ["/learn", "/partners", "/about", "/care"]) {
