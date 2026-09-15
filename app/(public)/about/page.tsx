@@ -1,21 +1,22 @@
 import type { Metadata } from "next";
+import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/site/Section";
 
 export const metadata: Metadata = {
   title: "About",
   description:
-    "How Smile Please started, what we believe, who runs it, and the registration details you can check.",
+    "Why Smile Please works to make free dental care and practical oral-health information easier to reach in Delhi.",
   alternates: { canonical: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/about` },
 };
 
 const values = [
   {
-    title: "Care is never conditional",
-    body: "A toothache does not care who you are, and neither do we. If you need dental care, you get it — no forms about income, no means testing, no judgement.",
+    title: "Care should be easier to reach",
+    body: "Cost and distance can turn a manageable dental problem into lasting pain. We connect people with volunteer dentists and make the route to asking for help clear.",
   },
   {
     title: "We say what we do",
-    body: "Every claim on this site is something a patient, a partner, or a regulator can check. If we don't know yet, we say so plainly.",
+    body: "We describe the care, availability and next steps as they are. When no appointment time is posted, we offer a request route instead of pretending care is immediately available.",
   },
   {
     title: "Your details stay your own",
@@ -26,34 +27,30 @@ const values = [
 export default function AboutPage() {
   return (
     <>
-      <Section marker="About" className="pt-24" snap>
+      <Section marker="About" className="public-hero" snap>
         <h1 className="text-display-l">Why Smile Please exists</h1>
 
-        {/* CLIENT-COPY: replace with the founder's real words. 150–200 words, first person. */}
-        <div className="mt-16 max-w-[65ch] space-y-6 text-body-l">
+        <div className="mt-8 max-w-[65ch] space-y-6 text-body-l sm:mt-12 lg:mt-16">
           <p>
-            I spent years watching people in Delhi live with pain they didn&apos;t have to. A
-            cavity that could be fixed in twenty minutes becomes an extraction, then a denture,
-            then a whole set of problems — because the nearest affordable dentist is two bus
-            rides and a day&apos;s wages away.
+            Smile Please is a New Delhi organisation helping people reach free dental care.
+            Patients can ask the team to find a nearby dentist or book directly when a volunteer
+            has posted an available time.
           </p>
           <p>
-            Smile Please started with a chair, a light, and a list of volunteers. We run free
-            clinic days in neighbourhoods where dental care is a luxury, and we go into schools
-            to explain what most people never get told: most dental disease is preventable, and
-            the prevention takes two minutes a day.
+            The work also includes practical oral-health awareness for communities, schools and
+            families. The aim is straightforward: make reliable guidance easier to understand and
+            make the next step toward care easier to take.
           </p>
           <p>
-            We are small, and we are honest about being small. Every rupee goes to treatment,
-            equipment, or the people who give their time. This is the story so far. It grows
-            with every patient who walks in.
+            Smile Please is a small service supported by volunteer professionals. That makes
+            honesty about capacity essential: availability changes, requests are reviewed by a
+            person, and the site always shows a useful fallback when a direct slot is not open.
           </p>
         </div>
-        {/* END CLIENT-COPY */}
       </Section>
 
-      <Section marker="What we hold to" className="border-t border-neem-100 py-24" snap>
-        <div className="space-y-16">
+      <Section marker="What we hold to" className="border-t border-neem-100 py-14 sm:py-20 lg:py-24" snap>
+        <div className="space-y-10 sm:space-y-16">
           {values.map((value) => (
             <div key={value.title} className="max-w-[65ch]">
               <h2 className="text-display-m">{value.title}</h2>
@@ -61,17 +58,12 @@ export default function AboutPage() {
             </div>
           ))}
         </div>
+        <div className="mt-12 flex flex-wrap gap-3 border-t border-neem-100 pt-8 sm:mt-16">
+          <Button href="/care/request">Request free care</Button>
+          <Button href="/care/dentists" variant="ghost">Browse dentists</Button>
+        </div>
       </Section>
 
-      <Section marker="Registration" className="border-t border-neem-100 py-24" snap>
-        <h2 className="text-display-l">Organisation details</h2>
-        <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
-          Registration details — the trust deed number, registered address and grievance
-          contact — will be published here once finalised.
-        </p>
-        {/* CLIENT-COPY: publish the trust's real deed details (registration number,
-            registered address and grievance contact) when they are finalised. */}
-      </Section>
     </>
   );
 }

@@ -72,7 +72,7 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
   const more = moreData ? moreData[0] : undefined;
 
   return (
-    <article className="py-24">
+    <article className="py-14 sm:py-20 lg:py-24">
       <div className="container-content max-w-3xl">
         <p className="font-utility text-label uppercase text-neem-600">
           {data.category}

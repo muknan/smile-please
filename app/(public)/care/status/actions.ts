@@ -17,7 +17,7 @@ export type LookupResult = {
   dentist: string;
   locality: string | null;
   cancelled_reason: string | null;
-  events: { status: string; at: string; by: string | null; reason: string | null }[];
+  events: { status: string; at: string }[];
 };
 
 const NOT_FOUND_MSG = `We couldn't find an appointment with those details. Check the reference and phone number, or call ${CONTACT_PHONE_DISPLAY} and we'll look it up for you.`;

@@ -27,7 +27,7 @@ export default async function ContactPage({ searchParams }: PageProps) {
 
   return (
     <>
-      <Section className="pt-16 sm:pt-20">
+      <Section className="pt-12 sm:pt-20">
         <div className="grid gap-8 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-7">
             <p className="eyebrow">Contact</p>
@@ -65,7 +65,7 @@ export default async function ContactPage({ searchParams }: PageProps) {
             >
               {GRIEVANCE_EMAIL}
             </a>{" "}
-            — we answer within 7 working days
+            — for complaints, privacy questions and data requests
           </dd>
         </dl>
       </Section>

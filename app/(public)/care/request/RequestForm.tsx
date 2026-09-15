@@ -19,7 +19,7 @@ import { CONTACT_PHONE_DISPLAY } from "@/lib/contact-info";
 import { fieldError } from "@/lib/form-errors";
 
 const MINOR_NOTE =
-  "A parent or guardian needs to make this booking. Please ask them to fill this in, or call " +
+  "We cannot accept details for someone under 18 through this form yet. Ask a parent or guardian to call " +
   CONTACT_PHONE_DISPLAY +
   ".";
 
@@ -28,7 +28,8 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
     submitCareRequest,
     { status: "idle" },
   );
-  const [forMinor, setForMinor] = useState(false);
+  const [selectedAgeBand, setSelectedAgeBand] = useState("");
+  const isMinor = selectedAgeBand === "under_12" || selectedAgeBand === "12_17";
   const issues = state.status === "error" ? state.issues : undefined;
   const formRef = useRef<HTMLFormElement>(null);
   const successRef = useRef<HTMLHeadingElement>(null);
@@ -132,7 +133,7 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
           </Field>
 
           <Field label="Age band" htmlFor="ageBand" required error={fieldError(issues, "ageBand")}>
-            <Select id="ageBand" name="ageBand" required defaultValue="">
+            <Select id="ageBand" name="ageBand" required defaultValue="" onChange={(event) => setSelectedAgeBand(event.target.value)}>
               <option value="" disabled>
                 Choose…
               </option>
@@ -248,27 +249,13 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
 
       <section className="mt-10 border-t border-neem-100 pt-10">
         <div className="space-y-6">
-          <div className="flex items-center gap-4">
-            <input
-              type="checkbox"
-              id="forMinor"
-              name="forMinor"
-              checked={forMinor}
-              onChange={(e) => setForMinor(e.target.checked)}
-              className="choice-control"
-            />
-            <label htmlFor="forMinor" className="cursor-pointer text-body">
-              Booking for someone under 18?
-            </label>
-          </div>
-
-          {forMinor && (
-            <p role="status" className="rounded border border-clay-600 bg-chalk-0 px-4 py-3 text-body-s text-clay-600">
+          {isMinor && (
+            <p role="status" className="rounded border border-clay-600 bg-clay-600/5 px-4 py-3 text-body-s text-clay-600">
               {MINOR_NOTE}
             </p>
           )}
 
-          <ConsentBlock disabled={forMinor} error={fieldError(issues, "consentBooking")} />
+          <ConsentBlock disabled={isMinor} error={fieldError(issues, "consentBooking")} />
         </div>
       </section>
 
@@ -284,7 +271,7 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
       )}
 
       <div className="mt-10">
-        <SubmitButton pendingLabel="Sending…" disabled={forMinor}>Send my request</SubmitButton>
+        <SubmitButton pendingLabel="Sending…" disabled={isMinor}>Send my request</SubmitButton>
       </div>
     </form>
   );

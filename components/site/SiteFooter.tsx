@@ -16,21 +16,21 @@ const LEARN_LINKS = [
 
 export function SiteFooter() {
   return (
-    <footer className="bg-neem-900 py-12 text-chalk-0 sm:py-16">
+    <footer className="bg-neem-900 py-9 text-chalk-0 sm:py-16">
       <div className="container-content">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-4 lg:gap-10">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-7 sm:gap-y-10 lg:grid-cols-4 lg:gap-10">
           <div className="col-span-2 lg:col-span-1">
             <Link href="/" aria-label="Smile Please — home" className="inline-flex rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-marigold-500">
               <Logo className="text-chalk-0" />
             </Link>
-            <p className="mt-6 max-w-[28ch] text-body-s text-chalk-0/70">
+            <p className="mt-4 max-w-[34ch] text-body-s text-chalk-0/70 sm:mt-6 sm:max-w-[28ch]">
               Free dental care and oral health awareness for underserved communities in Delhi.
             </p>
           </div>
 
           <nav aria-label="Care">
             <h2 className="font-utility text-label uppercase text-neem-100">Care</h2>
-            <ul className="mt-4 space-y-4">
+            <ul className="mt-3 space-y-2 sm:mt-4 sm:space-y-4">
               {CARE_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -46,7 +46,7 @@ export function SiteFooter() {
 
           <nav aria-label="Learn">
             <h2 className="font-utility text-label uppercase text-neem-100">Learn</h2>
-            <ul className="mt-4 space-y-4">
+            <ul className="mt-3 space-y-2 sm:mt-4 sm:space-y-4">
               {LEARN_LINKS.map((link) => (
                 <li key={link.href}>
                   <Link
@@ -62,7 +62,7 @@ export function SiteFooter() {
 
           <div className="col-span-2 lg:col-span-1">
             <h2 className="font-utility text-label uppercase text-neem-100">Contact</h2>
-            <address className="mt-4 space-y-4 text-body-s not-italic text-chalk-0/70">
+            <address className="mt-3 space-y-2 text-body-s not-italic text-chalk-0/70 sm:mt-4 sm:space-y-4">
               <p>New Delhi, India</p>
               <p>
                 <a href={`mailto:${CONTACT_EMAIL}`} className="text-chalk-0 transition hover:text-marigold-500">
@@ -78,7 +78,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-16 flex flex-col gap-4 border-t border-chalk-0/20 pt-6 text-body-s text-chalk-0/70 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-9 flex flex-col gap-3 border-t border-chalk-0/20 pt-5 text-body-s text-chalk-0/70 sm:mt-16 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pt-6">
           <p>© 2026 Smile Please</p>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
             <Link href="/privacy" className="transition hover:text-marigold-500">

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function CareRequestPage() {
   return (
-    <Section marker="Care request" className="pt-24">
+    <Section marker="Care request" className="public-hero">
       <h1 className="max-w-3xl text-display-l">Tell us what&apos;s wrong</h1>
       <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
         Two minutes, no account needed. We&apos;ll match you with a dentist near you —

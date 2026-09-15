@@ -3,7 +3,7 @@
 import { Suspense, useActionState, type ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, MailCheck, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -48,7 +48,7 @@ function AuthShell({ children }: { children: ReactNode }) {
     <main className="min-h-[calc(100vh-4rem)] bg-mineral-50 sm:min-h-[calc(100vh-4.5rem)]">
       <div className="mx-auto grid min-h-[inherit] max-w-[1440px] lg:grid-cols-[minmax(20rem,0.9fr)_minmax(0,1.1fr)]">
         <AuthIntro />
-        <section className="flex items-center px-5 py-14 sm:px-10 lg:px-16"><div className="w-full max-w-md">{children}</div></section>
+        <section className="flex items-start px-5 py-8 sm:px-10 sm:py-12 lg:items-center lg:px-16 lg:py-16"><div className="w-full max-w-lg">{children}</div></section>
       </div>
     </main>
   );
@@ -63,11 +63,16 @@ function Form({ renderedAt }: { renderedAt: string }) {
 
   if (state.status === "sent") {
     return <><AuthHeader /><AuthShell>
-      <p className="font-utility text-label uppercase tracking-[.14em] text-neem-600">Sign in</p>
-      <h1 className="mt-5 text-display-l">Check your email</h1>
-      <p className="mt-4 text-body-l">We&apos;ve sent a sign-in link to <strong>{state.email}</strong>. It expires in one hour.</p>
-      <p className="mt-2 text-body-s text-ink-950/75">No link in your inbox? Check the spam folder first — or use a different address below.</p>
-      <div className="mt-10 flex flex-col gap-4">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neem-100 text-neem-700">
+        <MailCheck size={24} aria-hidden="true" />
+      </div>
+      <p className="mt-6 font-utility text-label font-semibold uppercase tracking-[.14em] text-neem-600">Link sent</p>
+      <h1 className="mt-3 text-display-l">Check your email.</h1>
+      <div className="mt-6 rounded-panel border border-neem-100 bg-chalk-0 p-5 shadow-[0_16px_50px_rgba(27,48,41,0.07)] sm:p-8">
+        <p className="text-body-l">We&apos;ve sent a private sign-in link to <strong className="break-all">{state.email}</strong>.</p>
+        <p className="mt-3 text-body-s text-ink-950/70">It expires in one hour. If it is not in your inbox, check the spam folder before requesting another.</p>
+      </div>
+      <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:gap-6">
         <Link href="/auth/sign-in" className="inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline underline-offset-4 hover:text-neem-900">Use a different email</Link>
         <Link href="/" className="inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline underline-offset-4 hover:text-neem-900">Back to the site</Link>
       </div>
@@ -75,24 +80,30 @@ function Form({ renderedAt }: { renderedAt: string }) {
   }
 
   return <><AuthHeader /><AuthShell>
-    <p className="font-utility text-label uppercase tracking-[.14em] text-neem-600">Sign in</p>
-    <h1 className="mt-5 text-display-l">Sign in to your account</h1>
-    <p className="mt-4 text-body-l text-ink-950/70">Enter the email you use with Smile Please. We&apos;ll send you a link that signs you in without a password.</p>
-    <p className="mt-4 border-l-2 border-marigold-500 pl-4 text-body-s text-ink-950/70">The link is single-use and expires after one hour. We never ask for your password.</p>
+    <p className="font-utility text-label font-semibold uppercase tracking-[.14em] text-neem-600">Secure account access</p>
+    <h1 className="mt-3 text-display-l">Welcome back.</h1>
+    <p className="mt-3 max-w-[46ch] text-body-l text-ink-950/70">Enter the email you use with Smile Please. We&apos;ll send you a private link—no password needed.</p>
 
     {reason === "admin_timeout" && <p role="alert" aria-live="polite" className="mt-6 rounded border border-clay-600/40 bg-clay-600/5 px-4 py-3 text-body-s text-clay-600">Your admin session expired. Sign in again.</p>}
     {errorParam === "link_expired" && <p role="alert" aria-live="polite" className="mt-6 rounded border border-clay-600/40 bg-clay-600/5 px-4 py-3 text-body-s text-clay-600">That sign-in link has expired or was already used. Request a new one below.</p>}
 
-    <form action={formAction} className="mt-8 space-y-6">
-      {/* Honeypot and timestamp are server-side abuse protections; keep their names stable. */}
-      <input type="text" name="website" value="" tabIndex={-1} autoComplete="off" aria-hidden="true" className="sr-only" />
-      <input type="hidden" name="renderedAt" value={renderedAt} />
-      <input type="hidden" name="next" value={next} />
-      <Field label="Email" htmlFor="email" required>
-        <Input id="email" name="email" type="email" autoComplete="email" required aria-required="true" aria-describedby="signin-error" placeholder="you@example.com" />
-      </Field>
-      {state.status === "error" && <p id="signin-error" role="alert" aria-live="polite" className="text-body-s text-clay-600">{state.error}</p>}
-      <Button type="submit" disabled={pending} className="w-full sm:w-auto">{pending ? "Sending…" : "Send me a sign-in link"}</Button>
-    </form>
+    <div className="mt-7 rounded-panel border border-neem-100 bg-chalk-0 p-5 shadow-[0_16px_50px_rgba(27,48,41,0.07)] sm:p-8">
+      <form action={formAction} className="space-y-5">
+        {/* Honeypot and timestamp are server-side abuse protections; keep their names stable. */}
+        <input type="text" name="website" value="" tabIndex={-1} autoComplete="off" aria-hidden="true" className="sr-only" />
+        <input type="hidden" name="renderedAt" value={renderedAt} />
+        <input type="hidden" name="next" value={next} />
+        <Field label="Email address" htmlFor="email" required>
+          <Input id="email" name="email" type="email" autoComplete="email" required aria-required="true" aria-describedby={state.status === "error" ? "signin-error signin-security" : "signin-security"} placeholder="you@example.com" />
+        </Field>
+        {state.status === "error" && <p id="signin-error" role="alert" aria-live="polite" className="text-body-s text-clay-600">{state.error}</p>}
+        <Button type="submit" disabled={pending} className="w-full">{pending ? "Sending…" : "Email me a sign-in link"}</Button>
+      </form>
+      <div id="signin-security" className="mt-5 flex gap-3 border-t border-neem-100 pt-5 text-body-s text-ink-950/70">
+        <ShieldCheck className="mt-0.5 shrink-0 text-neem-600" size={19} aria-hidden="true" />
+        <p><strong className="font-medium text-ink-950">Private and password-free.</strong> The link works once and expires after one hour.</p>
+      </div>
+    </div>
+    <p className="mt-5 text-body-s text-ink-950/70">Need care but do not have an account? <Link href="/care/request" className="font-medium text-neem-700 underline decoration-neem-600/40 underline-offset-4 hover:decoration-neem-700">Start a care request instead.</Link></p>
   </AuthShell></>;
 }

@@ -17,7 +17,7 @@ export default async function StatusPage({
 }) {
   const { ref } = await searchParams;
   return (
-    <Section marker="Track" className="pt-24">
+    <Section marker="Track" className="public-hero">
       <h1 className="text-display-l">Track your appointment</h1>
       <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
         No account needed — just the reference from your confirmation message and

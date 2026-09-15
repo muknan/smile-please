@@ -80,7 +80,6 @@ export function StatusLookup({ initialRef, renderedAt }: { initialRef?: string; 
                     <p className="mt-1 font-utility text-body-s tabular-nums text-ink-950/60">
                       {formatDateTime(event.at)}
                     </p>
-                    {event.reason && <p className="mt-1 text-body-s text-ink-950/70">{event.reason}</p>}
                   </div>
                 </li>
               ))}

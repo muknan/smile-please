@@ -33,7 +33,7 @@ export default async function LearnPage({
   const articles = (data ?? []) as ArticleTeaser[];
 
   return (
-    <Section marker="Learn" className="pt-24">
+    <Section marker="Learn" className="public-hero">
       <h1 className="max-w-3xl text-display-l">Plain answers about your mouth</h1>
       <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
         Brushing, flossing, what hurts, what to eat, and what you can safely ignore. Short
@@ -61,7 +61,7 @@ export default async function LearnPage({
       </nav>
 
       {articles.length > 0 ? (
-        <div className="mt-14">
+        <div className="mt-8 md:mt-14">
           <ArticleCard article={articles[0]} featured />
           {articles.length > 1 && (
             <div className="mt-8 grid gap-x-8 md:grid-cols-2">
@@ -70,7 +70,7 @@ export default async function LearnPage({
           )}
         </div>
       ) : (
-        <div className="mt-16 max-w-[60ch] rounded-card border border-neem-100 bg-chalk-0 p-10">
+        <div className="mt-8 max-w-[60ch] rounded-card border border-neem-100 bg-chalk-0 p-6 sm:mt-12 sm:p-10">
           <h2 className="text-display-m">
             {active ? `Nothing under “${active}” yet.` : "No articles published yet."}
           </h2>

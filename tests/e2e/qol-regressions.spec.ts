@@ -1,4 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { loadEnvConfig } from "@next/env";
+import { createClient } from "@supabase/supabase-js";
+
+loadEnvConfig(process.cwd());
 
 test("mobile navigation uses spacing, marks nested routes active, and gives both actions full targets", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -17,6 +21,48 @@ test("mobile navigation uses spacing, marks nested routes active, and gives both
   const signIn = menu.getByRole("link", { name: "Sign in" });
   expect((await signIn.boundingBox())?.height).toBeGreaterThanOrEqual(44);
   await expect(signIn).toHaveCSS("border-bottom-style", "solid");
+});
+
+test("primary navigation stays focused on core visitor jobs", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/");
+  const mainNav = page.getByRole("navigation", { name: "Main" });
+  await expect(mainNav.getByRole("link")).toHaveCount(3);
+  await expect(mainNav.getByRole("link", { name: "Find care" })).toBeVisible();
+  await expect(mainNav.getByRole("link", { name: "Partner with us" })).toHaveCount(0);
+  await expect(page.getByRole("contentinfo").getByRole("link", { name: "Contact us" })).toBeVisible();
+});
+
+for (const path of ["/care/request"] as const) {
+  test(`${path} derives the under-18 safeguard from age band`, async ({ page }) => {
+    await page.goto(path);
+    await page.getByLabel("Age band").selectOption("12_17");
+    await expect(page.getByText(/cannot accept details for someone under 18/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Send my request" })).toBeDisabled();
+    await expect(page.getByLabel("Booking for someone under 18?")).toHaveCount(0);
+  });
+}
+
+test("direct booking derives the under-18 safeguard from age band", async ({ page }) => {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  test.skip(!supabaseUrl || !serviceRoleKey, "Supabase test credentials are unavailable");
+
+  const supabase = createClient(supabaseUrl!, serviceRoleKey!, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  const { data: slot } = await supabase
+    .from("availability_slots")
+    .select("id")
+    .limit(1)
+    .maybeSingle();
+  test.skip(!slot, "No slot exists for the direct-booking form fixture");
+
+  await page.goto(`/care/book/${slot!.id}`);
+  await page.getByLabel("Age band").selectOption("12_17");
+  await expect(page.getByText(/cannot accept details for someone under 18/i)).toBeVisible();
+  await expect(page.getByRole("button", { name: "Confirm booking" })).toBeDisabled();
+  await expect(page.getByLabel("Booking for someone under 18?")).toHaveCount(0);
 });
 
 test("contact audience choices all fit at mobile width", async ({ page }) => {

@@ -88,11 +88,9 @@ export function DentistCard({ dentist }: { dentist: DirectoryDentist }) {
           ) : (
             <p className="text-body-s text-ink-950/75">No times posted for the next 14 days</p>
           )}
-          {dentist.next_slot_at && (
-            <Link href={`/care/dentists/${dentist.slug}`} className="mt-3 inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline decoration-neem-600/40 underline-offset-4 transition hover:text-neem-900">
-              See times
-            </Link>
-          )}
+          <Link href={`/care/dentists/${dentist.slug}`} className="mt-3 inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline decoration-neem-600/40 underline-offset-4 transition hover:text-neem-900">
+            {dentist.next_slot_at ? "See times" : "View profile"}
+          </Link>
         </div>
       </div>
     </article>

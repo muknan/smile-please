@@ -48,7 +48,7 @@ export default async function BookPage({ params, searchParams }: PageProps) {
   if (Number.isNaN(startsAt.getTime())) notFound();
 
   return (
-    <Section marker="Confirm" className="pt-24">
+    <Section marker="Confirm" className="public-hero">
       <ArchStepper currentStep={2} />
 
       <div className="mt-12 max-w-[65ch]">

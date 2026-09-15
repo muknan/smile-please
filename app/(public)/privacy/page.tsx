@@ -42,7 +42,7 @@ const sharing = [
 export default function PrivacyPage() {
   return (
     <>
-      <Section marker="Privacy" className="pt-24" snap={false}>
+      <Section marker="Privacy" className="public-hero" snap={false}>
         <h1 className="text-display-l">Privacy notice</h1>
         <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
           This notice explains what we collect, why, how long we keep it, who we share it with,
@@ -66,7 +66,7 @@ export default function PrivacyPage() {
             <dt className="font-utility text-label uppercase text-neem-600">Grievance contact</dt>
             <dd className="mt-2 text-body">
               <a href={`mailto:${GRIEVANCE_EMAIL}`} className="font-medium text-neem-600 underline underline-offset-4">{GRIEVANCE_EMAIL}</a>
-              {" "}— we answer within 7 working days
+              {" "}— for privacy questions, data requests and complaints
             </dd>
           </div>
         </dl>
@@ -178,8 +178,8 @@ export default function PrivacyPage() {
             <strong>Erasure:</strong> ask us to delete your data. Where the law lets us, we do.
           </li>
           <li>
-            <strong>Grievance redressal:</strong> our grievance contact answers within 7 working
-            days.
+            <strong>Grievance redressal:</strong> contact us with a privacy complaint or question
+            and keep a copy of your message for reference.
           </li>
           <li>
             <strong>Nominate someone:</strong> name a person who may act on your data rights if
@@ -207,10 +207,9 @@ export default function PrivacyPage() {
       <Section marker="Children" className="py-16 sm:py-20" snap={false}>
         <h2 className="text-display-m">8. Children&apos;s data</h2>
         <p className="mt-6 max-w-[65ch] text-body">
-          Bookings for anyone under 18 must be made by a parent or guardian, who stands as the
-          data principal. We do not collect the child&apos;s name, age, or any other detail in the
-          booking form. If a child appears at a clinic unaccompanied, the dentist will handle it
-          as the law requires before any treatment.
+          We do not currently accept details for anyone under 18 through the online care forms.
+          A parent or guardian should call the team so consent and the appropriate next step can
+          be handled directly before any personal information is recorded online.
         </p>
       </Section>
 

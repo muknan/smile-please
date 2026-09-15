@@ -11,17 +11,17 @@ export const metadata: Metadata = {
 
 export default function CarePage() {
   return (
-    <Section marker="Care" className="pt-24" snap>
+    <Section marker="Care" className="public-hero" snap>
       <h1 className="max-w-3xl text-display-l">Book a check-up, free</h1>
       <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
-        Care costs nothing, and nobody here turns a patient away. Two ways in — pick
-        whichever matches what you know.
+        There is no charge for care arranged through Smile Please. Start with the route
+        that best matches what you need.
       </p>
 
-      <div className="mt-16 grid gap-6 md:grid-cols-2">
+      <div className="mt-10 grid gap-6 sm:mt-16 md:grid-cols-2">
         <Link
           href="/care/request"
-          className="group flex flex-col justify-between rounded-card border border-neem-100 bg-chalk-0 p-10 transition hover:border-neem-600"
+          className="group flex flex-col justify-between rounded-card border border-neem-100 bg-chalk-0 p-6 transition hover:border-neem-600 sm:p-10"
         >
           <div>
             <h2 className="text-display-m">Help me find a dentist</h2>
@@ -30,14 +30,14 @@ export default function CarePage() {
               Takes about two minutes.
             </p>
           </div>
-          <span className="mt-10 font-utility text-body-s font-medium text-neem-600 underline-offset-4 group-hover:underline">
+          <span className="mt-6 font-utility text-body-s font-medium text-neem-600 underline-offset-4 group-hover:underline sm:mt-10">
             Tell us what&apos;s wrong →
           </span>
         </Link>
 
         <Link
           href="/care/dentists"
-          className="group flex flex-col justify-between rounded-card border border-neem-100 bg-chalk-0 p-10 transition hover:border-neem-600"
+          className="group flex flex-col justify-between rounded-card border border-neem-100 bg-chalk-0 p-6 transition hover:border-neem-600 sm:p-10"
         >
           <div>
             <h2 className="text-display-m">Let me pick a dentist and time</h2>
@@ -46,13 +46,13 @@ export default function CarePage() {
               who&apos;s free and when.
             </p>
           </div>
-          <span className="mt-10 font-utility text-body-s font-medium text-neem-600 underline-offset-4 group-hover:underline">
+          <span className="mt-6 font-utility text-body-s font-medium text-neem-600 underline-offset-4 group-hover:underline sm:mt-10">
             See dentists and times →
           </span>
         </Link>
       </div>
 
-      <p className="mt-16 text-body-s text-ink-950/75">
+      <p className="mt-10 text-body-s text-ink-950/75 sm:mt-16">
         Already booked?{" "}
         <Link href="/care/status" className="font-medium text-neem-600 underline underline-offset-4 hover:underline">
           Track your appointment

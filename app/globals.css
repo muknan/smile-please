@@ -17,7 +17,8 @@
   .choice-control { @apply h-5 w-5 shrink-0 cursor-pointer accent-neem-600; }
   .eyebrow { @apply font-utility text-label font-semibold; letter-spacing: .02em; }
   .text-link { @apply inline-flex min-h-11 items-center gap-3 font-utility text-body-s font-medium underline underline-offset-4 decoration-neem-600/40 hover:decoration-neem-600; }
-  .public-section { padding-block: clamp(3.5rem, 6vw, 5.5rem); }
+  .public-section { padding-block: clamp(2.75rem, 6vw, 5.5rem); }
+  .public-hero { padding-top: clamp(3.5rem, 6vw, 6rem); }
   .hero-heading { font-size: clamp(2.75rem, 5vw, 4.75rem); line-height: 1.02; letter-spacing: -.04em; font-weight: 600; }
   .public-section > .container-content { min-width: 0; }
   .surface-soft { @apply rounded-panel border border-neem-100 bg-chalk-0; }

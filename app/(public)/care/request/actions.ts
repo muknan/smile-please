@@ -48,7 +48,6 @@ export async function submitCareRequest(
     preferredTimes: formData.getAll("preferredTimes"),
     consentBooking: formData.get("consentBooking") === "on",
     consentUpdates: formData.get("consentUpdates") === "on",
-    forMinor: formData.get("forMinor") === "on",
   };
 
   const parsed = requestBookingSchema.safeParse(raw);

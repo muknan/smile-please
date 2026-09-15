@@ -60,7 +60,6 @@ export const requestBookingSchema = z.object({
     .min(1, "Pick at least one time of day."),
   consentBooking: z.literal(true, { message: "You need to agree before we can store your details." }),
   consentUpdates: z.boolean().default(false),
-  forMinor: z.boolean().default(false),
 });
 
 /** Path B — /care/book/[slotId]: minimal patient fields + consent. */

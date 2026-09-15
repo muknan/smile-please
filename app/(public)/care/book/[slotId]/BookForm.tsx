@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { fieldError } from "@/lib/form-errors";
 import { Field } from "@/components/ui/Field";
@@ -11,6 +11,7 @@ import { SubmitButton } from "@/components/ui/SubmitButton";
 import { ConsentBlock } from "@/components/booking/ConsentBlock";
 import { AGE_BANDS, REASONS } from "@/lib/schemas";
 import { AGE_BAND_LABELS, REASON_CATEGORY_LABELS } from "@/lib/booking";
+import { CONTACT_PHONE_DISPLAY } from "@/lib/contact-info";
 import { confirmSlotBooking, type BookDetails, type BookState } from "../actions";
 
 export function BookForm({ details }: { details: BookDetails }) {
@@ -19,6 +20,8 @@ export function BookForm({ details }: { details: BookDetails }) {
     action,
     { status: "idle" },
   );
+  const [selectedAgeBand, setSelectedAgeBand] = useState("");
+  const isMinor = selectedAgeBand === "under_12" || selectedAgeBand === "12_17";
   const issues = state.status === "error" ? state.issues : undefined;
   const formRef = useRef<HTMLFormElement>(null);
   const successRef = useRef<HTMLHeadingElement>(null);
@@ -121,7 +124,7 @@ export function BookForm({ details }: { details: BookDetails }) {
           </Field>
 
           <Field label="Age band" htmlFor="ageBand" required error={fieldError(issues, "ageBand")}>
-            <Select id="ageBand" name="ageBand" required defaultValue="">
+            <Select id="ageBand" name="ageBand" required defaultValue="" onChange={(event) => setSelectedAgeBand(event.target.value)}>
               <option value="" disabled>
                 Choose…
               </option>
@@ -174,11 +177,16 @@ export function BookForm({ details }: { details: BookDetails }) {
       </section>
 
       <section className="mt-10 border-t border-neem-100 pt-10">
-        <ConsentBlock />
+        {isMinor && (
+          <p role="status" className="mb-6 rounded border border-clay-600 bg-clay-600/5 px-4 py-3 text-body-s text-clay-600">
+            We cannot accept details for someone under 18 through this form yet. Ask a parent or guardian to call {CONTACT_PHONE_DISPLAY}.
+          </p>
+        )}
+        <ConsentBlock disabled={isMinor} error={fieldError(issues, "consentBooking")} />
       </section>
 
       <div className="mt-10">
-        <SubmitButton pendingLabel="Confirming…">Confirm booking</SubmitButton>
+        <SubmitButton pendingLabel="Confirming…" disabled={isMinor}>Confirm booking</SubmitButton>
         <p className="mt-3 text-body-s text-ink-950/60">
           Confirming books the slot. It&apos;s free, and you can cancel up to 24 hours
           before.

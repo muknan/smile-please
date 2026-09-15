@@ -67,11 +67,12 @@ export default async function DentistsPage({
   }
 
   return (
-    <Section marker="Our dentists" className="pt-24">
+    <Section marker="Our dentists" className="public-hero">
       <h1 className="text-display-l">Our dentists</h1>
       <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
         Every dentist here is registered with the Dental Council of India and
-        gives their time for free. Pick someone near you and choose a slot.
+        gives their time for free. See who is near you and whether they have posted a time.
+        If no time works, our team can help match you.
       </p>
       <Link href="/care/request" className="mt-6 inline-flex min-h-11 items-center justify-center rounded bg-marigold-500 px-5 font-utility text-body-s font-medium text-ink-950 transition hover:brightness-95">
         Request care
@@ -155,7 +156,7 @@ export default async function DentistsPage({
           ))}
         </div>
       ) : (
-        <div className="mt-16 max-w-[60ch] rounded-card border border-neem-100 bg-chalk-0 p-10">
+        <div className="mt-10 max-w-[60ch] rounded-card border border-neem-100 bg-chalk-0 p-6 sm:mt-16 sm:p-10">
           <h2 className="text-display-m">No dentists match those filters right now.</h2>
           <p className="mt-4 text-body-l text-ink-950/70">
             Try a wider area, or tell us what you need and we&apos;ll find someone.

@@ -105,7 +105,7 @@ export default async function DentistProfilePage({ params, searchParams }: PageP
 
   return (
     <>
-      <Section marker={dentist.locality ?? dentist.city ?? "Dentist"} className="pt-24">
+      <Section marker={dentist.locality ?? dentist.city ?? "Dentist"} className="public-hero">
         <h1 className="text-display-l">{dentist.display_name}</h1>
         <p className="mt-2 font-utility text-body-l text-neem-600">
           {dentist.locality}, {dentist.city}
@@ -120,7 +120,7 @@ export default async function DentistProfilePage({ params, searchParams }: PageP
         {dentist.bio && <p className="mt-6 max-w-[65ch] text-body text-ink-950/80">{dentist.bio}</p>}
       </Section>
 
-      <Section marker="Pick a time" className="border-t border-neem-100 pb-24 pt-16">
+      <Section marker="Pick a time" className="border-t border-neem-100 py-14 sm:pb-20 sm:pt-16 lg:pb-24">
         <h2 className="text-display-m">Next two weeks</h2>
         {reschedule && (
           <p className="mt-4 max-w-[65ch] rounded border border-neem-100 bg-chalk-0 px-4 py-3 text-body-s">

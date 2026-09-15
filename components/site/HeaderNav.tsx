@@ -8,13 +8,16 @@ import { cn } from "@/lib/utils";
 import { HeaderProfile } from "./HeaderProfile";
 import { Logo } from "./Logo";
 
-export const NAV_LINKS = [
+export const PRIMARY_NAV_LINKS = [
   { href: "/about", label: "About" },
   { href: "/care", label: "Find care" },
   { href: "/learn", label: "Learn" },
+] as const;
+
+const SUPPORT_NAV_LINKS = [
   { href: "/partners", label: "Partner with us" },
   { href: "/contact", label: "Contact" },
-];
+] as const;
 
 function useActiveLink() {
   const pathname = usePathname();
@@ -25,7 +28,7 @@ export function DesktopNav() {
   const isActive = useActiveLink();
   return (
     <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
-      {NAV_LINKS.map((link) => (
+      {PRIMARY_NAV_LINKS.map((link) => (
         <Link
           key={link.href}
           href={link.href}
@@ -130,7 +133,7 @@ export function MobileMenu() {
           </div>
           <nav className="container-content flex min-h-[calc(100dvh-var(--header-h))] flex-col bg-mineral-50 py-7" aria-label="Mobile menu">
             <div className="space-y-1">
-              {NAV_LINKS.map((link) => {
+              {PRIMARY_NAV_LINKS.map((link) => {
                 const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
                 return (
                   <Link
@@ -147,11 +150,23 @@ export function MobileMenu() {
                 );
               })}
             </div>
-            <div className="mt-auto pb-4 pt-10">
-              <p className="mb-3 max-w-xs px-1 font-utility text-body-s text-ink-950/65">
+            <div className="px-1 pb-2 pt-8">
+              <p className="mb-3 font-utility text-body-s text-ink-950/65">
                 Need care? You can start without an account.
               </p>
               <HeaderProfile />
+            </div>
+            <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-neem-100 px-3 pt-4">
+              {SUPPORT_NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={pathname === link.href || pathname.startsWith(`${link.href}/`) ? "page" : undefined}
+                  className="inline-flex min-h-11 items-center rounded font-utility text-body-s font-medium text-ink-950/70 hover:text-neem-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600"
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
           </nav>
         </div>

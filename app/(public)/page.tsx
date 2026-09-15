@@ -31,7 +31,7 @@ export default async function HomePage() {
   return (
     <>
       <section className="overflow-hidden bg-neem-950 text-chalk-0">
-        <div className="container-content grid min-h-[610px] items-center gap-12 py-16 md:grid-cols-12 md:py-24">
+        <div className="container-content grid min-h-[540px] items-center gap-10 py-12 md:min-h-[610px] md:grid-cols-12 md:gap-12 md:py-24">
           <div className="md:col-span-7 lg:col-span-6">
             <p className="font-utility text-body-s font-semibold text-marigold-500">Free dental care in Delhi</p>
             <h1 className="hero-heading mt-5 max-w-[13ch]">A painful tooth should not have to wait.</h1>

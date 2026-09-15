@@ -21,8 +21,8 @@ const COLLABORATIONS = [
 export default function PartnersPage() {
   return (
     <>
-      <Section marker="Partner with us" className="pt-24 pb-20">
-        <div className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+      <Section marker="Partner with us" className="public-hero pb-14 sm:pb-20">
+        <div className="grid gap-8 sm:gap-12 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
           <div>
             <p className="font-utility text-label uppercase tracking-[0.16em] text-neem-600">A shared table</p>
             <h1 className="mt-5 max-w-[15ch] text-display-l">Make room for better care.</h1>
@@ -33,7 +33,7 @@ export default function PartnersPage() {
         </div>
       </Section>
 
-      <Section marker="Ways to work together" className="border-t border-neem-100 py-20">
+      <Section marker="Ways to work together" className="border-t border-neem-100 py-14 sm:py-20">
         <div className="grid gap-x-14 gap-y-12 lg:grid-cols-[0.7fr_1.3fr]">
           <h2 className="max-w-[12ch] text-display-m">A partnership can begin with one useful idea.</h2>
           <div className="divide-y divide-neem-100 border-y border-neem-100">
@@ -50,7 +50,7 @@ export default function PartnersPage() {
         </div>
       </Section>
 
-      <Section marker="Good fit" className="bg-[#f1eadb] py-20">
+      <Section marker="Good fit" className="bg-[#f1eadb] py-14 sm:py-20">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <h2 className="text-display-m">Bring your context. We will bring a careful conversation.</h2>
           <div className="max-w-[60ch] space-y-5 text-body-l text-ink-950/75">
@@ -60,7 +60,7 @@ export default function PartnersPage() {
         </div>
       </Section>
 
-      <Section marker="What happens next" className="border-t border-neem-100 py-20">
+      <Section marker="What happens next" className="border-t border-neem-100 py-14 sm:py-20">
         <div className="grid gap-12 lg:grid-cols-[0.7fr_1.3fr]">
           <h2 className="text-display-m">Three steps from idea to next step.</h2>
           <ol className="divide-y divide-neem-100 border-y border-neem-100">
@@ -78,7 +78,7 @@ export default function PartnersPage() {
         </div>
       </Section>
 
-      <Section marker="Start a conversation" className="bg-neem-900 py-20 text-chalk-0">
+      <Section marker="Start a conversation" className="bg-neem-900 py-14 text-chalk-0 sm:py-20">
         <div className="grid gap-12 lg:grid-cols-[0.7fr_1.3fr]">
           <div>
             <h2 className="text-display-m">Tell us what you have in mind.</h2>

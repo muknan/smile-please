@@ -26,7 +26,7 @@ function coverUrl(path: string): string {
 export function ArticleCard({ article, featured = false }: { article: ArticleTeaser; featured?: boolean }) {
   if (featured) {
     return (
-      <article className="grid gap-8 border-y border-neem-100 py-8 md:grid-cols-5 md:gap-10 md:py-10">
+      <article className="grid gap-8 border-b border-neem-100 py-8 md:grid-cols-5 md:gap-10 md:border-y md:py-10">
         {article.cover_path && (
           <div className="relative aspect-[16/9] overflow-hidden bg-neem-100 md:col-span-2 md:aspect-auto">
             <Image src={coverUrl(article.cover_path)} alt="" fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
