@@ -120,7 +120,7 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
             hint="We only use this to confirm the appointment. Format: +91 98765 43210."
             error={fieldError(issues, "phone")}
           >
-            <Input id="phone" name="phone" type="tel" inputMode="tel" placeholder="+91" required />
+            <Input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="+91" required />
           </Field>
 
           <Field
@@ -264,12 +264,6 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
           {MINOR_NOTE}
         </p>
       )}
-      {state.status === "error" && (
-        <p role="alert" className="mt-6 text-body-s text-clay-600">
-          {state.error}
-        </p>
-      )}
-
       <div className="mt-10">
         <SubmitButton pendingLabel="Sending…" disabled={isMinor}>Send my request</SubmitButton>
       </div>

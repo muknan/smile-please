@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/Button";
+import { SkipLink } from "@/components/site/SkipLink";
 
 export const metadata: Metadata = { title: "No access" };
 
 export default function ForbiddenPage() {
   return (
     <>
+      <SkipLink />
       <SiteHeader />
-      <main className="py-24">
+      <main id="main" tabIndex={-1} className="py-24">
         <div className="container-content">
           <p className="text-label">Access</p>
           <h1 className="mt-6 max-w-3xl text-display-l">You don&apos;t have access to this area</h1>

@@ -3,20 +3,18 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/auth";
 import { relativeDays } from "@/lib/format";
+import { delhiDayBounds, delhiTimestamp, delhiCalendarDate } from "@/lib/delhi-time";
 
 export const metadata: Metadata = { title: "Admin overview", robots: { index: false } };
-
-function dayStart(offsetDays: number): Date {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return new Date(d.getTime() + offsetDays * 86_400_000);
-}
 
 export default async function AdminOverviewPage() {
   await requireRole("admin");
   const supabase = await createClient();
 
   // Needs-action queues.
+  const today = delhiDayBounds(0);
+  const tomorrowBounds = delhiDayBounds(1);
+  const weekEnd = delhiTimestamp(delhiCalendarDate(7), "00:00");
   const [requested, dentistEnq, tomorrowUnconfirmed, todayRes, weekRes, allRes] =
     await Promise.all([
       supabase
@@ -34,10 +32,10 @@ export default async function AdminOverviewPage() {
         .from("appointments")
         .select("id")
         .eq("status", "assigned")
-        .gte("scheduled_for", dayStart(1).toISOString())
-        .lt("scheduled_for", dayStart(2).toISOString()),
-      supabase.from("appointments").select("id", { count: "exact", head: true }).gte("scheduled_for", dayStart(0).toISOString()).lt("scheduled_for", dayStart(1).toISOString()),
-      supabase.from("appointments").select("id", { count: "exact", head: true }).gte("scheduled_for", dayStart(0).toISOString()).lt("scheduled_for", dayStart(7).toISOString()),
+        .gte("scheduled_for", tomorrowBounds.start)
+        .lt("scheduled_for", tomorrowBounds.end),
+      supabase.from("appointments").select("id", { count: "exact", head: true }).gte("scheduled_for", today.start).lt("scheduled_for", today.end),
+      supabase.from("appointments").select("id", { count: "exact", head: true }).gte("scheduled_for", today.start).lt("scheduled_for", weekEnd),
       supabase.from("appointments").select("id", { count: "exact", head: true }),
     ]);
 

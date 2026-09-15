@@ -111,7 +111,7 @@ export function BookForm({ details }: { details: BookDetails }) {
             hint="We only use this to confirm the appointment. Format: +91 98765 43210."
             error={fieldError(issues, "phone")}
           >
-            <Input id="phone" name="phone" type="tel" inputMode="tel" placeholder="+91" required />
+            <Input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="+91" required />
           </Field>
 
           <Field

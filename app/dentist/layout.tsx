@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { SignOutForm } from "@/components/site/SignOutForm";
 import { DentistTabs } from "@/components/dentist/DentistTabs";
+import { SkipLink } from "@/components/site/SkipLink";
 
 export default async function DentistLayout({ children }: { children: React.ReactNode }) {
   const profile = await requireRole("dentist");
@@ -19,7 +20,8 @@ export default async function DentistLayout({ children }: { children: React.Reac
     if (!dentistRow) redirect("/admin");
   }
   return (
-    <main className="min-h-screen">
+    <div className="min-h-screen">
+      <SkipLink />
       <div className="container-content max-w-4xl py-16">
         <header className="flex flex-wrap items-center justify-between gap-6">
           <Link
@@ -31,8 +33,8 @@ export default async function DentistLayout({ children }: { children: React.Reac
           <SignOutForm />
         </header>
         <DentistTabs />
-        {children}
+        <main id="main" tabIndex={-1}>{children}</main>
       </div>
-    </main>
+    </div>
   );
 }

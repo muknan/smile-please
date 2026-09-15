@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
@@ -15,6 +15,11 @@ export function StatusLookup({ initialRef, renderedAt }: { initialRef?: string; 
     lookupAppointmentAction,
     { status: "idle" },
   );
+  const resultRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (state.status === "found") resultRef.current?.focus();
+  }, [state]);
 
   if (state.status === "found") {
     const { result } = state;
@@ -30,7 +35,7 @@ export function StatusLookup({ initialRef, renderedAt }: { initialRef?: string; 
             : ("neutral" as const);
     return (
       <div className="max-w-[65ch] rounded-card border border-neem-100 bg-chalk-0 p-10">
-        <h2 className="flex flex-wrap items-center gap-4 text-display-m">
+        <h2 ref={resultRef} tabIndex={-1} className="flex flex-wrap items-center gap-4 text-display-m focus:outline-none">
           Appointment
           <Badge tone={badgeTone}>
             {STATUS_LABELS[result.status as keyof typeof STATUS_LABELS] ?? result.status}
@@ -106,7 +111,7 @@ export function StatusLookup({ initialRef, renderedAt }: { initialRef?: string; 
   }
 
   return (
-    <form action={formAction} className="max-w-[65ch] space-y-8" aria-live="polite">
+    <form action={formAction} className="max-w-[65ch] space-y-8">
       <input
         type="text"
         name="website"
@@ -134,7 +139,7 @@ export function StatusLookup({ initialRef, renderedAt }: { initialRef?: string; 
       </Field>
 
       <Field label="Phone you booked with" htmlFor="phone" required>
-        <Input id="phone" name="phone" type="tel" inputMode="tel" placeholder="+91" required />
+        <Input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="+91" required />
       </Field>
 
       {state.status === "notfound" && (

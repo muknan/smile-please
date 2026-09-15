@@ -3,20 +3,29 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const HOLD_MS = 10 * 60 * 1000;
 const WARN_MS = 2 * 60 * 1000;
 
-export function HoldCountdown() {
-  const [remaining, setRemaining] = useState(HOLD_MS);
+export function HoldCountdown({
+  expiresAt,
+  renderedAt,
+  onExpire,
+}: {
+  expiresAt: number;
+  renderedAt: number;
+  onExpire: () => void;
+}) {
+  const [remaining, setRemaining] = useState(Math.max(0, expiresAt - renderedAt));
 
   useEffect(() => {
-    const started = Date.now();
-    const timer = window.setInterval(() => {
-      const left = HOLD_MS - (Date.now() - started);
-      setRemaining(Math.max(0, left));
-    }, 1000);
+    const update = () => {
+      const next = Math.max(0, expiresAt - Date.now());
+      setRemaining(next);
+      if (next === 0) onExpire();
+    };
+    update();
+    const timer = window.setInterval(update, 1000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [expiresAt, onExpire]);
 
   if (remaining <= 0) {
     return (
@@ -34,13 +43,12 @@ export function HoldCountdown() {
   const seconds = Math.floor((remaining % 60000) / 1000).toString().padStart(2, "0");
   const warning = remaining <= WARN_MS;
   return (
-    <p
-      role="status"
-      aria-live="polite"
-      className={warning ? "font-utility text-body-s font-medium text-clay-600" : "font-utility text-body-s text-ink-950/60"}
-    >
-      {warning ? "Hurry — this slot is held for " : "Your slot is held for "}
-      <span className="tabular-nums">{minutes}:{seconds}</span>. Complete the form to book it.
-    </p>
+    <>
+      {warning && <span role="status" className="sr-only">Less than two minutes remain on this slot hold.</span>}
+      <p className={warning ? "font-utility text-body-s font-medium text-clay-600" : "font-utility text-body-s text-ink-950/60"}>
+        {warning ? "Hurry — this slot is held for " : "Your slot is held for "}
+        <span className="tabular-nums">{minutes}:{seconds}</span>. Complete the form to book it.
+      </p>
+    </>
   );
 }

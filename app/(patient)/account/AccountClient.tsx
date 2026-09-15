@@ -274,7 +274,7 @@ export function AccountClient({
             />
           </Field>
           <Field label="Phone" htmlFor="edit-phone" required>
-            <Input id="edit-phone" name="phone" type="tel" defaultValue={profile.phone ?? ""} required />
+            <Input id="edit-phone" name="phone" type="tel" autoComplete="tel" defaultValue={profile.phone ?? ""} required />
           </Field>
           <Field label="Area" htmlFor="edit-locality" required>
             <Select id="edit-locality" name="locality" defaultValue={patient?.locality ?? ""} required>

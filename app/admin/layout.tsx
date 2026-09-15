@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/auth";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { SignOutForm } from "@/components/site/SignOutForm";
+import { SkipLink } from "@/components/site/SkipLink";
 
 /** Supabase JWT expiry is global (7 days), so admin sessions are capped here
  * at 8 hours: measured from the verified user's last_sign_in_at. */
@@ -36,6 +37,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="min-h-screen bg-chalk-0 pb-16 md:pb-0">
+      <SkipLink />
       <AdminNav counts={counts} />
 
       <div className="md:pl-60">
@@ -48,7 +50,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <SignOutForm />
         </header>
 
-        <main className="px-4 py-8 md:px-8">{children}</main>
+        <main id="main" tabIndex={-1} className="px-4 py-8 md:px-8">{children}</main>
       </div>
     </div>
   );

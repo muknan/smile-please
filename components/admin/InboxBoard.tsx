@@ -104,7 +104,19 @@ export function InboxBoard({ submissions }: { submissions: InboxSubmission[] }) 
                 (s.id === selectedId ? "bg-neem-100" : "")
               }
             >
-              <td className="px-4 py-3 font-medium text-ink-950">{s.reference_code}</td>
+              <td className="px-4 py-3 font-medium text-ink-950">
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    open(s.id);
+                  }}
+                  className="min-h-11 rounded font-medium underline decoration-neem-100 underline-offset-4 hover:decoration-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600"
+                  aria-label={`Open submission ${s.reference_code}`}
+                >
+                  {s.reference_code}
+                </button>
+              </td>
               <td className="px-4 py-3 text-ink-950">
                 {s.name}
                 {s.organization_name ? ` · ${s.organization_name}` : ""}

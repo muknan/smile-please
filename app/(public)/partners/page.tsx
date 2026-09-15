@@ -41,7 +41,7 @@ export default function PartnersPage() {
               <div key={title} className="grid gap-3 py-7 sm:grid-cols-[3rem_1fr] sm:gap-7">
                 <p className="font-utility text-label font-semibold text-marigold-700">0{index + 1}</p>
                 <div>
-                  <h3 className="text-heading-m">{title}</h3>
+                  <h3 className="text-body font-semibold">{title}</h3>
                   <p className="mt-2 max-w-[58ch] text-body text-ink-950/70">{body}</p>
                 </div>
               </div>
@@ -71,7 +71,7 @@ export default function PartnersPage() {
             ].map(([title, body], index) => (
               <li key={title} className="grid gap-3 py-6 sm:grid-cols-[3rem_1fr] sm:gap-7">
                 <span className="font-utility text-label font-semibold text-marigold-700">0{index + 1}</span>
-                <div><h3 className="text-heading-m">{title}</h3><p className="mt-2 text-body text-ink-950/70">{body}</p></div>
+                <div><h3 className="text-body font-semibold">{title}</h3><p className="mt-2 text-body text-ink-950/70">{body}</p></div>
               </li>
             ))}
           </ol>

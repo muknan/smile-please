@@ -50,7 +50,7 @@ export default async function ContactPage({ searchParams }: PageProps) {
 
       <Section className="border-t border-neem-100 bg-neem-50 py-16">
         <p className="eyebrow">Formal requests</p>
-        <h2 className="text-display-m">Complaints and data requests</h2>
+        <h2 className="mt-3 text-display-m">Complaints and data requests</h2>
         <p className="mt-4 max-w-[65ch] text-body-l text-ink-950/70">
           For email and phone, see the Contact block in the footer. This channel is for
           anything formal — a complaint, a request about your data, or an escalation.

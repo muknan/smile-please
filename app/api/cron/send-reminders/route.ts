@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { admin } from "@/lib/supabase/admin";
 import { sendTemplate } from "@/lib/email";
 import { formatDate, formatTime } from "@/lib/format";
+import { delhiDayBounds } from "@/lib/delhi-time";
 
 /**
  * Phase 8 §8.5 — emails patients whose confirmed appointment is tomorrow.
@@ -16,18 +17,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: "UNAUTHORIZED" }, { status: 401 });
   }
 
-  // Calendar day after today (UTC) — the job runs at 03:00 UTC, so "tomorrow"
-  // in IST is one UTC day ahead.
-  const tomorrowUtc = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-  const tomorrowStart = new Date(`${tomorrowUtc}T00:00:00Z`);
-  const tomorrowEnd = new Date(tomorrowStart.getTime() + 24 * 60 * 60 * 1000);
+  const tomorrow = delhiDayBounds(1);
 
   const { data: appts, error } = await admin
     .from("appointments")
     .select("id, reference_code, patient_id, dentist_id, scheduled_for")
     .eq("status", "confirmed")
-    .gte("scheduled_for", tomorrowStart.toISOString())
-    .lt("scheduled_for", tomorrowEnd.toISOString());
+    .gte("scheduled_for", tomorrow.start)
+    .lt("scheduled_for", tomorrow.end);
 
   if (error) return NextResponse.json({ ok: false, error: "DB_ERROR" }, { status: 500 });
 

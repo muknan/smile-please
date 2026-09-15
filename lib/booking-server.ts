@@ -58,6 +58,18 @@ export function verifyHoldCapability(token: string | undefined, slotId: string, 
   return parts?.[1] === ownerId;
 }
 
+/** Returns the signed lease deadline only when the capability belongs to this browser and slot. */
+export function holdExpiresAtFromCapability(
+  token: string | undefined,
+  slotId: string,
+  ownerId: string,
+  now = Date.now(),
+) {
+  if (!verifyHoldCapability(token, slotId, ownerId, now)) return null;
+  const expiresAt = Number(token?.split(".")[2]);
+  return Number.isFinite(expiresAt) ? expiresAt : null;
+}
+
 export const HOLD_COOKIE = "smile-please-hold";
 export const HOLD_OWNER_COOKIE = "smile-please-hold-owner";
 export const HOLD_TTL_SECONDS = CAPABILITY_TTL_MS / 1000;

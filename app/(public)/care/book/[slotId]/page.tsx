@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { Section } from "@/components/site/Section";
 import { ArchStepper } from "@/components/booking/ArchStepper";
-import { HoldCountdown } from "@/components/booking/HoldCountdown";
+import { BookingLease } from "./BookingLease";
 import { createClient } from "@/lib/supabase/server";
 import { makeRenderedAt } from "@/lib/antispam";
 import { formatDateTime } from "@/lib/format";
-import { BookForm } from "./BookForm";
 import type { BookDetails } from "../actions";
+import {
+  HOLD_COOKIE,
+  HOLD_OWNER_COOKIE,
+  holdExpiresAtFromCapability,
+  holdOwnerFromCookie,
+} from "@/lib/booking-server";
 
 export const metadata: Metadata = {
   title: "Confirm your booking",
@@ -47,6 +53,18 @@ export default async function BookPage({ params, searchParams }: PageProps) {
   const startsAt = new Date(details.startsAt);
   if (Number.isNaN(startsAt.getTime())) notFound();
 
+  const renderedAt = Number(details.renderedAt.split(".")[0]);
+  const cookieStore = await cookies();
+  const ownerId = holdOwnerFromCookie(cookieStore.get(HOLD_OWNER_COOKIE)?.value, renderedAt);
+  const holdExpiresAt = ownerId
+    ? holdExpiresAtFromCapability(
+        cookieStore.get(HOLD_COOKIE)?.value,
+        slotId,
+        ownerId,
+        renderedAt,
+      )
+    : null;
+
   return (
     <Section marker="Confirm" className="public-hero">
       <ArchStepper currentStep={2} />
@@ -70,13 +88,11 @@ export default async function BookPage({ params, searchParams }: PageProps) {
         </div>
       </div>
 
-      <div className="mt-10 max-w-[65ch]">
-        <HoldCountdown />
-      </div>
-
-      <div className="mt-6 max-w-[65ch]">
-        <BookForm details={details} />
-      </div>
+      <BookingLease
+        details={details}
+        expiresAt={holdExpiresAt ?? renderedAt}
+        renderedAt={renderedAt}
+      />
     </Section>
   );
 }

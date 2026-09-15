@@ -195,19 +195,19 @@ export function ContactForm({
             <Field label="Your name" htmlFor="contact-name" required error={fieldError(issues, "name")}>
               <Input id="contact-name"  name="name" value={draftValue("name")} onChange={setDraftField("name")} autoComplete="name" required />
             </Field>
-            <Field label="Phone" htmlFor="contact-phone" required>
+            <Field label="Phone" htmlFor="contact-phone" required error={fieldError(issues, "phone")}>
               <Input id="contact-phone" name="phone" value={draftValue("phone")} onChange={setDraftField("phone")} type="tel" inputMode="tel" autoComplete="tel" placeholder="+91" required />
             </Field>
             <Field label="Email" htmlFor="contact-email" required hint="We reply here, usually within two working days." error={fieldError(issues, "email")}>
               <Input id="contact-email"  name="email" value={draftValue("email")} onChange={setDraftField("email")} type="email" autoComplete="email" required />
             </Field>
-            <Field label="DCI registration number" htmlFor="contact-dci" hint="Optional, but it speeds things up.">
+            <Field label="DCI registration number" htmlFor="contact-dci" hint="Optional, but it speeds things up." error={fieldError(issues, "dciRegNo")}>
               <Input id="contact-dci"  name="dciRegNo" value={draftValue("dciRegNo")} onChange={setDraftField("dciRegNo")} autoComplete="off" maxLength={40} />
             </Field>
             <Field label="Clinic area" htmlFor="contact-area" required hint="Which area of Delhi can you practise in?" error={fieldError(issues, "clinicArea")}>
               <Input id="contact-area"  name="clinicArea" value={draftValue("clinicArea")} onChange={setDraftField("clinicArea")} required maxLength={120} />
             </Field>
-            <Field label="When you're free" htmlFor="contact-when" hint="Evenings, weekends, a half-day a month — anything helps.">
+            <Field label="When you're free" htmlFor="contact-when" hint="Evenings, weekends, a half-day a month — anything helps." error={fieldError(issues, "availability")}>
               <Input id="contact-when"  name="availability" value={draftValue("availability")} onChange={setDraftField("availability")} maxLength={200} />
             </Field>
             <Field label="Your message" htmlFor="contact-message" required error={fieldError(issues, "message")}>
@@ -233,7 +233,7 @@ export function ContactForm({
             <Field label="Email" htmlFor="contact-email" required error={fieldError(issues, "email")}>
               <Input id="contact-email"  name="email" value={draftValue("email")} onChange={setDraftField("email")} type="email" autoComplete="email" required />
             </Field>
-            <Field label="Phone" htmlFor="contact-phone" hint="Optional.">
+            <Field label="Phone" htmlFor="contact-phone" hint="Optional." error={fieldError(issues, "phone")}>
               <Input id="contact-phone" name="phone" value={draftValue("phone")} onChange={setDraftField("phone")} type="tel" inputMode="tel" autoComplete="tel" placeholder="+91" />
             </Field>
             <Field label="Website" htmlFor="contact-website" hint="Optional — include https:// if you have one." error={fieldError(issues, "organizationWebsite")}>
