@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/site/Section";
-import { BRAND_TAGLINE } from "@/components/site/Logo";
 
 export const metadata: Metadata = {
   title: "About",
   description:
     "Why Smile Please works to make free dental care and practical oral-health information easier to reach in Delhi.",
   alternates: { canonical: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/about` },
-  openGraph: {
-    siteName: "Smile Please",
-    locale: "en_IN",
-    type: "website",
-    images: [{ url: "/og?title=Why Smile Please exists" }],
-  },
 };
 
 const values = [
@@ -36,7 +29,6 @@ export default function AboutPage() {
     <>
       <Section marker="About" className="public-hero" snap>
         <h1 className="text-display-l">Why Smile Please exists</h1>
-        <p className="mt-4 font-display text-display-m text-neem-700">{BRAND_TAGLINE}</p>
 
         <div className="mt-8 max-w-[65ch] space-y-6 text-body-l sm:mt-12 lg:mt-16">
           <p>

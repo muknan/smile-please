@@ -54,7 +54,7 @@ test("deeply scrolled Learn to the logo always opens Home at the top", async ({ 
   for (let run = 0; run < 2; run += 1) {
     await page.goto("/learn");
     await scrollDeep(page);
-    await page.locator("header").getByRole("link", { name: "Smile Please — Home" }).click();
+    await page.locator("header").getByRole("link", { name: "Smile Please — home" }).click();
     await expect(page).toHaveURL(/\/$/);
     await expectPageTop(page);
   }

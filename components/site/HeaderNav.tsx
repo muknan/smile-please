@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HeaderProfile } from "./HeaderProfile";
-import { BrandLockup } from "./Logo";
+import { Logo } from "./Logo";
 import { PageTopLink } from "./PageTopLink";
 
 export const PRIMARY_NAV_LINKS = [
@@ -147,7 +147,7 @@ export function MobileMenu() {
             <button type="button" aria-label="Close menu" onClick={() => { restoreBackgroundScroll(); setOpen(false); }} className="order-2 flex h-11 w-11 items-center justify-center rounded text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600">
               <X size={22} aria-hidden="true" />
             </button>
-            <PageTopLink href="/" aria-label="Smile Please — Home" className="order-1" onClick={closeForNavigation}><BrandLockup /></PageTopLink>
+            <PageTopLink href="/" aria-label="Smile Please — home" className="order-1" onClick={closeForNavigation}><Logo /></PageTopLink>
           </div>
           <nav className="container-content flex min-h-[calc(100dvh-var(--header-h))] flex-col bg-mineral-50 py-7" aria-label="Mobile menu">
             <div className="space-y-1">
