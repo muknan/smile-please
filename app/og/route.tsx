@@ -36,9 +36,17 @@ export async function GET(request: Request) {
           padding: "0 96px 96px",
         }}
       >
-        <svg width="160" height="160" viewBox="0 0 48 48" fill="none" style={{ position: "absolute", top: 64 }}>
-          <path d="M9 24c3.1 8.2 9.3 12.3 15 12.3S35.9 32.2 39 24" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" />
-          <path d="m33 4 2.2 6.8L42 13l-6.8 2.2L33 22l-2.2-6.8L24 13l6.8-2.2L33 4Z" fill="#E0B54B" />
+        <svg width="152" height="152" viewBox="0 0 64 64" fill="none" style={{ position: "absolute", top: 58 }}>
+          <g fill="#FFFFFF">
+            <rect x="14" y="13" width="8" height="25" rx="4" />
+            <rect x="23" y="6" width="8" height="33" rx="4" />
+            <rect x="32" y="4" width="8" height="35" rx="4" />
+            <rect x="41" y="10" width="8" height="29" rx="4" />
+            <rect x="9" y="24" width="9" height="24" rx="4.5" transform="rotate(-35 9 24)" />
+            <rect x="14" y="27" width="36" height="29" rx="15" />
+          </g>
+          <path d="M23 39c2.2 5 5.7 7.5 9.8 7.5s7.6-2.5 9.8-7.5" stroke="#183C34" strokeWidth="3" strokeLinecap="round" />
+          <path d="m54 6 1.6 4.4L60 12l-4.4 1.6L54 18l-1.6-4.4L48 12l4.4-1.6L54 6Z" fill="#E0B54B" />
         </svg>
         <div
           style={{
@@ -51,7 +59,7 @@ export async function GET(request: Request) {
         >
           {title}
         </div>
-        <div style={{ fontSize: 24, color: "#DCE7E0", marginTop: 28 }}>Smile Please · New Delhi</div>
+        <div style={{ fontSize: 24, color: "#DCE7E0", marginTop: 28 }}>Healthier smiles, within reach. · New Delhi</div>
       </div>
     ),
     {

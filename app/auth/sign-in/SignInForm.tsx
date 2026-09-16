@@ -6,7 +6,7 @@ import { ArrowLeft, MailCheck, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
-import { Logo, SmileMark } from "@/components/site/Logo";
+import { BrandLockup, BrandMark } from "@/components/site/Logo";
 import { PageTopLink } from "@/components/site/PageTopLink";
 import { requestSignInLink, type SignInState } from "../actions";
 
@@ -20,7 +20,7 @@ function AuthHeader() {
   return (
     <header className="border-b border-neem-100 bg-mineral-50">
       <div className="container-content flex h-16 items-center justify-between sm:h-[72px]">
-        <PageTopLink href="/" className="rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 focus-visible:ring-offset-4" aria-label="Smile Please — home"><Logo /></PageTopLink>
+        <PageTopLink href="/" className="rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 focus-visible:ring-offset-4" aria-label="Smile Please — Home"><BrandLockup /></PageTopLink>
         <PageTopLink href="/" className="inline-flex min-h-11 items-center gap-2 rounded px-2 font-utility text-body-s font-medium text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600">
           <ArrowLeft size={18} aria-hidden="true" /> Back to site
         </PageTopLink>
@@ -33,7 +33,7 @@ function AuthIntro() {
   return (
     <aside className="hidden bg-neem-900 p-10 text-chalk-0 lg:flex lg:flex-col lg:justify-between">
       <div>
-        <SmileMark className="h-12 w-12 text-marigold-500" />
+        <BrandMark variant="reversed" className="h-12 w-12" />
         <p className="mt-12 font-utility text-label uppercase tracking-[.14em] text-neem-100">Your Smile Please account</p>
         <h2 className="mt-5 max-w-sm font-display text-display-l">Care stays within reach.</h2>
         <p className="mt-5 max-w-sm text-body-l text-chalk-0/75">Use your email to view appointments, keep your details current, or continue supporting community care.</p>
@@ -90,7 +90,7 @@ function Form({ renderedAt }: { renderedAt: string }) {
     <div className="mt-7 rounded-panel border border-neem-100 bg-chalk-0 p-5 shadow-[0_16px_50px_rgba(27,48,41,0.07)] sm:p-8">
       <form action={formAction} className="space-y-5">
         {/* Honeypot and timestamp are server-side abuse protections; keep their names stable. */}
-        <input type="text" name="website" value="" tabIndex={-1} autoComplete="off" aria-hidden="true" className="sr-only" />
+        <input type="text" name="website" defaultValue="" tabIndex={-1} autoComplete="off" aria-hidden="true" className="sr-only" />
         <input type="hidden" name="renderedAt" value={renderedAt} />
         <input type="hidden" name="next" value={next} />
         <Field label="Email address" htmlFor="email" required>

@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 56" role="img" aria-labelledby="title">
-  <title id="title">Smile Please</title>
-  <g fill="none" stroke="#183C34" stroke-linecap="round">
-    <path d="M8 29c3.1 8.2 9.3 12.3 15 12.3S34.9 37.2 38 29" stroke-width="3.5"/>
-  </g>
-  <path fill="#183C34" d="m32 5 2.2 6.8L41 14l-6.8 2.2L32 23l-2.2-6.8L23 14l6.8-2.2L32 5Z"/>
-  <text x="56" y="35" fill="#183C34" font-family="Georgia,serif" font-size="28" font-weight="600" letter-spacing="-1.2">Smile Please</text>
-</svg>
