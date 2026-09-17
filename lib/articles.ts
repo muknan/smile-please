@@ -4,7 +4,7 @@ import { createPublicClient } from "@/lib/supabase/server";
 
 /** Public editorial content is shared by every visitor and changes infrequently. */
 export const getPublishedArticles = unstable_cache(
-  async (category?: string): Promise<ArticleTeaser[]> => {
+  async (category?: string, limit?: number): Promise<ArticleTeaser[]> => {
     const supabase = createPublicClient();
     let query = supabase
       .from("articles")
@@ -13,6 +13,7 @@ export const getPublishedArticles = unstable_cache(
       .order("published_at", { ascending: false });
 
     if (category) query = query.eq("category", category);
+    if (limit) query = query.limit(limit);
     const { data, error } = await query;
     if (error) throw error;
     return (data ?? []) as ArticleTeaser[];

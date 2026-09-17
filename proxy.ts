@@ -2,12 +2,13 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|webp)$).*)"],
+  matcher: ["/admin/:path*", "/dentist/:path*", "/account/:path*"],
 };
 
 /**
- * Refreshes the session cookie on every request and does a coarse
- * unauthenticated redirect for the protected areas. This is NOT the
+ * Refreshes the session cookie and does a coarse unauthenticated redirect
+ * only for protected areas. Public navigation must not wait on a remote auth
+ * lookup. This is NOT the
  * authorisation boundary — roles are checked in each area's layout, against
  * the database (Task 3.3).
  */

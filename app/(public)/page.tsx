@@ -3,7 +3,7 @@ import { ArrowRight, BookOpen, HeartHandshake, MapPin, ShieldCheck, Stethoscope 
 import { ArticleCard, type ArticleTeaser } from "@/components/site/ArticleCard";
 import { Button } from "@/components/ui/Button";
 import { PageTopLink } from "@/components/site/PageTopLink";
-import { createClient } from "@/lib/supabase/server";
+import { getPublishedArticles } from "@/lib/articles";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const revalidate = 60;
@@ -14,12 +14,6 @@ export const metadata: Metadata = {
   openGraph: { images: [{ url: "/og?title=Free dental care for Delhi" }] },
 };
 
-async function getLatestArticles(limit: number): Promise<ArticleTeaser[] | null> {
-  const supabase = await createClient();
-  const { data } = await supabase.from("articles").select("slug, title, excerpt, category, published_at, body_md, cover_path").eq("status", "published").order("published_at", { ascending: false }).limit(limit);
-  return data;
-}
-
 const steps = [
   ["Tell us what you need", "Share a few details online. It takes about two minutes and you do not need an account."],
   ["We find nearby care", "Our team checks your request and matches you with a registered dentist near your area."],
@@ -27,7 +21,7 @@ const steps = [
 ] as const;
 
 export default async function HomePage() {
-  const articles = await getLatestArticles(3);
+  const articles: ArticleTeaser[] = await getPublishedArticles(undefined, 3);
   return (
     <>
       <section className="overflow-hidden bg-neem-950 text-chalk-0">

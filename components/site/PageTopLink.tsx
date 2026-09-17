@@ -43,40 +43,70 @@ export function PageTopNavigationManager() {
   return null;
 }
 
-function PendingIndicator({ surfaceLabel }: { surfaceLabel?: string }) {
+type PendingSurfaceLabel = "Home" | "Learn" | "Dentists";
+
+function PendingSurface({ label }: { label: PendingSurfaceLabel }) {
+  const line = "block rounded bg-neem-100";
+  return createPortal(
+    <div className="route-pending-surface" data-surface={label.toLowerCase()} role="status" aria-label={`Loading ${label}`} aria-busy="true">
+      {label === "Home" ? (
+        <div className="container-content grid min-h-[540px] items-center gap-10 py-12 md:grid-cols-12 md:gap-12 md:py-24" aria-hidden="true">
+          <div className="space-y-5 md:col-span-7 lg:col-span-6">
+            <span className="block h-4 w-40 rounded bg-chalk-0/20" />
+            <span className="block h-14 w-full max-w-xl rounded bg-chalk-0/20 sm:h-20" />
+            <span className="block h-6 w-5/6 rounded bg-chalk-0/15" />
+            <span className="block h-11 w-48 rounded bg-marigold-500/70" />
+          </div>
+          <span className="block min-h-64 rounded-panel bg-chalk-0/10 md:col-span-5 md:col-start-8" />
+        </div>
+      ) : (
+        <div className="container-content py-14 sm:py-20" aria-hidden="true">
+          <span className={`${line} h-4 w-20`} />
+          <span className={`${line} mt-6 h-11 w-full max-w-2xl sm:h-14`} />
+          <div className="mt-6 max-w-[65ch] space-y-3">
+            <span className={`${line} h-5 w-full`} />
+            <span className={`${line} h-5 w-4/5`} />
+          </div>
+          {label === "Learn" ? (
+            <>
+              <div className="mt-10 flex gap-6">
+                {["w-9", "w-16", "w-20", "w-14", "w-12"].map((width) => <span key={width} className={`${line} h-8 ${width}`} />)}
+              </div>
+              <div className="mt-8 grid gap-8 border-y border-neem-100 py-8 md:grid-cols-5">
+                <span className={`${line} aspect-[16/9] md:col-span-2 md:aspect-auto md:min-h-48`} />
+                <div className="space-y-4 md:col-span-3">
+                  <span className={`${line} h-4 w-24`} />
+                  <span className={`${line} h-8 w-full`} />
+                  <span className={`${line} h-8 w-3/4`} />
+                  <span className={`${line} h-5 w-full`} />
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mt-10 flex flex-wrap gap-3">
+                {["w-36", "w-36", "w-64", "w-24"].map((width, index) => <span key={`${width}-${index}`} className={`${line} h-11 ${width}`} />)}
+              </div>
+              <div className="mt-10 grid gap-6 md:grid-cols-2">
+                {[0, 1, 2, 3].map((item) => <span key={item} className={`${line} h-44`} />)}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+      <span className="sr-only">Loading {label}…</span>
+    </div>,
+    document.body,
+  );
+}
+
+function PendingIndicator({ showLine, surfaceLabel }: { showLine: boolean; surfaceLabel?: PendingSurfaceLabel }) {
   const { pending } = useLinkStatus();
   return (
     <>
-      <span aria-hidden="true" className={cn("link-pending-indicator", pending && "is-pending")} />
+      {showLine && <span aria-hidden="true" className={cn("link-pending-indicator", pending && "is-pending")} />}
       <span className="sr-only" aria-live="polite">{pending ? "Loading destination…" : ""}</span>
-      {pending && surfaceLabel && createPortal(
-        <div className="route-pending-surface" role="status" aria-label={`Loading ${surfaceLabel}`} aria-busy="true">
-          <div className="container-content py-14 sm:py-20" aria-hidden="true">
-            <span className="block h-4 w-16 rounded bg-neem-100" />
-            <span className="mt-6 block h-11 w-full max-w-2xl rounded bg-neem-100 sm:h-14" />
-            <div className="mt-6 max-w-[65ch] space-y-3">
-              <span className="block h-5 w-full rounded bg-neem-100" />
-              <span className="block h-5 w-4/5 rounded bg-neem-100" />
-            </div>
-            <div className="mt-10 flex gap-6">
-              {["w-9", "w-16", "w-20", "w-14", "w-12"].map((width) => (
-                <span key={width} className={`block h-8 rounded bg-neem-100 ${width}`} />
-              ))}
-            </div>
-            <div className="mt-8 grid gap-8 border-y border-neem-100 py-8 md:grid-cols-5">
-              <span className="block aspect-[16/9] rounded bg-neem-100 md:col-span-2 md:aspect-auto md:min-h-48" />
-              <div className="space-y-4 md:col-span-3">
-                <span className="block h-4 w-24 rounded bg-neem-100" />
-                <span className="block h-8 w-full rounded bg-neem-100" />
-                <span className="block h-8 w-3/4 rounded bg-neem-100" />
-                <span className="block h-5 w-full rounded bg-neem-100" />
-              </div>
-            </div>
-          </div>
-          <span className="sr-only">Loading {surfaceLabel}…</span>
-        </div>,
-        document.body,
-      )}
+      {pending && surfaceLabel && <PendingSurface label={surfaceLabel} />}
     </>
   );
 }
@@ -84,7 +114,7 @@ function PendingIndicator({ surfaceLabel }: { surfaceLabel?: string }) {
 type PageTopLinkProps = Omit<ComponentProps<typeof Link>, "href" | "onNavigate" | "scroll"> & {
   href: string;
   pendingIndicator?: boolean;
-  pendingSurfaceLabel?: string;
+  pendingSurfaceLabel?: PendingSurfaceLabel;
   onCurrentNavigate?: () => void;
 };
 
@@ -126,7 +156,7 @@ export function PageTopLink({ href, pendingIndicator = false, pendingSurfaceLabe
       {...props}
     >
       {children}
-      {pendingIndicator && <PendingIndicator surfaceLabel={pendingSurfaceLabel} />}
+      {(pendingIndicator || pendingSurfaceLabel) && <PendingIndicator showLine={pendingIndicator} surfaceLabel={pendingSurfaceLabel} />}
     </Link>
   );
 }

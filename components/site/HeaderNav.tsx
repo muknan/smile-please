@@ -31,7 +31,6 @@ export function DesktopNav() {
         <PageTopLink
           key={link.href}
           href={link.href}
-          pendingIndicator
           pendingSurfaceLabel={link.href === "/learn" ? "Learn" : undefined}
           aria-label={link.label}
           aria-current={isActive(link.href) ? "page" : undefined}
@@ -52,10 +51,8 @@ export function MobileMenu() {
   const [open, setOpen] = useState(false);
   const [openPath, setOpenPath] = useState(pathname);
   const menuOpen = open && openPath === pathname;
-  const [menuRendered, setMenuRendered] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const restoreToggleFocusRef = useRef(true);
   const backgroundScrollRef = useRef<number | null>(null);
 
@@ -73,28 +70,6 @@ export function MobileMenu() {
     restoreToggleFocusRef.current = true;
     setOpen(false);
   };
-
-  useEffect(() => {
-    if (closeTimerRef.current !== null) clearTimeout(closeTimerRef.current);
-    if (menuOpen) {
-      return;
-    }
-    if (!menuRendered) return;
-    closeTimerRef.current = setTimeout(() => {
-      setMenuRendered(false);
-      closeTimerRef.current = null;
-    }, 150);
-    return () => {
-      if (closeTimerRef.current !== null) {
-        clearTimeout(closeTimerRef.current);
-        closeTimerRef.current = null;
-      }
-    };
-  }, [menuOpen, menuRendered]);
-
-  useEffect(() => () => {
-    if (closeTimerRef.current !== null) clearTimeout(closeTimerRef.current);
-  }, []);
 
   useEffect(() => {
     if (!open || openPath === pathname) return;
@@ -175,7 +150,6 @@ export function MobileMenu() {
             restoreToggleFocusRef.current = true;
             backgroundScrollRef.current = window.scrollY;
             setOpenPath(pathname);
-            setMenuRendered(true);
             setOpen(true);
           }
         }}
@@ -183,18 +157,14 @@ export function MobileMenu() {
         {menuOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
       </button>
 
-      {menuRendered && (
-        <div
-          ref={panelRef}
-          id="mobile-menu"
-          aria-hidden={!menuOpen}
-          className={cn(
-            "fixed inset-x-0 bottom-0 top-[var(--header-h)] overflow-y-auto bg-mineral-50 md:hidden",
-            menuOpen
-              ? "motion-safe:animate-[mobile-menu-surface-in_150ms_ease-out]"
-              : "pointer-events-none motion-safe:animate-[mobile-menu-surface-out_150ms_ease-in] motion-reduce:hidden",
-          )}
-        >
+      <div
+        ref={panelRef}
+        id="mobile-menu"
+        data-open={menuOpen}
+        aria-hidden={!menuOpen}
+        inert={!menuOpen}
+        className="mobile-menu-surface fixed inset-x-0 bottom-0 top-[var(--header-h)] overflow-y-auto bg-mineral-50 md:hidden"
+      >
           <nav className="container-content flex min-h-full flex-col bg-mineral-50 py-7" aria-label="Mobile menu">
             <div className="space-y-1">
               {PRIMARY_NAV_LINKS.map((link) => {
@@ -203,8 +173,6 @@ export function MobileMenu() {
                   <PageTopLink
                     key={link.href}
                     href={link.href}
-                    pendingIndicator
-                    pendingSurfaceLabel={link.href === "/learn" ? "Learn" : undefined}
                     aria-label={link.label}
                     onClick={closeForNavigation}
                     onCurrentNavigate={closeCurrentPage}
@@ -243,16 +211,33 @@ export function MobileMenu() {
               })}
             </div>
           </nav>
-        </div>
-      )}
+      </div>
       <style jsx global>{`
-        @keyframes mobile-menu-surface-in {
-          from { opacity: 0; transform: translateY(-4px); }
-          to { opacity: 1; transform: translateY(0); }
+        .mobile-menu-surface {
+          opacity: 0;
+          pointer-events: none;
+          transform: translateY(-4px);
+          visibility: hidden;
+          transition:
+            opacity 150ms ease-in,
+            transform 150ms ease-in,
+            visibility 0s linear 150ms;
         }
-        @keyframes mobile-menu-surface-out {
-          from { opacity: 1; transform: translateY(0); }
-          to { opacity: 0; transform: translateY(-4px); }
+
+        .mobile-menu-surface[data-open="true"] {
+          opacity: 1;
+          pointer-events: auto;
+          transform: translateY(0);
+          visibility: visible;
+          transition-delay: 0ms;
+          transition-timing-function: ease-out;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .mobile-menu-surface,
+          .mobile-menu-surface[data-open="true"] {
+            transform: none;
+          }
         }
       `}</style>
     </div>

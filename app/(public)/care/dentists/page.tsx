@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Section } from "@/components/site/Section";
 import { DentistCard, type DirectoryDentist } from "@/components/booking/DentistCard";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
 import { LOCALITIES } from "@/lib/schemas";
 
 export const metadata: Metadata = {
@@ -20,21 +20,22 @@ export default async function DentistsPage({
   const { locality, lang, slots, err } = await searchParams;
   const slotsOnly = slots === "1";
 
-  const supabase = await createClient();
-  const { data: dentists } = await supabase
-    .from("public_dentists")
-    .select("slug, display_name, locality, city, specialties, languages, bio, photo_path")
-    .order("locality");
-
   // Next available slot per dentist within 14 days (for the card + filter).
   const windowStart = new Date();
   const windowEnd = new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000);
-  const { data: slotsData } = await supabase
-    .from("public_slots")
-    .select("dentist_slug, starts_at")
-    .gte("starts_at", windowStart.toISOString())
-    .lte("starts_at", windowEnd.toISOString())
-    .order("starts_at");
+  const supabase = createPublicClient();
+  const [{ data: dentists }, { data: slotsData }] = await Promise.all([
+    supabase
+      .from("public_dentists")
+      .select("slug, display_name, locality, city, specialties, languages, bio, photo_path")
+      .order("locality"),
+    supabase
+      .from("public_slots")
+      .select("dentist_slug, starts_at")
+      .gte("starts_at", windowStart.toISOString())
+      .lte("starts_at", windowEnd.toISOString())
+      .order("starts_at"),
+  ]);
 
   const nextBySlug = new Map<string, string>();
   for (const slot of slotsData ?? []) {

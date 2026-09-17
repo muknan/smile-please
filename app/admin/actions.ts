@@ -415,6 +415,7 @@ export async function saveArticle(input: ArticleInput): Promise<ActionResult & {
     if (error) return { ok: false, error: error.code === "23505" ? "That slug is already in use." : "We couldn't save the article." };
     await logAudit("article.save", "article", input.id, { status: input.status });
     revalidatePath("/admin/articles");
+    revalidatePath("/");
     revalidatePath("/learn");
     revalidatePath(`/learn/${input.slug}`);
     revalidateTag("published-articles", "max");
@@ -434,6 +435,7 @@ export async function saveArticle(input: ArticleInput): Promise<ActionResult & {
   if (error) return { ok: false, error: error.code === "23505" ? "That slug is already in use." : "We couldn't save the article." };
   await logAudit("article.save", "article", data?.id, { status: input.status });
   revalidatePath("/admin/articles");
+  revalidatePath("/");
   revalidatePath("/learn");
   revalidatePath(`/learn/${input.slug}`);
   revalidateTag("published-articles", "max");
@@ -464,6 +466,7 @@ export async function setArticleStatus(id: string, status: "draft" | "published"
   await logAudit(status === "published" ? "article.publish" : "article.unpublish", "article", id);
   const slug = data?.slug ? String(data.slug) : undefined;
   revalidatePath("/admin/articles");
+  revalidatePath("/");
   revalidatePath("/learn");
   if (slug) revalidatePath(`/learn/${slug}`);
   revalidateTag("published-articles", "max");

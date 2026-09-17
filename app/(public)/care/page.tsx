@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Section } from "@/components/site/Section";
+import { PageTopLink } from "@/components/site/PageTopLink";
 
 export const metadata: Metadata = {
   title: "Free dental care",
@@ -35,8 +36,9 @@ export default function CarePage() {
           </span>
         </Link>
 
-        <Link
+        <PageTopLink
           href="/care/dentists"
+          pendingSurfaceLabel="Dentists"
           className="group flex flex-col justify-between rounded-card border border-neem-100 bg-chalk-0 p-6 transition hover:border-neem-600 sm:p-10"
         >
           <div>
@@ -49,7 +51,7 @@ export default function CarePage() {
           <span className="mt-6 font-utility text-body-s font-medium text-neem-600 underline-offset-4 group-hover:underline sm:mt-10">
             See dentists and times →
           </span>
-        </Link>
+        </PageTopLink>
       </div>
 
       <p className="mt-10 text-body-s text-ink-950/75 sm:mt-16">
