@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { delhiTimestamp, isValidDelhiDate, isValidDelhiTime, nextDelhiMidnight } from "@/lib/delhi-time";
 import { createClient } from "@/lib/supabase/server";
 import { admin } from "@/lib/supabase/admin";
@@ -417,6 +417,7 @@ export async function saveArticle(input: ArticleInput): Promise<ActionResult & {
     revalidatePath("/admin/articles");
     revalidatePath("/learn");
     revalidatePath(`/learn/${input.slug}`);
+    revalidateTag("published-articles", "max");
     return { ok: true, id: data?.id };
   }
 
@@ -435,6 +436,7 @@ export async function saveArticle(input: ArticleInput): Promise<ActionResult & {
   revalidatePath("/admin/articles");
   revalidatePath("/learn");
   revalidatePath(`/learn/${input.slug}`);
+  revalidateTag("published-articles", "max");
   return { ok: true, id: data?.id };
 }
 
@@ -464,5 +466,6 @@ export async function setArticleStatus(id: string, status: "draft" | "published"
   revalidatePath("/admin/articles");
   revalidatePath("/learn");
   if (slug) revalidatePath(`/learn/${slug}`);
+  revalidateTag("published-articles", "max");
   return { ok: true };
 }

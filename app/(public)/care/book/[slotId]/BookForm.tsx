@@ -139,13 +139,12 @@ export function BookForm({ details }: { details: BookDetails }) {
       </section>
 
       <section className="mt-10 border-t border-neem-100 pt-10">
-        <h2 className="font-utility text-label uppercase text-ink-950">What&apos;s wrong</h2>
-        <p className="mt-2 text-body-s text-ink-950/60">
-          Just so the dentist can prepare for your visit.
-        </p>
-        <div className="mt-6 space-y-6">
+        <div className="space-y-6">
           <fieldset className="space-y-4">
             <legend className="text-label uppercase text-ink-950">What&apos;s wrong?<span aria-hidden="true" className="text-marigold-500"> *</span></legend>
+            <p className="text-body-s text-ink-950/60">
+              Just so the dentist can prepare for your visit.
+            </p>
             {fieldError(issues, "reason") && (
               <p role="alert" className="text-body-s text-clay-600">{fieldError(issues, "reason")}</p>
             )}

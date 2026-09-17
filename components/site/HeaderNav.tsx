@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HeaderProfile } from "./HeaderProfile";
-import { Logo } from "./Logo";
 import { PageTopLink } from "./PageTopLink";
 
 export const PRIMARY_NAV_LINKS = [
@@ -32,6 +31,9 @@ export function DesktopNav() {
         <PageTopLink
           key={link.href}
           href={link.href}
+          pendingIndicator
+          pendingSurfaceLabel={link.href === "/learn" ? "Learn" : undefined}
+          aria-label={link.label}
           aria-current={isActive(link.href) ? "page" : undefined}
           className={cn(
             "inline-flex min-h-11 items-center rounded px-3 font-utility text-[13px] font-medium text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600",
@@ -50,8 +52,10 @@ export function MobileMenu() {
   const [open, setOpen] = useState(false);
   const [openPath, setOpenPath] = useState(pathname);
   const menuOpen = open && openPath === pathname;
+  const [menuRendered, setMenuRendered] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const restoreToggleFocusRef = useRef(true);
   const backgroundScrollRef = useRef<number | null>(null);
 
@@ -63,9 +67,41 @@ export function MobileMenu() {
 
   const closeForNavigation = () => {
     restoreToggleFocusRef.current = false;
-    restoreBackgroundScroll();
+  };
+
+  const closeCurrentPage = () => {
+    restoreToggleFocusRef.current = true;
     setOpen(false);
   };
+
+  useEffect(() => {
+    if (closeTimerRef.current !== null) clearTimeout(closeTimerRef.current);
+    if (menuOpen) {
+      return;
+    }
+    if (!menuRendered) return;
+    closeTimerRef.current = setTimeout(() => {
+      setMenuRendered(false);
+      closeTimerRef.current = null;
+    }, 150);
+    return () => {
+      if (closeTimerRef.current !== null) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    };
+  }, [menuOpen, menuRendered]);
+
+  useEffect(() => () => {
+    if (closeTimerRef.current !== null) clearTimeout(closeTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (!open || openPath === pathname) return;
+    backgroundScrollRef.current = null;
+    const timer = window.setTimeout(() => setOpen(false), 0);
+    return () => window.clearTimeout(timer);
+  }, [open, openPath, pathname]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -76,7 +112,7 @@ export function MobileMenu() {
     const first = focusables?.[0];
     const last = focusables?.[focusables.length - 1];
     const toggleButton = toggleRef.current;
-    first?.focus({ preventScroll: true });
+    toggleButton?.focus({ preventScroll: true });
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -85,13 +121,20 @@ export function MobileMenu() {
         setOpen(false);
         return;
       }
-      if (event.key !== "Tab" || !first || !last) return;
+      if (event.key !== "Tab" || !first || !last || !toggleButton) return;
+      if (event.shiftKey && document.activeElement === toggleButton) {
+        event.preventDefault();
+        last.focus();
+        return;
+      }
+      if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        toggleButton.focus();
+        return;
+      }
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
       }
     };
     document.addEventListener("keydown", onKeyDown);
@@ -102,7 +145,7 @@ export function MobileMenu() {
     };
   }, [menuOpen]);
 
-  // Lock body scroll while the full-screen menu is open.
+  // Lock body scroll while the menu is open.
   useEffect(() => {
     if (!menuOpen) return;
     const previous = document.body.style.overflow;
@@ -113,43 +156,46 @@ export function MobileMenu() {
   }, [menuOpen]);
 
   return (
-    <>
+    <div
+      className="md:hidden"
+      role={menuOpen ? "dialog" : undefined}
+      aria-modal={menuOpen ? "true" : undefined}
+      aria-label={menuOpen ? "Site menu" : undefined}
+    >
       <button
         ref={toggleRef}
         type="button"
-        className={cn("h-11 w-11 items-center justify-center rounded text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 md:hidden motion-reduce:transition-none", menuOpen ? "hidden" : "flex")}
+        className="flex h-11 w-11 items-center justify-center rounded text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 motion-reduce:transition-none"
         aria-expanded={menuOpen}
         aria-controls="mobile-menu"
-        aria-label="Open menu"
+        aria-label={menuOpen ? "Close menu" : "Open menu"}
         onClick={() => {
           if (menuOpen) setOpen(false);
           else {
             restoreToggleFocusRef.current = true;
             backgroundScrollRef.current = window.scrollY;
             setOpenPath(pathname);
+            setMenuRendered(true);
             setOpen(true);
           }
         }}
       >
-        <Menu size={22} aria-hidden="true" />
+        {menuOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
       </button>
 
-      {menuOpen && (
+      {menuRendered && (
         <div
           ref={panelRef}
           id="mobile-menu"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Site menu"
-          className="fixed inset-0 z-50 h-dvh overflow-y-auto bg-mineral-50 md:hidden motion-safe:animate-[mobile-menu-in_150ms_ease-out]"
+          aria-hidden={!menuOpen}
+          className={cn(
+            "fixed inset-x-0 bottom-0 top-[var(--header-h)] overflow-y-auto bg-mineral-50 md:hidden",
+            menuOpen
+              ? "motion-safe:animate-[mobile-menu-surface-in_150ms_ease-out]"
+              : "pointer-events-none motion-safe:animate-[mobile-menu-surface-out_150ms_ease-in] motion-reduce:hidden",
+          )}
         >
-          <div className="container-content flex h-[var(--header-h)] items-center justify-between border-b border-neem-100">
-            <button type="button" aria-label="Close menu" onClick={() => { restoreBackgroundScroll(); setOpen(false); }} className="order-2 flex h-11 w-11 items-center justify-center rounded text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600">
-              <X size={22} aria-hidden="true" />
-            </button>
-            <PageTopLink href="/" aria-label="Smile Please — home" className="order-1" onClick={closeForNavigation}><Logo /></PageTopLink>
-          </div>
-          <nav className="container-content flex min-h-[calc(100dvh-var(--header-h))] flex-col bg-mineral-50 py-7" aria-label="Mobile menu">
+          <nav className="container-content flex min-h-full flex-col bg-mineral-50 py-7" aria-label="Mobile menu">
             <div className="space-y-1">
               {PRIMARY_NAV_LINKS.map((link) => {
                 const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
@@ -157,7 +203,11 @@ export function MobileMenu() {
                   <PageTopLink
                     key={link.href}
                     href={link.href}
+                    pendingIndicator
+                    pendingSurfaceLabel={link.href === "/learn" ? "Learn" : undefined}
+                    aria-label={link.label}
                     onClick={closeForNavigation}
+                    onCurrentNavigate={closeCurrentPage}
                     aria-current={active ? "page" : undefined}
                     className={cn(
                       "flex min-h-12 items-center rounded-lg px-3 py-2 font-display text-display-m text-ink-950 transition-colors hover:bg-neem-100/50 hover:text-neem-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 motion-reduce:transition-none",
@@ -176,27 +226,35 @@ export function MobileMenu() {
               <HeaderProfile />
             </div>
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-neem-100 px-3 pt-4">
-              {SUPPORT_NAV_LINKS.map((link) => (
-                <PageTopLink
-                  key={link.href}
-                  href={link.href}
-                  onClick={closeForNavigation}
-                  aria-current={pathname === link.href || pathname.startsWith(`${link.href}/`) ? "page" : undefined}
-                  className="inline-flex min-h-11 items-center rounded font-utility text-body-s font-medium text-ink-950/70 hover:text-neem-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600"
-                >
-                  {link.label}
-                </PageTopLink>
-              ))}
+              {SUPPORT_NAV_LINKS.map((link) => {
+                const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
+                return (
+                  <PageTopLink
+                    key={link.href}
+                    href={link.href}
+                    onClick={closeForNavigation}
+                    onCurrentNavigate={closeCurrentPage}
+                    aria-current={active ? "page" : undefined}
+                    className="inline-flex min-h-11 items-center rounded font-utility text-body-s font-medium text-ink-950/70 hover:text-neem-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600"
+                  >
+                    {link.label}
+                  </PageTopLink>
+                );
+              })}
             </div>
           </nav>
         </div>
       )}
       <style jsx global>{`
-        @keyframes mobile-menu-in {
-          from { opacity: 0; transform: translateY(-8px); }
+        @keyframes mobile-menu-surface-in {
+          from { opacity: 0; transform: translateY(-4px); }
           to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes mobile-menu-surface-out {
+          from { opacity: 1; transform: translateY(0); }
+          to { opacity: 0; transform: translateY(-4px); }
+        }
       `}</style>
-    </>
+    </div>
   );
 }

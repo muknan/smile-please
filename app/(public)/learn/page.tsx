@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Section } from "@/components/site/Section";
 import { ArticleCard, type ArticleTeaser } from "@/components/site/ArticleCard";
-import { createClient } from "@/lib/supabase/server";
+import { getPublishedArticles } from "@/lib/articles";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -22,15 +22,7 @@ export default async function LearnPage({
   const { category } = await searchParams;
   const active = CATEGORIES.find((c) => c === category);
 
-  const supabase = await createClient();
-  let query = supabase
-    .from("articles")
-    .select("slug, title, excerpt, category, published_at, body_md, cover_path")
-    .eq("status", "published")
-    .order("published_at", { ascending: false });
-  if (active) query = query.eq("category", active);
-  const { data } = await query;
-  const articles = (data ?? []) as ArticleTeaser[];
+  const articles: ArticleTeaser[] = await getPublishedArticles(active);
 
   return (
     <Section marker="Learn" className="public-hero">

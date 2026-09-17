@@ -6,6 +6,7 @@ test("Learn filters connect visually to the article results", async ({ page }) =
   await page.goto("/learn");
   const lastFilter = page.getByRole("link", { name: "Camps", exact: true });
   const firstArticle = page.locator("article").first();
+  await expect(firstArticle).toBeVisible();
   const [filterBox, articleBox] = await Promise.all([lastFilter.boundingBox(), firstArticle.boundingBox()]);
   expect(filterBox).not.toBeNull();
   expect(articleBox).not.toBeNull();
@@ -16,6 +17,7 @@ test("Learn filters connect visually to the article results", async ({ page }) =
 for (const route of ["/learn", "/partners", "/about", "/care"]) {
   test(`${route} starts with a compact mobile rhythm`, async ({ page }) => {
     await page.goto(route);
+    await expect(page.locator("main h1").first()).toBeVisible();
     const [headerBox, headingBox] = await Promise.all([
       page.locator("header").first().boundingBox(),
       page.locator("main > section").first().locator(":scope > .container-content > :first-child").boundingBox(),

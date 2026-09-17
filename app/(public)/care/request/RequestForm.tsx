@@ -147,8 +147,7 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
       </section>
 
       <section className="mt-10 border-t border-neem-100 pt-10">
-        <h2 className="font-utility text-label uppercase text-ink-950">What&apos;s wrong</h2>
-        <div className="mt-6 space-y-6">
+        <div className="space-y-6">
 
       <fieldset className="space-y-4">
         <legend className="text-label uppercase text-ink-950">What&apos;s wrong?<span aria-hidden="true" className="text-marigold-500"> *</span></legend>

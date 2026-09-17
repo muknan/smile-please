@@ -41,3 +41,12 @@ export async function createClient() {
     );
   }
 }
+
+/** Stateless anon client for cacheable public data that never depends on a session. */
+export function createPublicClient() {
+  return createStatelessClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } },
+  );
+}
