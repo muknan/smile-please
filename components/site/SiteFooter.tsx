@@ -1,4 +1,5 @@
 import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL } from "@/lib/contact-info";
+import { BRAND_TAGLINE } from "@/lib/brand";
 import { Logo } from "./Logo";
 import { PageTopLink } from "./PageTopLink";
 
@@ -21,10 +22,10 @@ export function SiteFooter() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-7 sm:gap-y-10 lg:grid-cols-4 lg:gap-10">
           <div className="col-span-2 lg:col-span-1">
             <PageTopLink href="/" aria-label="Smile Please — home" className="inline-flex rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-marigold-500">
-              <Logo className="text-chalk-0" />
+              <Logo reversed className="h-12 w-auto" />
             </PageTopLink>
             <p className="mt-4 max-w-[34ch] text-body-s text-chalk-0/70 sm:mt-6 sm:max-w-[28ch]">
-              Free dental care and oral health awareness for underserved communities in Delhi.
+              {BRAND_TAGLINE}
             </p>
           </div>
 

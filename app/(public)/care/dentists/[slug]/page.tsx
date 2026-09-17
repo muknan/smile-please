@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!data) return { title: "Dentist not found" };
   return {
     title: data.display_name,
-    description: `Free dental check-ups with ${data.display_name} in ${data.locality}, New Delhi — book a slot directly.`,
+    description: `Free dental check-ups with ${data.display_name} in ${data.locality}, New Delhi. Book a slot directly.`,
     alternates: {
       canonical: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/care/dentists/${slug}`,
     },
@@ -124,8 +124,8 @@ export default async function DentistProfilePage({ params, searchParams }: PageP
         <h2 className="text-display-m">Next two weeks</h2>
         {reschedule && (
           <p className="mt-4 max-w-[65ch] rounded border border-neem-100 bg-chalk-0 px-4 py-3 text-body-s">
-            You&apos;re changing an existing appointment. Pick a new time below —
-            your old slot will be freed automatically.
+            You&apos;re changing an existing appointment. Pick a new time below.
+            Your old slot will be freed automatically.
           </p>
         )}
         <div className="mt-10">

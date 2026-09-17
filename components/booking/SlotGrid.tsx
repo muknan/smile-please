@@ -139,7 +139,7 @@ export function SlotGrid({
       }
       if (body.error === "SLOT_HELD") {
         setMessage(
-          "Someone else is looking at this slot right now — pick the next one.",
+          "Someone else is looking at this slot right now. Pick the next one.",
         );
       } else {
         setMessage("Someone just booked this slot. Here are the next available times.");
@@ -209,7 +209,7 @@ export function SlotGrid({
           })}
         </ul>
         <p className="text-body-s text-ink-950/60">
-          Choose a day, then a time — it&apos;s held for ten minutes while you enter your details.
+          Choose a day, then a time. It&apos;s held for ten minutes while you enter your details.
         </p>
       </div>
 

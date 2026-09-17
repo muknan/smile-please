@@ -31,8 +31,8 @@ export default async function StatusByRefPage({
     <Section marker="Track" className="public-hero">
       <h1 className="text-display-l">Track your appointment</h1>
       <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
-        Reference <span className="font-utility font-semibold tabular-nums">{ref}</span> —
-        enter the phone you booked with.
+        Reference <span className="font-utility font-semibold tabular-nums">{ref}</span>.
+        Enter the phone you booked with.
       </p>
       <div className="mt-16">
         <StatusLookup initialRef={ref} renderedAt={makeRenderedAt()} />

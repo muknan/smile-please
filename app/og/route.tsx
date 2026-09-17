@@ -5,8 +5,8 @@ import path from "node:path";
 export const runtime = "nodejs";
 
 /**
- * One reusable Open Graph image: the Smile Please mark, page title and a
- * calm neem field. Used via /og?title=... from generateMetadata.
+ * One reusable Open Graph image: the approved Smile Please lockup, page title
+ * and a calm neem field. Used via /og?title=... from generateMetadata.
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -18,6 +18,10 @@ export async function GET(request: Request) {
   // TTF, not woff2: the bundled @vercel/og parser reads plain OpenType only.
   const font = await readFile(
     path.join(process.cwd(), "public/fonts/fraunces-latin-600.ttf"),
+  );
+  const logo = await readFile(
+    path.join(process.cwd(), "public/brand/soft-embrace-reversed.svg"),
+    "base64",
   );
 
   return new ImageResponse(
@@ -36,10 +40,14 @@ export async function GET(request: Request) {
           padding: "0 96px 96px",
         }}
       >
-        <svg width="160" height="160" viewBox="0 0 48 48" fill="none" style={{ position: "absolute", top: 64 }}>
-          <path d="M9 24c3.1 8.2 9.3 12.3 15 12.3S35.9 32.2 39 24" stroke="#FFFFFF" strokeWidth="3.5" strokeLinecap="round" />
-          <path d="m33 4 2.2 6.8L42 13l-6.8 2.2L33 22l-2.2-6.8L24 13l6.8-2.2L33 4Z" fill="#E0B54B" />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`data:image/svg+xml;base64,${logo}`}
+          alt=""
+          width={720}
+          height={173}
+          style={{ position: "absolute", top: 46, objectFit: "contain" }}
+        />
         <div
           style={{
             fontSize: 64,

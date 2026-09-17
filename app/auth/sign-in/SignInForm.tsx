@@ -33,7 +33,7 @@ function AuthIntro() {
   return (
     <aside className="hidden bg-neem-900 p-10 text-chalk-0 lg:flex lg:flex-col lg:justify-between">
       <div>
-        <SmileMark className="h-12 w-12 text-marigold-500" />
+        <SmileMark className="h-12 w-12" />
         <p className="mt-12 font-utility text-label uppercase tracking-[.14em] text-neem-100">Your Smile Please account</p>
         <h2 className="mt-5 max-w-sm font-display text-display-l">Care stays within reach.</h2>
         <p className="mt-5 max-w-sm text-body-l text-chalk-0/75">Use your email to view appointments, keep your details current, or continue supporting community care.</p>
@@ -82,7 +82,7 @@ function Form({ renderedAt }: { renderedAt: string }) {
   return <><AuthHeader /><AuthShell>
     <p className="font-utility text-label font-semibold uppercase tracking-[.14em] text-neem-600">Secure account access</p>
     <h1 className="mt-3 text-display-l">Welcome back.</h1>
-    <p className="mt-3 max-w-[46ch] text-body-l text-ink-950/70">Enter the email you use with Smile Please. We&apos;ll send you a private link—no password needed.</p>
+    <p className="mt-3 max-w-[46ch] text-body-l text-ink-950/70">Enter the email you use with Smile Please. We&apos;ll send you a private link. No password needed.</p>
 
     {reason === "admin_timeout" && <p role="alert" aria-live="polite" className="mt-6 rounded border border-clay-600/40 bg-clay-600/5 px-4 py-3 text-body-s text-clay-600">Your admin session expired. Sign in again.</p>}
     {errorParam === "link_expired" && <p role="alert" aria-live="polite" className="mt-6 rounded border border-clay-600/40 bg-clay-600/5 px-4 py-3 text-body-s text-clay-600">That sign-in link has expired or was already used. Request a new one below.</p>}

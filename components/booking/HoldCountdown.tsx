@@ -46,7 +46,7 @@ export function HoldCountdown({
     <>
       {warning && <span role="status" className="sr-only">Less than two minutes remain on this slot hold.</span>}
       <p className={warning ? "font-utility text-body-s font-medium text-clay-600" : "font-utility text-body-s text-ink-950/60"}>
-        {warning ? "Hurry — this slot is held for " : "Your slot is held for "}
+        {warning ? "Hurry. This slot is held for " : "Your slot is held for "}
         <span className="tabular-nums">{minutes}:{seconds}</span>. Complete the form to book it.
       </p>
     </>

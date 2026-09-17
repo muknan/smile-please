@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "Learn",
   description:
-    "Plain-language dental health articles from Smile Please dentists — brushing, gums, children's first visits, and what happens at our camps.",
+    "Plain-language dental health articles from Smile Please dentists about brushing, gums, children's first visits and what happens at our camps.",
   alternates: { canonical: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/learn` },
 };
 
@@ -76,7 +76,7 @@ export default async function LearnPage({
           </h2>
           <p className="mt-4 text-body-l text-ink-950/70">
             We&apos;re writing these up. Meanwhile, if something in your mouth is bothering you,
-            don&apos;t wait for an article — book a check-up.
+            don&apos;t wait for an article. Book a check-up.
           </p>
           <Link
             href="/care"

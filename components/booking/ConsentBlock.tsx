@@ -34,8 +34,7 @@ export function ConsentBlock({ disabled, error }: { disabled?: boolean; error?: 
           <p id="consent-booking-note" className="mt-2 text-body-s text-ink-950/70">
             <Link href="/privacy" className="font-medium text-neem-600 underline underline-offset-4">
               Read the full privacy notice
-            </Link>{" "}
-            — it explains what we keep, why, and how to withdraw.
+            </Link>. It explains what we keep, why, and how to withdraw.
           </p>
         </div>
       </div>
@@ -52,7 +51,7 @@ export function ConsentBlock({ disabled, error }: { disabled?: boolean; error?: 
         <label htmlFor="consentUpdates" className="text-body">
           <span className="mr-2 inline-flex rounded-full border border-neem-200 bg-chalk-0 px-2 py-0.5 font-utility text-label font-semibold">Optional</span>
           I&apos;d also like occasional updates about camp dates and oral health. This is
-          separate from booking consent — you can unsubscribe any time.
+          separate from booking consent. You can unsubscribe any time.
         </label>
       </div>
     </fieldset>

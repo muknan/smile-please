@@ -57,7 +57,7 @@ export function BookForm({ details }: { details: BookDetails }) {
           </p>
         ) : (
           <p className="mt-4 text-body text-ink-950/80">
-            Keep the reference safe — you can track the appointment with it and
+            Keep the reference safe. You can track the appointment with it and
             your phone number.
           </p>
         )}

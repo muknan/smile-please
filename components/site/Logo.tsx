@@ -1,20 +1,40 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-/** The compact Smile Please mark: a welcoming smile and a four-point spark. */
+const LOGO_ASSETS = {
+  default: "/brand/soft-embrace-header.svg",
+  reversed: "/brand/soft-embrace-reversed.svg",
+} as const;
+
+/** The approved Soft Embrace compact mark. */
 export function SmileMark({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 48 48" fill="none" aria-hidden="true" className={cn("h-9 w-9 shrink-0", className)}>
-      <path d="M9 24c3.1 8.2 9.3 12.3 15 12.3S35.9 32.2 39 24" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="m33 4 2.2 6.8L42 13l-6.8 2.2L33 22l-2.2-6.8L24 13l6.8-2.2L33 4Z" fill="currentColor" />
-    </svg>
+    <Image
+      src="/brand/soft-embrace-compact.svg"
+      alt=""
+      aria-hidden="true"
+      width={64}
+      height={64}
+      className={cn("h-9 w-9 shrink-0", className)}
+    />
   );
 }
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({
+  className,
+  reversed = false,
+}: {
+  className?: string;
+  reversed?: boolean;
+}) {
   return (
-    <span className={cn("inline-flex items-center gap-2.5 text-neem-900", className)}>
-      <SmileMark />
-      <span className="whitespace-nowrap font-display text-[22px] font-semibold leading-none tracking-[-.045em]">Smile Please</span>
-    </span>
+    <Image
+      src={LOGO_ASSETS[reversed ? "reversed" : "default"]}
+      alt=""
+      aria-hidden="true"
+      width={300}
+      height={72}
+      className={cn("h-10 w-auto shrink-0", className)}
+    />
   );
 }

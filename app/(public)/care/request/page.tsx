@@ -14,8 +14,8 @@ export default function CareRequestPage() {
     <Section marker="Care request" className="public-hero">
       <h1 className="max-w-3xl text-display-l">Tell us what&apos;s wrong</h1>
       <p className="mt-6 max-w-[65ch] text-body-l text-ink-950/70">
-        Two minutes, no account needed. We&apos;ll match you with a dentist near you —
-        usually within two working days — and call or message to confirm.
+        Two minutes, no account needed. We&apos;ll usually match you with a dentist near you
+        within two working days, then call or message to confirm.
       </p>
       <div className="mt-16">
         <RequestForm renderedAt={makeRenderedAt()} />

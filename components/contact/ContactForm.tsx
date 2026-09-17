@@ -80,7 +80,7 @@ export function ContactForm({
     return (
       <div className="max-w-[65ch] rounded-panel border border-neem-200 bg-neem-50 p-8 sm:p-10">
         <p className="font-utility text-body-s font-semibold text-neem-600">Message received</p>
-        <h2 ref={successRef} tabIndex={-1} role="status" className="mt-4 text-display-m focus:outline-none">Thanks — it&apos;s with a real person now.</h2>
+        <h2 ref={successRef} tabIndex={-1} role="status" className="mt-4 text-display-m focus:outline-none">Thanks. It&apos;s with a real person now.</h2>
         <p className="mt-4 text-body text-ink-950/80">
           Your reference is <strong className="text-neem-600">{state.ref}</strong>.{" "}
           The Smile Please team will get back to you within 2 working days. Keep the reference if
@@ -181,7 +181,7 @@ export function ContactForm({
             >
               <Input id="contact-phone" name="phone" value={draftValue("phone")} onChange={setDraftField("phone")} type="tel" inputMode="tel" autoComplete="tel" placeholder="+91" required />
             </Field>
-            <Field label="Email" htmlFor="contact-email" hint="Optional — reply by email instead of phone." error={fieldError(issues, "email")}>
+            <Field label="Email" htmlFor="contact-email" hint="Optional. Add this if you prefer email to phone." error={fieldError(issues, "email")}>
               <Input id="contact-email"  name="email" value={draftValue("email")} onChange={setDraftField("email")} type="email" autoComplete="email" />
             </Field>
             <Field label="Your message" htmlFor="contact-message" required error={fieldError(issues, "message")}>
@@ -207,7 +207,7 @@ export function ContactForm({
             <Field label="Clinic area" htmlFor="contact-area" required hint="Which area of Delhi can you practise in?" error={fieldError(issues, "clinicArea")}>
               <Input id="contact-area"  name="clinicArea" value={draftValue("clinicArea")} onChange={setDraftField("clinicArea")} required maxLength={120} />
             </Field>
-            <Field label="When you're free" htmlFor="contact-when" hint="Evenings, weekends, a half-day a month — anything helps." error={fieldError(issues, "availability")}>
+            <Field label="When you're free" htmlFor="contact-when" hint="Evenings, weekends or half a day each month all help." error={fieldError(issues, "availability")}>
               <Input id="contact-when"  name="availability" value={draftValue("availability")} onChange={setDraftField("availability")} maxLength={200} />
             </Field>
             <Field label="Your message" htmlFor="contact-message" required error={fieldError(issues, "message")}>
@@ -236,7 +236,7 @@ export function ContactForm({
             <Field label="Phone" htmlFor="contact-phone" hint="Optional." error={fieldError(issues, "phone")}>
               <Input id="contact-phone" name="phone" value={draftValue("phone")} onChange={setDraftField("phone")} type="tel" inputMode="tel" autoComplete="tel" placeholder="+91" />
             </Field>
-            <Field label="Website" htmlFor="contact-website" hint="Optional — include https:// if you have one." error={fieldError(issues, "organizationWebsite")}>
+            <Field label="Website" htmlFor="contact-website" hint="Optional. Include https:// if you have one." error={fieldError(issues, "organizationWebsite")}>
               <Input id="contact-website" name="organizationWebsite" value={draftValue("organizationWebsite")} onChange={setDraftField("organizationWebsite")} type="url" inputMode="url" autoComplete="url" placeholder="https://" maxLength={200} />
             </Field>
             <Field label="Partnership type" htmlFor="contact-partnership" required error={fieldError(issues, "partnershipType")}>
@@ -277,8 +277,7 @@ export function ContactForm({
               <p className="mt-2 text-body-s text-ink-950/70">
                 <Link href="/privacy" className="font-medium text-neem-600 underline underline-offset-4">
                   Read the full privacy notice
-                </Link>{" "}
-                — it explains what we keep, why, and how to withdraw.
+                </Link>. It explains what we keep, why, and how to withdraw.
               </p>
             </div>
           </div>

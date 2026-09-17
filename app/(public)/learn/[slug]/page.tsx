@@ -96,7 +96,7 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
           <h2 className="text-display-m">Something in your mouth needs a look?</h2>
           <p className="mt-4 max-w-[55ch] text-body-l text-ink-950/70">
             A check-up is free, and it takes about ten minutes to arrange. The dentist will tell
-            you what&apos;s actually going on — no scare tactics.
+            you what&apos;s actually going on. No scare tactics.
           </p>
           <Link
             href="/care"

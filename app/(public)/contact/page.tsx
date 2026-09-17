@@ -8,7 +8,7 @@ import { GRIEVANCE_EMAIL } from "@/lib/contact-info";
 export const metadata: Metadata = {
   title: "Contact us",
   description:
-    "A question about care, a dentist volunteering a few hours a month, or an organisation that wants to partner with Smile Please — write to us and a real person will reply within two working days.",
+    "A question about care, a dentist volunteering a few hours a month, or an organisation that wants to partner with Smile Please? Write to us and a real person will reply within two working days.",
   alternates: {
     canonical: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/contact`,
   },
@@ -35,7 +35,7 @@ export default async function ContactPage({ searchParams }: PageProps) {
           </div>
           <p className="max-w-[58ch] text-body-l text-ink-950/70 lg:col-span-5">
           A question about care, a dentist who wants to give a few hours a month, a school or
-          clinic that wants to host a camp — choose the route that fits. We usually reply within two working days.
+          clinic that wants to host a camp. Choose the route that fits. We usually reply within two working days.
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export default async function ContactPage({ searchParams }: PageProps) {
         <h2 className="mt-3 text-display-m">Complaints and data requests</h2>
         <p className="mt-4 max-w-[65ch] text-body-l text-ink-950/70">
           For email and phone, see the Contact block in the footer. This channel is for
-          anything formal — a complaint, a request about your data, or an escalation.
+          formal matters, including complaints, data requests and escalations.
         </p>
         <dl className="mt-8 max-w-[65ch]">
           <dt className="font-utility text-body-s font-semibold text-neem-600">Grievance contact</dt>
@@ -64,8 +64,7 @@ export default async function ContactPage({ searchParams }: PageProps) {
               className="font-medium text-neem-600 underline underline-offset-4"
             >
               {GRIEVANCE_EMAIL}
-            </a>{" "}
-            — for complaints, privacy questions and data requests
+            </a>. Use it for complaints, privacy questions and data requests.
           </dd>
         </dl>
       </Section>

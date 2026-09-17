@@ -83,7 +83,7 @@ export default async function BookPage({ params, searchParams }: PageProps) {
             {details.locationType === "camp" ? ` · camp${details.campName ? `: ${details.campName}` : ""}` : ""}
           </p>
           <p className="mt-2 text-body-s text-ink-950/60">
-            Your slot is held for ten minutes. Free — no payment, ever.
+            Your slot is held for ten minutes. There is no charge.
           </p>
         </div>
       </div>

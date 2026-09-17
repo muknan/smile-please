@@ -61,8 +61,7 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
           Your reference is{" "}
           <span className="font-utility font-semibold tabular-nums text-neem-600">
             {state.ref}
-          </span>
-          . Keep it somewhere — you can use it with your phone number to track the
+          </span>. Keep it somewhere. You can use it with your phone number to track the
           appointment.
         </p>
         <p className="mt-4 text-body text-ink-950/80">

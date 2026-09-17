@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Button } from "@/components/ui/Button";
 import { Section } from "@/components/site/Section";
+import { BRAND_TAGLINE } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "About",
@@ -29,8 +30,9 @@ export default function AboutPage() {
     <>
       <Section marker="About" className="public-hero" snap>
         <h1 className="text-display-l">Why Smile Please exists</h1>
+        <p className="mt-5 font-display text-2xl font-medium text-neem-700">{BRAND_TAGLINE}</p>
 
-        <div className="mt-8 max-w-[65ch] space-y-6 text-body-l sm:mt-12 lg:mt-16">
+        <div className="mt-8 max-w-[65ch] space-y-6 text-body-l sm:mt-10 lg:mt-12">
           <p>
             Smile Please is a New Delhi organisation helping people reach free dental care.
             Patients can ask the team to find a nearby dentist or book directly when a volunteer

@@ -80,7 +80,7 @@ export default async function DentistsPage({
 
       {err === "slot" && (
         <p role="status" className="mt-6 rounded-card border border-clay-600 bg-chalk-0 px-4 py-3 text-body-s text-clay-600">
-          That slot was just taken or is no longer available — pick another time from the list below.
+          That slot was just taken or is no longer available. Pick another time from the list below.
         </p>
       )}
 

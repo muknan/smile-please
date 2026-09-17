@@ -126,7 +126,7 @@ export function StatusLookup({ initialRef, renderedAt }: { initialRef?: string; 
         label="Reference code"
         htmlFor="ref"
         required
-        hint="It looks like SP-2026-0417 — on your confirmation message."
+        hint="Example: SP-2026-0417. You'll find it on your confirmation message."
       >
         <Input
           id="ref"
