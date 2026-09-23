@@ -125,7 +125,7 @@ export function AppearanceControl({
           role="menu"
           aria-label="Appearance"
           onKeyDown={onMenuKeyDown}
-          className={`appearance-menu absolute right-0 z-[70] w-44 max-w-[calc(100vw-2rem)] rounded-card border border-neem-200 bg-chalk-0 p-1.5 text-ink-950 shadow-xl ${variant === "mobile" ? "bottom-full mb-2" : "top-full mt-2"}`}
+          className={`appearance-menu absolute z-[70] w-44 max-w-[calc(100vw-2rem)] rounded-card border border-neem-200 bg-chalk-0 p-1.5 text-ink-950 shadow-xl ${variant === "mobile" ? "bottom-full left-0 mb-2" : "right-0 top-full mt-2"}`}
         >
           {OPTIONS.map(({ value, label, Icon }, index) => (
             <button

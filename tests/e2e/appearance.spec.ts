@@ -86,3 +86,20 @@ test("appearance menu supports arrow keys and Escape without closing the mobile 
   await light.press("Enter");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
+
+test("mobile appearance options stay inside the viewport", async ({ page }) => {
+  await page.addInitScript((key) => localStorage.setItem(key, "dark"), STORAGE_KEY);
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto("/");
+    await openAppearance(page);
+    const menu = page.getByRole("menu", { name: "Appearance" });
+    const bounds = await menu.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0);
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
+    await expect(page.getByRole("menuitemradio", { name: "System" })).toBeVisible();
+    await expect(page.getByRole("menuitemradio", { name: "Light" })).toBeVisible();
+    await expect(page.getByRole("menuitemradio", { name: "Dark" })).toBeVisible();
+  }
+});
