@@ -17,12 +17,13 @@ export type FieldProps = {
 export function Field({ label, htmlFor, hint, error, required, children }: FieldProps) {
   const errorId = error ? `${htmlFor}-error` : undefined;
   const hintId = hint && !error ? `${htmlFor}-hint` : undefined;
-  const describedBy = [hintId, errorId].filter(Boolean).join(" ") || undefined;
+  const control = React.isValidElement<React.HTMLAttributes<HTMLElement>>(children) ? children : null;
+  const describedBy = [control?.props["aria-describedby"], hintId, errorId].filter(Boolean).join(" ") || undefined;
 
   const child =
     React.isValidElement(children) && React.Children.count(children) === 1
       ? React.cloneElement(children as React.ReactElement<React.HTMLAttributes<HTMLElement>>, {
-          "aria-invalid": error ? true : undefined,
+          "aria-invalid": error ? true : control?.props["aria-invalid"],
           "aria-describedby": describedBy,
         })
       : children;

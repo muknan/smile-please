@@ -80,7 +80,7 @@ export function BookForm({ details }: { details: BookDetails }) {
   }
 
   return (
-    <form ref={formRef} action={formAction}>
+    <form ref={formRef} action={formAction} onReset={(event) => event.preventDefault()}>
       <input
         type="text"
         name="website"

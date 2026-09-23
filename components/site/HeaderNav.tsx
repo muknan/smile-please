@@ -79,6 +79,19 @@ export function MobileMenu() {
   }, [open, openPath, pathname]);
 
   useEffect(() => {
+    // Match the configured md breakpoint where desktop navigation replaces us.
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => {
+      if (!desktop.matches) return;
+      restoreToggleFocusRef.current = false;
+      backgroundScrollRef.current = null;
+      setOpen(false);
+    };
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, []);
+
+  useEffect(() => {
     if (!menuOpen) return;
     const panel = panelRef.current;
     const focusables = panel?.querySelectorAll<HTMLElement>(
@@ -97,6 +110,13 @@ export function MobileMenu() {
         return;
       }
       if (event.key !== "Tab" || !first || !last || !toggleButton) return;
+      if (!event.shiftKey && document.activeElement === toggleButton) {
+        // Safari can skip links in its native tab order. Keep the menu's
+        // keyboard path consistent across browsers.
+        event.preventDefault();
+        first.focus({ preventScroll: true });
+        return;
+      }
       if (event.shiftKey && document.activeElement === toggleButton) {
         event.preventDefault();
         last.focus();
@@ -109,7 +129,7 @@ export function MobileMenu() {
       }
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
-        last.focus();
+        toggleButton.focus({ preventScroll: true });
       }
     };
     document.addEventListener("keydown", onKeyDown);
@@ -173,6 +193,8 @@ export function MobileMenu() {
                   <PageTopLink
                     key={link.href}
                     href={link.href}
+                    pendingIndicator
+                    pendingSurfaceLabel={link.href === "/learn" ? "Learn" : undefined}
                     aria-label={link.label}
                     onClick={closeForNavigation}
                     onCurrentNavigate={closeCurrentPage}
@@ -200,6 +222,7 @@ export function MobileMenu() {
                   <PageTopLink
                     key={link.href}
                     href={link.href}
+                    pendingIndicator
                     onClick={closeForNavigation}
                     onCurrentNavigate={closeCurrentPage}
                     aria-current={active ? "page" : undefined}
@@ -212,34 +235,6 @@ export function MobileMenu() {
             </div>
           </nav>
       </div>
-      <style jsx global>{`
-        .mobile-menu-surface {
-          opacity: 0;
-          pointer-events: none;
-          transform: translateY(-4px);
-          visibility: hidden;
-          transition:
-            opacity 150ms ease-in,
-            transform 150ms ease-in,
-            visibility 0s linear 150ms;
-        }
-
-        .mobile-menu-surface[data-open="true"] {
-          opacity: 1;
-          pointer-events: auto;
-          transform: translateY(0);
-          visibility: visible;
-          transition-delay: 0ms;
-          transition-timing-function: ease-out;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .mobile-menu-surface,
-          .mobile-menu-surface[data-open="true"] {
-            transform: none;
-          }
-        }
-      `}</style>
     </div>
   );
 }

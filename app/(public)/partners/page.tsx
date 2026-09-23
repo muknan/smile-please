@@ -18,7 +18,7 @@ const COLLABORATIONS = [
   ["Treatment support", "If your organisation wants to support patient treatment, tell us what you have in mind so the team can discuss a responsible route."],
 ] as const;
 
-export default function PartnersPage() {
+export default async function PartnersPage() {
   return (
     <>
       <Section marker="Partner with us" className="public-hero pb-14 sm:pb-20">
@@ -85,7 +85,7 @@ export default function PartnersPage() {
             <p className="mt-4 max-w-[34ch] text-body text-chalk-0/70">A few considered details help the team understand where to begin.</p>
           </div>
           <div className="rounded-card bg-mineral-50 p-6 text-ink-950 sm:p-10">
-            <ContactForm initialTab="organization" renderedAt={makeRenderedAt()} whatsappNumberSet={false} organizationOnly sourcePage="/partners" />
+            <ContactForm initialTab="organization" renderedAt={await makeRenderedAt()} whatsappNumberSet={false} organizationOnly sourcePage="/partners" />
           </div>
         </div>
       </Section>

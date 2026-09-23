@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/server";
 import { renderMarkdown } from "@/lib/markdown";
 import { ArticleCard, readMinutes } from "@/components/site/ArticleCard";
 import { formatDate } from "@/lib/format";
@@ -11,7 +11,7 @@ export const revalidate = 3600;
 type Params = { slug: string };
 
 export async function generateStaticParams(): Promise<Params[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("articles")
     .select("slug")
@@ -25,7 +25,7 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("articles")
     .select("title, excerpt")
@@ -49,7 +49,7 @@ export async function generateMetadata({
 
 export default async function ArticlePage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("articles")
     .select(
@@ -85,7 +85,7 @@ export default async function ArticlePage({ params }: { params: Promise<Params> 
           <span className="sr-only">, </span>
           {readMinutes(data.body_md)} min read
         </p>
-        <h1 className="mt-6 text-display-l">{data.title}</h1>
+        <h1 className="mt-6 break-words text-display-l">{data.title}</h1>
 
         <div className="mt-16 space-y-6 [&_h2]:mt-16 [&_h2]:text-display-m [&_h3]:mt-10 [&_h3]:text-display-m">
           {renderMarkdown(data.body_md, data.title)}

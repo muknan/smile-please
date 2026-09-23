@@ -34,7 +34,7 @@ export function ArticleCard({ article, featured = false }: { article: ArticleTea
         )}
         <div className={article.cover_path ? "md:col-span-3" : "md:col-span-5"}>
           <p className="font-utility text-label text-neem-600">{article.category}</p>
-          <h2 className="mt-3 font-display text-display-m leading-tight md:text-display-l">
+          <h2 className="mt-3 break-words font-display text-display-m leading-tight md:text-display-l">
             <Link href={`/learn/${article.slug}`} className="text-ink-950 transition hover:text-neem-600">{article.title}</Link>
           </h2>
           {article.excerpt && <p className="mt-4 max-w-[58ch] text-body-l text-ink-950/70">{article.excerpt}</p>}

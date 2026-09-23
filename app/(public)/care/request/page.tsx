@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     "Tell Smile Please what's wrong and we'll match you with a free dentist near you in Delhi. Two minutes, no account needed.",
 };
 
-export default function CareRequestPage() {
+export default async function CareRequestPage() {
   return (
     <Section marker="Care request" className="public-hero">
       <h1 className="max-w-3xl text-display-l">Tell us what&apos;s wrong</h1>
@@ -18,7 +18,7 @@ export default function CareRequestPage() {
         within two working days, then call or message to confirm.
       </p>
       <div className="mt-16">
-        <RequestForm renderedAt={makeRenderedAt()} />
+        <RequestForm renderedAt={await makeRenderedAt()} />
       </div>
     </Section>
   );

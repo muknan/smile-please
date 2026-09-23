@@ -111,7 +111,7 @@ export function StatusLookup({ initialRef, renderedAt }: { initialRef?: string; 
   }
 
   return (
-    <form action={formAction} className="max-w-[65ch] space-y-8">
+    <form action={formAction} onReset={(event) => event.preventDefault()} className="max-w-[65ch] space-y-8">
       <input
         type="text"
         name="website"

@@ -24,7 +24,7 @@ export default async function StatusPage({
         phone number you booked with.
       </p>
       <div className="mt-16">
-        <StatusLookup initialRef={ref} renderedAt={makeRenderedAt()} />
+        <StatusLookup initialRef={ref} renderedAt={await makeRenderedAt()} />
       </div>
     </Section>
   );

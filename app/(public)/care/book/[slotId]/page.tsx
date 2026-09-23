@@ -47,7 +47,7 @@ export default async function BookPage({ params, searchParams }: PageProps) {
     locationType: String(data.location_type ?? "clinic"),
     campName: data.camp_name ? String(data.camp_name) : null,
     rescheduleAppointmentId: reschedule,
-    renderedAt: makeRenderedAt(),
+    renderedAt: await makeRenderedAt(),
   };
 
   const startsAt = new Date(details.startsAt);

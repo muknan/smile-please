@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Section } from "@/components/site/Section";
 import { PageTopLink } from "@/components/site/PageTopLink";
+import { ArrowLabel } from "@/components/ui/ArrowLabel";
 
 export const metadata: Metadata = {
   title: "Free dental care",
@@ -32,7 +33,7 @@ export default function CarePage() {
             </p>
           </div>
           <span className="mt-6 font-utility text-body-s font-medium text-neem-600 underline-offset-4 group-hover:underline sm:mt-10">
-            Tell us what&apos;s wrong →
+            <ArrowLabel>Tell us what&apos;s wrong</ArrowLabel>
           </span>
         </Link>
 
@@ -49,7 +50,7 @@ export default function CarePage() {
             </p>
           </div>
           <span className="mt-6 font-utility text-body-s font-medium text-neem-600 underline-offset-4 group-hover:underline sm:mt-10">
-            See dentists and times →
+            <ArrowLabel>See dentists and times</ArrowLabel>
           </span>
         </PageTopLink>
       </div>

@@ -1,6 +1,7 @@
 import "server-only";
 import { createHash, createHmac } from "node:crypto";
 import { headers } from "next/headers";
+import { connection } from "next/server";
 import { admin } from "@/lib/supabase/admin";
 
 /**
@@ -37,7 +38,9 @@ export function signRenderedAt(ts: number): string {
 }
 
 /** Returns the signed timestamp to embed in a hidden field (server render). */
-export function makeRenderedAt(): string {
+export async function makeRenderedAt(): Promise<string> {
+  // A build-time token would expire for every visitor two hours after deployment.
+  await connection();
   const ts = Date.now();
   return `${ts}.${signRenderedAt(ts)}`;
 }

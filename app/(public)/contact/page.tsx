@@ -42,7 +42,7 @@ export default async function ContactPage({ searchParams }: PageProps) {
         <div className="mt-12">
           <ContactForm
             initialTab={initialTab}
-            renderedAt={makeRenderedAt()}
+            renderedAt={await makeRenderedAt()}
             whatsappNumberSet={whatsappNumberSet}
           />
         </div>

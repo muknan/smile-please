@@ -87,7 +87,9 @@ export function RequestForm({ renderedAt }: { renderedAt: string }) {
   }
 
   return (
-    <form ref={formRef} action={formAction} className="max-w-[65ch]">
+    // React resets action forms even when the returned state contains an error.
+    // Success replaces the form; on failure retain all fields and consent choices.
+    <form ref={formRef} action={formAction} onReset={(event) => event.preventDefault()} className="max-w-[65ch]">
       {/* honeypot — hidden but not display:none; bots fill it, humans never see it */}
       <input
         type="text"

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useActionState, type ReactNode } from "react";
+import { Suspense, useActionState, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft, MailCheck, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -13,7 +13,8 @@ import { requestSignInLink, type SignInState } from "../actions";
 const initial: SignInState = { status: "idle" };
 
 export function SignInForm({ renderedAt }: { renderedAt: string }) {
-  return <Suspense fallback={null}><Form renderedAt={renderedAt} /></Suspense>;
+  const [attempt, setAttempt] = useState(0);
+  return <Suspense fallback={null}><Form key={attempt} renderedAt={renderedAt} onReset={() => setAttempt((value) => value + 1)} /></Suspense>;
 }
 
 function AuthHeader() {
@@ -54,7 +55,7 @@ function AuthShell({ children }: { children: ReactNode }) {
   );
 }
 
-function Form({ renderedAt }: { renderedAt: string }) {
+function Form({ renderedAt, onReset }: { renderedAt: string; onReset: () => void }) {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") ?? "/account";
   const reason = searchParams.get("reason");
@@ -73,7 +74,7 @@ function Form({ renderedAt }: { renderedAt: string }) {
         <p className="mt-3 text-body-s text-ink-950/70">It expires in one hour. If it is not in your inbox, check the spam folder before requesting another.</p>
       </div>
       <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:gap-6">
-        <PageTopLink href="/auth/sign-in" className="inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline underline-offset-4 hover:text-neem-900">Use a different email</PageTopLink>
+        <button type="button" onClick={onReset} className="inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline underline-offset-4 hover:text-neem-900">Use a different email</button>
         <PageTopLink href="/" className="inline-flex min-h-11 items-center font-utility text-body-s font-medium text-neem-600 underline underline-offset-4 hover:text-neem-900">Back to the site</PageTopLink>
       </div>
     </AuthShell></>;
@@ -88,7 +89,7 @@ function Form({ renderedAt }: { renderedAt: string }) {
     {errorParam === "link_expired" && <p role="alert" aria-live="polite" className="mt-6 rounded border border-clay-600/40 bg-clay-600/5 px-4 py-3 text-body-s text-clay-600">That sign-in link has expired or was already used. Request a new one below.</p>}
 
     <div className="mt-7 rounded-panel border border-neem-100 bg-chalk-0 p-5 shadow-[0_16px_50px_rgba(27,48,41,0.07)] sm:p-8">
-      <form action={formAction} className="space-y-5">
+      <form action={formAction} onReset={(event) => event.preventDefault()} className="space-y-5">
         {/* Honeypot and timestamp are server-side abuse protections; keep their names stable. */}
         <input type="text" name="website" value="" tabIndex={-1} autoComplete="off" aria-hidden="true" className="sr-only" />
         <input type="hidden" name="renderedAt" value={renderedAt} />

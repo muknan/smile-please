@@ -59,7 +59,7 @@ export function DentistCard({ dentist }: { dentist: DirectoryDentist }) {
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <h3 className="text-display-m leading-tight">
+        <h3 className="break-words text-display-m leading-tight">
           <Link
             href={`/care/dentists/${dentist.slug}`}
             className="text-ink-950 transition hover:text-neem-600"

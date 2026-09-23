@@ -145,14 +145,17 @@ Redirect URLs → `https://smile-please.vercel.app/auth/callback` plus
 
 ### Scheduled jobs (GitHub Actions)
 
-Repository secrets/vars to set once: `SITE_URL` (var), `CRON_SECRET` (secret),
-`SUPABASE_DB_URL` (secret, session pooler connection string), `BACKUP_PASSPHRASE`
-(secret). Two workflows: `.github/workflows/cron.yml` (hold release every 15 min,
-reminders daily, admin digest daily, keep-alive to stop the free Supabase tier
-pausing) and `.github/workflows/backup.yml` (weekly encrypted `pg_dump` artifact).
-
-**The free Supabase tier has no built-in backups.** The weekly dump is mandatory; after
-the first backup, restore it into a scratch project once to prove it works.
+The public repository runs `.github/workflows/cron.yml` for hold release,
+reminders, admin digest, and keep-alive. Database backups run only in the
+private `muknan/smile-please-backups` repository; the mirrored workflow here
+has a guard that prevents a public run. Configure that private repository's
+Actions secrets with the Supabase **session pooler** URL on port 5432
+(`SUPABASE_DB_URL`), the project's CA certificate downloaded from Supabase
+Database Settings (`SUPABASE_CA_CERT`), and the encryption key
+(`BACKUP_PASSPHRASE`). The script enforces verified TLS, encrypts the dump, and
+tests an isolated restore before a 90-day private artifact is uploaded. See
+the private repository's recovery procedure and verify each run. GitHub
+artifacts are time-limited and not an off-account recovery copy.
 
 ### Branch protection
 

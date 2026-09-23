@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { ArrowLabel } from "@/components/ui/ArrowLabel";
 import { submitContact, type ContactState } from "@/app/(public)/contact/actions";
 import {
   CONTACT_TABS,
@@ -105,7 +106,7 @@ export function ContactForm({
           className="group flex w-fit max-w-[65ch] flex-col gap-1 font-utility text-body-s text-neem-700 sm:flex-row sm:items-center sm:gap-3"
         >
           <span className="font-semibold">Prefer WhatsApp?</span>
-          <span className="underline decoration-neem-600/40 underline-offset-4 group-hover:decoration-neem-600">Message us about “{TAB_LABELS[tab]}” →</span>
+          <span className="underline decoration-neem-600/40 underline-offset-4 group-hover:decoration-neem-600"><ArrowLabel>{`Message us about “${TAB_LABELS[tab]}”`}</ArrowLabel></span>
         </a>
       )}
 
@@ -155,7 +156,7 @@ export function ContactForm({
       )}
 
       <div id="contact-panel" role={!organizationOnly ? "tabpanel" : undefined} aria-labelledby={!organizationOnly ? `contact-tab-${tab}` : undefined}>
-      <form ref={formRef} action={formAction} className="max-w-[65ch] space-y-7" aria-label={`${TAB_LABELS[tab]} form`}>
+      <form ref={formRef} action={formAction} onReset={(event) => event.preventDefault()} className="max-w-[65ch] space-y-7" aria-label={`${TAB_LABELS[tab]} form`}>
         <input
           type="text"
           name="website"

@@ -1,5 +1,6 @@
+import { ArrowLabel } from "@/components/ui/ArrowLabel";
 import type { Metadata } from "next";
-import { ArrowRight, BookOpen, HeartHandshake, MapPin, ShieldCheck, Stethoscope } from "lucide-react";
+import { BookOpen, HeartHandshake, MapPin, ShieldCheck, Stethoscope } from "lucide-react";
 import { ArticleCard, type ArticleTeaser } from "@/components/site/ArticleCard";
 import { Button } from "@/components/ui/Button";
 import { PageTopLink } from "@/components/site/PageTopLink";
@@ -31,7 +32,7 @@ export default async function HomePage() {
             <h1 className="hero-heading mt-5 max-w-[13ch]">A painful tooth should not have to wait.</h1>
             <p className="mt-6 max-w-[52ch] text-body-l text-chalk-0/80">Tell us what is wrong. We connect people who cannot afford treatment with registered dentists who give their time for free.</p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Button href="/care/request">Request free care <ArrowRight size={18} aria-hidden="true" /></Button>
+              <Button href="/care/request"><ArrowLabel>Request free care</ArrowLabel></Button>
               <Button href="/care/dentists" variant="ghost" className="border-chalk-0/45 text-chalk-0 hover:border-chalk-0 hover:bg-chalk-0/10">Browse dentists</Button>
             </div>
             <p className="mt-6 flex items-center gap-2 font-utility text-body-s text-chalk-0/70"><ShieldCheck size={18} aria-hidden="true" /> No payment. No account needed to start.</p>
@@ -70,12 +71,12 @@ export default async function HomePage() {
       </section>
 
       <section className="bg-neem-100/65 py-16 sm:py-20"><div className="container-content grid gap-8 md:grid-cols-2">
-        <div className="border-b border-neem-600/20 pb-8 md:border-b-0 md:border-r md:pb-0 md:pr-10"><Stethoscope className="text-neem-600" size={28} aria-hidden="true" /><h2 className="mt-5 text-display-m">Need treatment?</h2><p className="mt-3 max-w-[48ch] text-body text-ink-950/75">Request help and let our team find a suitable dentist, or browse the public directory yourself.</p><PageTopLink className="text-link mt-5 text-neem-700" href="/care">Find free care <ArrowRight size={17} aria-hidden="true" /></PageTopLink></div>
-        <div className="md:pl-4"><BookOpen className="text-neem-600" size={28} aria-hidden="true" /><h2 className="mt-5 text-display-m">Want practical guidance?</h2><p className="mt-3 max-w-[48ch] text-body text-ink-950/75">Read short, plain-language advice about brushing, pain, children’s teeth and gum health.</p><PageTopLink className="text-link mt-5 text-neem-700" href="/learn">Explore oral-health guides <ArrowRight size={17} aria-hidden="true" /></PageTopLink></div>
+        <div className="border-b border-neem-600/20 pb-8 md:border-b-0 md:border-r md:pb-0 md:pr-10"><Stethoscope className="text-neem-600" size={28} aria-hidden="true" /><h2 className="mt-5 text-display-m">Need treatment?</h2><p className="mt-3 max-w-[48ch] text-body text-ink-950/75">Request help and let our team find a suitable dentist, or browse the public directory yourself.</p><PageTopLink className="cta-link mt-5 text-neem-700" href="/care"><ArrowLabel>Find free care</ArrowLabel></PageTopLink></div>
+        <div className="md:pl-4"><BookOpen className="text-neem-600" size={28} aria-hidden="true" /><h2 className="mt-5 text-display-m">Want practical guidance?</h2><p className="mt-3 max-w-[48ch] text-body text-ink-950/75">Read short, plain-language advice about brushing, pain, children’s teeth and gum health.</p><PageTopLink className="cta-link mt-5 text-neem-700" href="/learn"><ArrowLabel>Explore oral-health guides</ArrowLabel></PageTopLink></div>
       </div></section>
 
       <section className="public-section"><div className="container-content">
-        <div className="flex flex-col gap-4 border-b border-neem-100 pb-7 sm:flex-row sm:items-end sm:justify-between"><div><p className="eyebrow">Useful now</p><h2 className="mt-3 text-display-l">Advice from our dentists.</h2></div><PageTopLink href="/learn" className="text-link text-neem-700">View all guides <ArrowRight size={17} aria-hidden="true" /></PageTopLink></div>
+        <div className="flex flex-col gap-4 border-b border-neem-100 pb-7 sm:flex-row sm:items-end sm:justify-between"><div><p className="eyebrow">Useful now</p><h2 className="mt-3 text-display-l">Advice from our dentists.</h2></div><PageTopLink href="/learn" className="cta-link text-neem-700"><ArrowLabel>View all guides</ArrowLabel></PageTopLink></div>
         {articles?.length ? <div className="divide-y divide-neem-100">{articles.map((article) => <ArticleCard key={article.slug} article={article} />)}</div> : <p className="py-10 text-body-l text-ink-950/70">New guides are being prepared. If something hurts, request care now.</p>}
       </div></section>
 

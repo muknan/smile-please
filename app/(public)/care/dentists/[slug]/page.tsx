@@ -106,7 +106,7 @@ export default async function DentistProfilePage({ params, searchParams }: PageP
   return (
     <>
       <Section marker={dentist.locality ?? dentist.city ?? "Dentist"} className="public-hero">
-        <h1 className="text-display-l">{dentist.display_name}</h1>
+        <h1 className="break-words text-display-l">{dentist.display_name}</h1>
         <p className="mt-2 font-utility text-body-l text-neem-600">
           {dentist.locality}, {dentist.city}
         </p>

@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { signInSchema } from "@/lib/schemas";
 import { checkHuman, clientIp, hashedIpKey } from "@/lib/antispam";
+import { safeRedirectPath } from "@/lib/safe-redirect";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 const HOURLY_LIMIT = 5;
@@ -46,11 +47,7 @@ export async function requestSignInLink(
     };
   }
 
-  const rawNext = formData.get("next");
-  const next =
-    typeof rawNext === "string" && rawNext.startsWith("/") && !rawNext.startsWith("//")
-      ? rawNext
-      : "/account";
+  const next = safeRedirectPath(formData.get("next"));
 
   const { error: sendError } = await supabase.auth.signInWithOtp({
     email,
@@ -68,4 +65,3 @@ export async function requestSignInLink(
 
   return { status: "sent", email };
 }
-

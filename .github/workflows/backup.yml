@@ -2,44 +2,58 @@ name: Weekly database backup
 
 on:
   schedule:
-    - cron: "0 4 * * 1"     # Mondays 04:00 UTC (09:30 IST)
+    - cron: "0 4 * * 1"
   workflow_dispatch: {}
 
+permissions:
+  contents: read
+
+concurrency:
+  group: database-backup
+  cancel-in-progress: false
+
+# Mirrored to the private backup repository. Public-repository artifacts are
+# readable by other GitHub users, so this job must never run here.
 jobs:
   backup:
+    if: github.repository == 'muknan/smile-please-backups' && github.event.repository.private == true
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
-      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+    container: postgres:17-bookworm
+    timeout-minutes: 20
+    services:
+      restore:
+        image: postgres:17-bookworm
+        env:
+          POSTGRES_PASSWORD: isolated-restore-only
+          POSTGRES_DB: recovery_check
+        options: >-
+          --health-cmd "pg_isready -U postgres -d recovery_check"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install PostgreSQL client
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y postgresql-client
-
-      - name: Dump + encrypt the database
-        run: |
-          set -euo pipefail
-          test -n "$SUPABASE_DB_URL" && test -n "$BACKUP_PASSPHRASE"
-          trap 'rm -f backup.dump' EXIT
-          server_version="$(psql "$SUPABASE_DB_URL" -Atc 'show server_version_num')"
-          client_version="$(pg_dump --version | sed -E 's/.* ([0-9]+)(\..*)?$/\1/')"
-          server_major="${server_version:0:2}"
-          if [ "$client_version" -lt "$server_major" ]; then
-            echo "pg_dump $client_version cannot dump PostgreSQL $server_major" >&2
-            exit 1
-          fi
-          pg_dump "$SUPABASE_DB_URL" --no-owner --no-acl -F c -f backup.dump
-          gpg --batch --yes --pinentry-mode loopback --passphrase-file <(printf '%s' "$BACKUP_PASSPHRASE") \
-            --symmetric --cipher-algo AES256 --s2k-count 65011712 --output backup.dump.gpg backup.dump
-
-      - uses: actions/upload-artifact@v4
+        with:
+          persist-credentials: false
+      - name: Install encryption tools
+        run: apt-get update -qq && apt-get install --no-install-recommends -y gnupg ca-certificates openssl
+      - name: Export, encrypt and verify an isolated restore
+        shell: bash
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SUPABASE_CA_CERT: ${{ secrets.SUPABASE_CA_CERT }}
+          BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+          RESTORE_DB_URL: postgresql://postgres:isolated-restore-only@restore:5432/recovery_check
+        run: bash scripts/backup-database.sh
+      - name: Store encrypted recovery copy (private repository only)
+        uses: actions/upload-artifact@v4
         with:
           name: db-backup-${{ github.run_number }}
           path: backup.dump.gpg
+          if-no-files-found: error
           retention-days: 90
 
       - name: Remove encrypted backup from runner
         if: always()
-        run: rm -f backup.dump backup.dump.gpg
+        run: rm -f backup.dump.gpg
+      - name: Report backup failure
+        if: failure()
+        run: echo '::error::Database backup or isolated restore failed. No verified recovery point was created. Inspect this private run; keep GitHub Actions failure notifications enabled.'
