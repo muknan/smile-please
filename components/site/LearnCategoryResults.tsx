@@ -12,7 +12,7 @@ function ResultsSkeleton() {
   const line = "block rounded bg-neem-100/75";
   return (
     <div className="absolute inset-x-0 top-0" aria-hidden="true">
-      <div className="grid gap-8 border-y border-neem-100 py-8 md:grid-cols-5">
+      <div className="grid gap-8 border-b border-neem-100 py-8 md:grid-cols-5 md:border-t">
         <span className={`${line} aspect-[16/9] md:col-span-2 md:aspect-auto md:min-h-48`} />
         <div className="space-y-4 md:col-span-3">
           <span className={`${line} h-4 w-24`} />

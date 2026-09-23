@@ -72,7 +72,7 @@ function PendingSurface({ label }: { label: PendingSurfaceLabel }) {
               <div className="mt-10 flex gap-6">
                 {["w-9", "w-16", "w-20", "w-14", "w-12"].map((width) => <span key={width} className={`${line} h-8 ${width}`} />)}
               </div>
-              <div className="mt-8 grid gap-8 border-y border-neem-100 py-8 md:grid-cols-5">
+              <div className="mt-8 grid gap-8 border-b border-neem-100 py-8 md:grid-cols-5 md:border-t">
                 <span className={`${line} aspect-[16/9] md:col-span-2 md:aspect-auto md:min-h-48`} />
                 <div className="space-y-4 md:col-span-3">
                   <span className={`${line} h-4 w-24`} />

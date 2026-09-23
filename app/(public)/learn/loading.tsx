@@ -18,7 +18,7 @@ export default function LearnLoading() {
             <SkeletonLine key={width} className={`h-8 ${width}`} />
           ))}
         </div>
-        <div className="mt-8 border-y border-neem-100 py-8 md:grid md:grid-cols-5 md:gap-10">
+        <div className="mt-8 border-b border-neem-100 py-8 md:grid md:grid-cols-5 md:gap-10 md:border-t">
           <SkeletonLine className="aspect-[16/9] w-full md:col-span-2 md:aspect-auto md:min-h-48" />
           <div className="mt-6 space-y-4 md:col-span-3 md:mt-0">
             <SkeletonLine className="h-4 w-24" />
