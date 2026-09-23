@@ -32,7 +32,7 @@ export default function CarePage() {
               Takes about two minutes.
             </p>
           </div>
-          <span className="mt-6 font-utility text-body-s font-medium text-neem-600 underline-offset-4 group-hover:underline sm:mt-10">
+          <span className="mt-6 font-utility text-body-s font-medium text-neem-600 transition-colors group-hover:text-neem-700 sm:mt-10">
             <ArrowLabel>Tell us what&apos;s wrong</ArrowLabel>
           </span>
         </Link>
@@ -49,7 +49,7 @@ export default function CarePage() {
               who&apos;s free and when.
             </p>
           </div>
-          <span className="mt-6 font-utility text-body-s font-medium text-neem-600 underline-offset-4 group-hover:underline sm:mt-10">
+          <span className="mt-6 font-utility text-body-s font-medium text-neem-600 transition-colors group-hover:text-neem-700 sm:mt-10">
             <ArrowLabel>See dentists and times</ArrowLabel>
           </span>
         </PageTopLink>

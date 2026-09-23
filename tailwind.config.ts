@@ -8,12 +8,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        neem: { 950: "#102D27", 900: "#183C34", 700: "#285545", 600: "#32634F", 200: "#C6D5C9", 100: "#E2E9DF", 50: "#F0F4EE" },
-        marigold: { 700: "#76520B", 600: "#9B6E14", 500: "#E0B54B", 100: "#F7E8B7" },
-        mineral: { 50: "#F8F5ED" },
-        ink: { 950: "#1B3029" },
-        chalk: { 0: "#FFFFFF" },
-        clay: { 600: "#B4472F" },
+        neem: { 950: "rgb(var(--neem-950) / <alpha-value>)", 900: "rgb(var(--neem-900) / <alpha-value>)", 700: "rgb(var(--neem-700) / <alpha-value>)", 600: "rgb(var(--neem-600) / <alpha-value>)", 200: "rgb(var(--neem-200) / <alpha-value>)", 100: "rgb(var(--neem-100) / <alpha-value>)", 50: "rgb(var(--neem-50) / <alpha-value>)" },
+        marigold: { 700: "rgb(var(--marigold-700) / <alpha-value>)", 600: "rgb(var(--marigold-600) / <alpha-value>)", 500: "rgb(var(--marigold-500) / <alpha-value>)", 100: "rgb(var(--marigold-100) / <alpha-value>)" },
+        mineral: { 50: "rgb(var(--mineral-50) / <alpha-value>)" },
+        ink: { 950: "rgb(var(--ink-950) / <alpha-value>)" },
+        chalk: { 0: "rgb(var(--chalk-0) / <alpha-value>)" },
+        clay: { 600: "rgb(var(--clay-600) / <alpha-value>)" },
+        canvas: "rgb(var(--mineral-50) / <alpha-value>)",
+        surface: "rgb(var(--chalk-0) / <alpha-value>)",
+        foreground: "rgb(var(--ink-950) / <alpha-value>)",
+        outline: "rgb(var(--neem-200) / <alpha-value>)",
       },
       fontFamily: {
         display: ["var(--font-display)", "Georgia", "serif"],

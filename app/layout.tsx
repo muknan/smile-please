@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Fraunces, IBM_Plex_Sans } from "next/font/google";
 import { PageTopNavigationManager } from "@/components/site/PageTopLink";
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image" },
 };
 
-export const viewport: Viewport = { themeColor: "#183C34" };
+const appearanceBootstrap = `(function(){try{var t=localStorage.getItem('smile-please-appearance');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -39,7 +39,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${utility.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${display.variable} ${body.variable} ${utility.variable}`}>
+      <head><script dangerouslySetInnerHTML={{ __html: appearanceBootstrap }} /></head>
       <body className="antialiased">
         <Suspense fallback={null}>
           <PageTopNavigationManager />

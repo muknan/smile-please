@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Section } from "@/components/site/Section";
 import { ArticleCard, type ArticleTeaser } from "@/components/site/ArticleCard";
 import { getPublishedArticles } from "@/lib/articles";
-import { cn } from "@/lib/utils";
+import { LearnCategoryResults } from "@/components/site/LearnCategoryResults";
 
 export const metadata: Metadata = {
   title: "Learn",
@@ -32,28 +32,9 @@ export default async function LearnPage({
         articles without jargon, so the advice works when you&apos;re not in the clinic.
       </p>
 
-      <nav className="mt-10 flex flex-wrap gap-x-6 gap-y-2" aria-label="Filter by topic">
-        <Link
-          href="/learn"
-          aria-current={!active ? "page" : undefined}
-            className={cn("min-h-11 border-b-2 px-0 font-utility text-body-s font-medium text-ink-950 transition hover:text-neem-600", !active ? "border-neem-600" : "border-transparent")}
-        >
-          All
-        </Link>
-        {CATEGORIES.map((c) => (
-          <Link
-            key={c}
-            href={`/learn?category=${c}`}
-            aria-current={active === c ? "page" : undefined}
-            className={cn("min-h-11 border-b-2 px-0 font-utility text-body-s font-medium text-ink-950 transition hover:text-neem-600", active === c ? "border-neem-600" : "border-transparent")}
-          >
-            {c}
-          </Link>
-        ))}
-      </nav>
-
+      <LearnCategoryResults key={active ?? "All"} active={active}>
       {articles.length > 0 ? (
-        <div className="mt-6 md:mt-10">
+        <div>
           <ArticleCard article={articles[0]} featured />
           {articles.length > 1 && (
             <div className="mt-8 grid gap-x-8 md:grid-cols-2">
@@ -62,7 +43,7 @@ export default async function LearnPage({
           )}
         </div>
       ) : (
-        <div className="mt-8 max-w-[60ch] rounded-card border border-neem-100 bg-chalk-0 p-6 sm:mt-12 sm:p-10">
+        <div className="max-w-[60ch] rounded-card border border-neem-100 bg-chalk-0 p-6 sm:p-10">
           <h2 className="text-display-m">
             {active ? `Nothing under “${active}” yet.` : "No articles published yet."}
           </h2>
@@ -78,6 +59,7 @@ export default async function LearnPage({
           </Link>
         </div>
       )}
+      </LearnCategoryResults>
     </Section>
   );
 }

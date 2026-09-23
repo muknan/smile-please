@@ -27,6 +27,28 @@ export function Logo({
   className?: string;
   reversed?: boolean;
 }) {
+  if (!reversed) {
+    return (
+      <span className="inline-grid shrink-0">
+        <Image
+          src={LOGO_ASSETS.default}
+          alt=""
+          aria-hidden="true"
+          width={300}
+          height={72}
+          className={cn("theme-logo-light col-start-1 row-start-1 h-10 w-auto", className)}
+        />
+        <Image
+          src={LOGO_ASSETS.reversed}
+          alt=""
+          aria-hidden="true"
+          width={300}
+          height={72}
+          className={cn("theme-logo-dark col-start-1 row-start-1 h-10 w-auto", className)}
+        />
+      </span>
+    );
+  }
   return (
     <Image
       src={LOGO_ASSETS[reversed ? "reversed" : "default"]}

@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HeaderProfile } from "./HeaderProfile";
 import { PageTopLink } from "./PageTopLink";
+import { AppearanceControl } from "./AppearanceControl";
 
 export const PRIMARY_NAV_LINKS = [
   { href: "/about", label: "About" },
@@ -26,7 +27,7 @@ function useActiveLink() {
 export function DesktopNav() {
   const isActive = useActiveLink();
   return (
-    <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
+    <nav className="hidden items-center gap-1 lg:gap-2 md:flex" aria-label="Main">
       {PRIMARY_NAV_LINKS.map((link) => (
         <PageTopLink
           key={link.href}
@@ -35,7 +36,7 @@ export function DesktopNav() {
           aria-label={link.label}
           aria-current={isActive(link.href) ? "page" : undefined}
           className={cn(
-            "inline-flex min-h-11 items-center rounded px-3 font-utility text-[13px] font-medium text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600",
+            "inline-flex min-h-11 items-center rounded px-2 lg:px-3 font-utility text-body-s font-semibold text-ink-950 transition-colors hover:text-neem-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600",
             isActive(link.href) && "text-neem-600",
           )}
         >
@@ -104,6 +105,7 @@ export function MobileMenu() {
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if ((event.target as HTMLElement).closest("[data-appearance-menu]")) return;
         event.preventDefault();
         restoreBackgroundScroll();
         setOpen(false);
@@ -193,14 +195,13 @@ export function MobileMenu() {
                   <PageTopLink
                     key={link.href}
                     href={link.href}
-                    pendingIndicator
                     pendingSurfaceLabel={link.href === "/learn" ? "Learn" : undefined}
                     aria-label={link.label}
                     onClick={closeForNavigation}
                     onCurrentNavigate={closeCurrentPage}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "flex min-h-12 items-center rounded-lg px-3 py-2 font-display text-display-m text-ink-950 transition-colors hover:bg-neem-100/50 hover:text-neem-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 motion-reduce:transition-none",
+                      "flex min-h-12 items-center rounded-lg px-3 py-2 font-display text-[clamp(1.5rem,5vw,1.875rem)] leading-tight text-ink-950 transition-colors hover:bg-neem-100/50 hover:text-neem-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-neem-600 motion-reduce:transition-none",
                       active && "bg-neem-100/70 text-neem-700",
                     )}
                   >
@@ -215,6 +216,9 @@ export function MobileMenu() {
               </p>
               <HeaderProfile />
             </div>
+            <div className="px-3 py-4">
+              <AppearanceControl variant="mobile" />
+            </div>
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-1 border-t border-neem-100 px-3 pt-4">
               {SUPPORT_NAV_LINKS.map((link) => {
                 const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
@@ -222,7 +226,6 @@ export function MobileMenu() {
                   <PageTopLink
                     key={link.href}
                     href={link.href}
-                    pendingIndicator
                     onClick={closeForNavigation}
                     onCurrentNavigate={closeCurrentPage}
                     aria-current={active ? "page" : undefined}

@@ -50,7 +50,7 @@ export default async function PartnersPage() {
         </div>
       </Section>
 
-      <Section marker="Good fit" className="bg-[#f1eadb] py-14 sm:py-20">
+      <Section marker="Good fit" className="warm-section py-14 sm:py-20">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <h2 className="text-display-m">Bring your context. We will bring a careful conversation.</h2>
           <div className="max-w-[60ch] space-y-5 text-body-l text-ink-950/75">

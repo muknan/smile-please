@@ -25,28 +25,28 @@ export default async function HomePage() {
   const articles: ArticleTeaser[] = await getPublishedArticles(undefined, 3);
   return (
     <>
-      <section className="overflow-hidden bg-neem-950 text-chalk-0">
+      <section className="overflow-hidden bg-neem-950 text-white">
         <div className="container-content grid min-h-[540px] items-center gap-10 py-12 md:min-h-[610px] md:grid-cols-12 md:gap-12 md:py-24">
           <div className="md:col-span-7 lg:col-span-6">
             <p className="font-utility text-body-s font-semibold text-marigold-500">Free dental care in Delhi</p>
             <h1 className="hero-heading mt-5 max-w-[13ch]">A painful tooth should not have to wait.</h1>
-            <p className="mt-6 max-w-[52ch] text-body-l text-chalk-0/80">Tell us what is wrong. We connect people who cannot afford treatment with registered dentists who give their time for free.</p>
+            <p className="mt-6 max-w-[52ch] text-body-l text-white/80">Tell us what is wrong. We connect people who cannot afford treatment with registered dentists who give their time for free.</p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Button href="/care/request"><ArrowLabel>Request free care</ArrowLabel></Button>
-              <Button href="/care/dentists" variant="ghost" className="border-chalk-0/45 text-chalk-0 hover:border-chalk-0 hover:bg-chalk-0/10">Browse dentists</Button>
+              <Button href="/care/dentists" variant="ghost" className="border-white/45 text-white hover:border-white hover:bg-white/10">Browse dentists</Button>
             </div>
-            <p className="mt-6 flex items-center gap-2 font-utility text-body-s text-chalk-0/70"><ShieldCheck size={18} aria-hidden="true" /> No payment. No account needed to start.</p>
+            <p className="mt-6 flex items-center gap-2 font-utility text-body-s text-white/70"><ShieldCheck size={18} aria-hidden="true" /> No payment. No account needed to start.</p>
           </div>
           <div className="md:col-span-5 md:col-start-8 lg:col-start-8" aria-label="Care available across Delhi">
-            <div className="rounded-panel bg-neem-900 p-6 ring-1 ring-chalk-0/15 sm:p-8">
-              <div className="flex items-center justify-between border-b border-chalk-0/15 pb-6">
+            <div className="rounded-panel bg-neem-900 p-6 ring-1 ring-white/15 sm:p-8">
+              <div className="flex items-center justify-between border-b border-white/15 pb-6">
                 <span className="flex h-12 w-12 items-center justify-center rounded-full bg-marigold-500 text-neem-950"><Stethoscope size={24} aria-hidden="true" /></span>
-                <span className="rounded-full bg-chalk-0/10 px-3 py-1 font-utility text-label font-semibold text-chalk-0/80">Delhi</span>
+                <span className="rounded-full bg-white/10 px-3 py-1 font-utility text-label font-semibold text-white/80">Delhi</span>
               </div>
               <p className="mt-8 font-display text-display-m">Care that starts with a person listening.</p>
-              <dl className="mt-8 grid grid-cols-2 gap-6 border-t border-chalk-0/15 pt-6">
-                <div><dt className="text-body-s text-chalk-0/60">Response</dt><dd className="mt-1 font-utility text-body-s font-semibold">Within 2 working days</dd></div>
-                <div><dt className="text-body-s text-chalk-0/60">Dentists</dt><dd className="mt-1 font-utility text-body-s font-semibold">DCI registered</dd></div>
+              <dl className="mt-8 grid grid-cols-2 gap-6 border-t border-white/15 pt-6">
+                <div><dt className="text-body-s text-white/60">Response</dt><dd className="mt-1 font-utility text-body-s font-semibold">Within 2 working days</dd></div>
+                <div><dt className="text-body-s text-white/60">Dentists</dt><dd className="mt-1 font-utility text-body-s font-semibold">DCI registered</dd></div>
               </dl>
             </div>
           </div>
@@ -80,7 +80,7 @@ export default async function HomePage() {
         {articles?.length ? <div className="divide-y divide-neem-100">{articles.map((article) => <ArticleCard key={article.slug} article={article} />)}</div> : <p className="py-10 text-body-l text-ink-950/70">New guides are being prepared. If something hurts, request care now.</p>}
       </div></section>
 
-      <section className="bg-neem-950 py-16 text-chalk-0 sm:py-20"><div className="container-content grid gap-8 lg:grid-cols-12 lg:items-end"><div className="lg:col-span-7"><p className="font-utility text-body-s font-semibold text-marigold-500">Help more people get care</p><h2 className="mt-4 text-display-l">Dentists, schools and organisations are part of the work.</h2></div><div className="flex flex-wrap gap-3 lg:col-span-4 lg:col-start-9"><Button href="/contact?tab=dentist">Volunteer as a dentist</Button><Button href="/partners" variant="ghost" className="border-chalk-0/45 text-chalk-0 hover:bg-chalk-0/10">Partner with us</Button></div></div></section>
+      <section className="bg-neem-950 py-16 text-white sm:py-20"><div className="container-content grid gap-8 lg:grid-cols-12 lg:items-end"><div className="lg:col-span-7"><p className="font-utility text-body-s font-semibold text-marigold-500">Help more people get care</p><h2 className="mt-4 text-display-l">Dentists, schools and organisations are part of the work.</h2></div><div className="flex flex-wrap gap-3 lg:col-span-4 lg:col-start-9"><Button href="/contact?tab=dentist">Volunteer as a dentist</Button><Button href="/partners" variant="ghost" className="border-white/45 text-white hover:border-white hover:bg-white/10">Partner with us</Button></div></div></section>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "NGO", name: "Smile Please", description: "Free dental care and oral health awareness for underserved communities in New Delhi.", areaServed: "New Delhi", url: SITE_URL }) }} />
     </>
   );
