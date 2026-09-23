@@ -27,6 +27,46 @@ async function runSql(filePath, label) {
   }
 }
 
+/** Verify block-day refuses immediately when a booking transaction owns a slot. */
+async function runBlockDayContentionTest() {
+  const slotId = '70000000-0000-0000-0000-000000000001';
+  const dentistId = '10000000-0000-0000-0000-000000000001';
+  const locker = postgres.getPgClient(database, '127.0.0.1');
+  await locker.connect();
+  try {
+    await client.query(
+      `insert into public.availability_slots (id, dentist_id, starts_at, ends_at, created_by)
+       values ($1, $2,
+         (((now() at time zone 'Asia/Kolkata')::date + 20) + time '16:00') at time zone 'Asia/Kolkata',
+         (((now() at time zone 'Asia/Kolkata')::date + 20) + time '16:30') at time zone 'Asia/Kolkata',
+         $2)`,
+      [slotId, dentistId],
+    );
+    await locker.query('begin');
+    await locker.query('select id from public.availability_slots where id = $1 for update', [slotId]);
+
+    await client.query('begin');
+    try {
+      await client.query('set local role authenticated');
+      await client.query(`set local request.jwt.claims = '{"sub":"10000000-0000-0000-0000-000000000001"}'`);
+      await client.query(
+        `select public.block_availability_day($1, (now() at time zone 'Asia/Kolkata')::date + 20)`,
+        [dentistId],
+      );
+      throw new Error('contention test failed: block-day waited for a locked booking slot');
+    } catch (error) {
+      if (!String(error.message ?? error).includes('DAY_BUSY')) throw error;
+    } finally {
+      await client.query('rollback').catch(() => {});
+    }
+    process.stdout.write('  contention: block-day returns DAY_BUSY for a locked booking slot\n');
+  } finally {
+    await locker.query('rollback').catch(() => {});
+    await locker.end().catch(() => {});
+    await client.query('delete from public.availability_slots where id = $1', [slotId]).catch(() => {});
+  }
+}
+
 async function main() {
   await mkdir(tempDir, { recursive: true });
   postgres = new EmbeddedPostgres({
@@ -61,6 +101,7 @@ async function main() {
     // dentists, so the disposable database follows the documented migration
     // + seed test precondition.
     await runSql(seedPath, 'seed');
+    await runBlockDayContentionTest();
     const tests = (await readdir(testDir))
       .filter((name) => name.endsWith('.test.sql'))
       .sort();

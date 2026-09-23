@@ -85,6 +85,9 @@ function getTransport(): Transporter {
       port,
       secure: port === 465,
       auth: { user: process.env.SMTP_USER!, pass: process.env.SMTP_PASS! },
+      connectionTimeout: 15_000,
+      greetingTimeout: 15_000,
+      socketTimeout: 45_000,
     });
   }
   return transport;
@@ -305,6 +308,9 @@ export async function sendMail(
   if (!smtpConfigured()) return { ok: false, reason: "smtp-not-configured" };
   try {
     const { html, text } = renderLayout(opts);
+    // Wait for Nodemailer's socket/connection timeout or SMTP result. A
+    // Promise.race timeout would leave the actual send running in the
+    // background, even if we recorded this reminder as completed.
     await getTransport().sendMail({
       from: FROM,
       to,

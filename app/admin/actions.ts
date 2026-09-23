@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
-import { delhiTimestamp, isValidDelhiDate, isValidDelhiTime, nextDelhiMidnight } from "@/lib/delhi-time";
+import { delhiTimestamp, isValidDelhiDate, isValidDelhiTime } from "@/lib/delhi-time";
 import { createClient } from "@/lib/supabase/server";
 import { admin } from "@/lib/supabase/admin";
 import { requireRole } from "@/lib/auth";
@@ -51,6 +51,7 @@ export async function appointmentAction(
     if (msg.includes("ILLEGAL_TRANSITION"))
       return { ok: false, error: "That move isn't possible from the appointment's current state." };
     if (msg.includes("SLOT_TAKEN")) return { ok: false, error: "That slot was just taken. Pick another." };
+    if (msg.includes("DAY_BLOCKED")) return { ok: false, error: "That day is blocked. Choose another date." };
     if (msg.includes("REASON_REQUIRED"))
       return { ok: false, error: "A one-line reason is required for this action." };
     return { ok: false, error: "We couldn't update the appointment. Try again in a moment." };
@@ -103,6 +104,7 @@ export async function assignAppointment(
   if (error) {
     const msg = error.message ?? "";
     if (msg.includes("SLOT_TAKEN")) return { ok: false, error: "That slot was just taken. Pick another." };
+    if (msg.includes("DAY_BLOCKED")) return { ok: false, error: "That day is blocked. Choose another date." };
     return { ok: false, error: "We couldn't assign the dentist. Try again in a moment." };
   }
 
@@ -314,6 +316,7 @@ export async function adminAddSlot(
   });
   if (error) {
     if ((error as { code?: string }).code === "23P01") return { ok: false, error: OVERLAP_MSG };
+    if (error.message.includes("DAY_BLOCKED")) return { ok: false, error: "That day is blocked. Choose another date." };
     return { ok: false, error: "We couldn't add the slot." };
   }
   await logAudit("dentist.update", "dentist", dentistId, { action: "add_slot", date });
@@ -332,31 +335,25 @@ export async function adminBlockDay(
     return { ok: false, error: "Choose a valid date." };
   }
   const supabase = await createClient();
-  const dayStart = delhiTimestamp(date, "00:00");
-  const dayEnd = nextDelhiMidnight(date);
-  // D-22: do not void a live booking. Refuse if any confirmed/assigned
-  // appointment falls inside the day.
-  const { data: conflicting } = await supabase
-    .from("appointments")
-    .select("id")
-    .eq("dentist_id", dentistId)
-    .in("status", ["confirmed", "assigned"])
-    .gte("scheduled_for", dayStart)
-    .lt("scheduled_for", dayEnd);
-  if (conflicting && conflicting.length > 0) {
-    return {
-      ok: false,
-      error: "There is a confirmed/assigned appointment that day. Cancel or move it before blocking.",
-    };
+  const { error } = await supabase.rpc("block_availability_day", {
+    p_dentist_id: dentistId,
+    p_date: date,
+  });
+  if (error) {
+    if (error.message.includes("DAY_HAS_SCHEDULED_APPOINTMENT")) {
+      return { ok: false, error: "An appointment is scheduled that day. Cancel or move it before blocking." };
+    }
+    if (error.message.includes("DAY_HAS_ACTIVE_HOLD")) {
+      return { ok: false, error: "A patient is currently booking a slot that day. Try again after the hold expires." };
+    }
+    if (error.message.includes("DAY_HAS_BOOKED_SLOT")) {
+      return { ok: false, error: "A booked appointment exists that day. Cancel or move it before blocking." };
+    }
+    if (error.message.includes("DAY_BUSY")) {
+      return { ok: false, error: "Booking activity is in progress for that day. Try blocking it again in a moment." };
+    }
+    return { ok: false, error: "We couldn't block the day." };
   }
-  const { error } = await supabase
-    .from("availability_slots")
-    .update({ status: "blocked" })
-    .eq("dentist_id", dentistId)
-    .eq("status", "open")
-    .gte("starts_at", dayStart)
-    .lt("starts_at", dayEnd);
-  if (error) return { ok: false, error: "We couldn't block the day." };
   await logAudit("dentist.update", "dentist", dentistId, { action: "block_day", date });
   revalidatePath("/admin/dentists");
   revalidatePath("/care/dentists");

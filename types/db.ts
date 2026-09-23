@@ -183,6 +183,32 @@ export type Database = {
           },
         ];
       };
+      availability_day_blocks: {
+        Row: {
+          dentist_id: string;
+          local_date: string;
+          created_at: string;
+        };
+        Insert: {
+          dentist_id: string;
+          local_date: string;
+          created_at?: string;
+        };
+        Update: {
+          dentist_id?: string;
+          local_date?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "availability_day_blocks_dentist_id_fkey";
+            columns: ["dentist_id"];
+            isOneToOne: false;
+            referencedRelation: "dentists";
+            referencedColumns: ["profile_id"];
+          },
+        ];
+      };
       availability_slots: {
         Row: {
           id: string;
@@ -638,6 +664,62 @@ export type Database = {
         };
         Relationships: [];
       };
+      appointment_reminders: {
+        Row: {
+          appointment_id: string;
+          kind: string;
+          scheduled_for: string;
+          status: "pending" | "claimed" | "sending" | "sent" | "failed" | "uncertain";
+          attempts: number;
+          claim_token: string | null;
+          claimed_at: string | null;
+          claim_expires_at: string | null;
+          sending_expires_at: string | null;
+          sent_at: string | null;
+          last_error: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          appointment_id: string;
+          kind: string;
+          scheduled_for: string;
+          status?: "pending" | "claimed" | "sending" | "sent" | "failed" | "uncertain";
+          attempts?: number;
+          claim_token?: string | null;
+          claimed_at?: string | null;
+          claim_expires_at?: string | null;
+          sending_expires_at?: string | null;
+          sent_at?: string | null;
+          last_error?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          appointment_id?: string;
+          kind?: string;
+          scheduled_for?: string;
+          status?: "pending" | "claimed" | "sending" | "sent" | "failed" | "uncertain";
+          attempts?: number;
+          claim_token?: string | null;
+          claimed_at?: string | null;
+          claim_expires_at?: string | null;
+          sending_expires_at?: string | null;
+          sent_at?: string | null;
+          last_error?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "appointment_reminders_appointment_id_fkey";
+            columns: ["appointment_id"];
+            isOneToOne: false;
+            referencedRelation: "appointments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       public_dentists: {
@@ -795,6 +877,49 @@ export type Database = {
       };
       touch_updated_at: {
         Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
+      block_availability_day: {
+        Args: { p_dentist_id: string; p_date: string };
+        Returns: number;
+      };
+      update_patient_profile: {
+        Args: {
+          p_full_name: string;
+          p_phone: string;
+          p_locality: string;
+          p_age_band: Enums<"age_band">;
+        };
+        Returns: undefined;
+      };
+      claim_appointment_reminder: {
+        Args: {
+          p_appointment_id: string;
+          p_kind: string;
+          p_due_start: string;
+          p_due_end: string;
+        };
+        Returns: Json;
+      };
+      begin_appointment_reminder_send: {
+        Args: {
+          p_appointment_id: string;
+          p_kind: string;
+          p_scheduled_for: string;
+          p_claim_token: string;
+        };
+        Returns: Json;
+      };
+      complete_appointment_reminder: {
+        Args: {
+          p_appointment_id: string;
+          p_kind: string;
+          p_scheduled_for: string;
+          p_claim_token: string;
+          p_sent: boolean;
+          p_error?: string | null;
+          p_retryable?: boolean;
+        };
         Returns: undefined;
       };
     };

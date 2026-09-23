@@ -93,28 +93,14 @@ export async function updateProfile(
   }
 
   const supabase = await createClient();
-  const profile = await requirePatient();
-  const user = { id: profile.id };
-
-  const { error: profileError } = await supabase
-    .from("profiles")
-    .update({ full_name: parsed.data.fullName, phone: parsed.data.phone })
-    .eq("id", user.id);
-  if (profileError) {
-    return { status: "error", error: "We couldn't save your details. Try again." };
-  }
-
-  const { error: patientError } = await supabase
-    .from("patients")
-    .upsert(
-      {
-        profile_id: user.id,
-        age_band: parsed.data.ageBand,
-        locality: parsed.data.locality,
-      },
-      { onConflict: "profile_id" },
-    );
-  if (patientError) {
+  await requirePatient();
+  const { error } = await supabase.rpc("update_patient_profile", {
+    p_full_name: parsed.data.fullName,
+    p_phone: parsed.data.phone,
+    p_locality: parsed.data.locality,
+    p_age_band: parsed.data.ageBand,
+  });
+  if (error) {
     return { status: "error", error: "We couldn't save your details. Try again." };
   }
 

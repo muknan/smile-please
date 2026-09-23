@@ -5,7 +5,8 @@ import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { notifyAppointmentTransition } from "@/lib/notifications";
 import type { Database } from "@/types/db";
-import { delhiTimestamp, isValidDelhiDate, isValidDelhiTime, nextDelhiMidnight } from "@/lib/delhi-time";
+import { delhiTimestamp, isValidDelhiDate, isValidDelhiTime } from "@/lib/delhi-time";
+import { isAllowedSlotDuration, validateWeeklyAvailabilityInput } from "@/lib/availability";
 
 type AppointmentStatus = Database["public"]["Enums"]["appointment_status"];
 export type DentistState = { ok: boolean; error?: string };
@@ -19,6 +20,8 @@ function istTimestamp(date: string, time: string): string {
 
 function slotConflictMessage(err: unknown): string {
   const code = (err as { code?: string })?.code;
+  const message = (err as { message?: string })?.message ?? "";
+  if (message.includes("DAY_BLOCKED")) return "That day is blocked. Choose another date.";
   return code === "23P01" ? OVERLAP_MSG : "We couldn't save that slot. Try again.";
 }
 
@@ -116,6 +119,9 @@ export async function addSingleSlot(
   if (!isValidDelhiDate(date) || !isValidDelhiTime(time)) {
     return { ok: false, error: "Choose a date and time." };
   }
+  if (!isAllowedSlotDuration(duration)) {
+    return { ok: false, error: "Choose a 30- or 60-minute duration." };
+  }
   const supabase = await createClient();
   const {
     data: { user },
@@ -163,10 +169,11 @@ export async function addWeeklyPattern(
   const isCamp = formData.get("locationType") === "camp";
   const campName = String(formData.get("campName") ?? "").trim() || null;
 
-  if (days.length === 0 || !isValidDelhiTime(time) || !isValidDelhiDate(from) || !isValidDelhiDate(to)) {
+  if (!isValidDelhiTime(time)) {
     return { ok: false, error: "Pick the days, time, and a date range." };
   }
-  if (from > to) return { ok: false, error: "The range ends before it starts." };
+  const weeklyError = validateWeeklyAvailabilityInput({ days, from, to, duration });
+  if (weeklyError) return { ok: false, error: weeklyError };
 
   const supabase = await createClient();
   const {
@@ -245,20 +252,25 @@ export async function blockDay(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in again." };
 
-  // D-23: block by updating the day's existing open slots rather than inserting
-  // a 00:00–23:59 slot (which would violate the overlap exclusion constraint
-  // whenever the dentist already has slots that day). Booked/held slots are
-  // left untouched so a live appointment is never silently voided.
-  const dayStart = istTimestamp(date, "00:00");
-  const dayEnd = nextDelhiMidnight(date);
-  const { error } = await supabase
-    .from("availability_slots")
-    .update({ status: "blocked" })
-    .eq("dentist_id", user.id)
-    .eq("status", "open")
-    .gte("starts_at", dayStart)
-    .lt("starts_at", dayEnd);
-  if (error) return { ok: false, error: slotConflictMessage(error) };
+  const { error } = await supabase.rpc("block_availability_day", {
+    p_dentist_id: user.id,
+    p_date: date,
+  });
+  if (error) {
+    if (error.message.includes("DAY_HAS_SCHEDULED_APPOINTMENT")) {
+      return { ok: false, error: "An appointment is scheduled that day. Cancel or move it before blocking." };
+    }
+    if (error.message.includes("DAY_HAS_ACTIVE_HOLD")) {
+      return { ok: false, error: "A patient is currently booking a slot that day. Try again after the hold expires." };
+    }
+    if (error.message.includes("DAY_HAS_BOOKED_SLOT")) {
+      return { ok: false, error: "A booked appointment exists that day. Cancel or move it before blocking." };
+    }
+    if (error.message.includes("DAY_BUSY")) {
+      return { ok: false, error: "Booking activity is in progress for that day. Try blocking it again in a moment." };
+    }
+    return { ok: false, error: slotConflictMessage(error) };
+  }
   revalidatePath("/dentist/availability");
   return { ok: true, message: `${date} is blocked.` };
 }

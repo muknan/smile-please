@@ -148,6 +148,7 @@ function WeeklyForm() {
           <Input id="w-to" name="to" type="date" required />
         </Field>
       </div>
+      <p className="text-body-s text-ink-950/70">You can add up to 90 days of weekly availability at once.</p>
       <LocationFields />
       <button
         type="submit"
